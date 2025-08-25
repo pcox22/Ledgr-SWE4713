@@ -1,0 +1,98 @@
+### Rider / IntelliJ ###
+.idea/
+*.iml
+out/
+.idea_modules/
+atlassian-ide-plugin.xml
+
+# Rider caches
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/contentModel.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# JetBrains Rider specific
+.idea/.idea.*
+.idea/.idea.*
+.idea/*
+
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf/
+
+# Mono
+mono_crash.*
+
+### C# / .NET ###
+bin/
+obj/
+[Bb]uild/
+[Bb]uild[Ll]og.*
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+*.vscode
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Azure
+*.azurePubxml
+*.pubxml
+*.publishproj
+PublishScripts/
+
+### Node / Frontend ###
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+.pnpm-debug.log
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+trace.zip
+
+### Logs ###
+*.log
+*.tld
+*.pid
+*.seed
+*.pid.lock
+
+### OS / Misc ###
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Env files
+.env
+.env.*

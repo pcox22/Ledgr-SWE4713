@@ -21,4 +21,8 @@
       <ProjectReference Include="..\LedgrLogic\LedgrLogic.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="LedgrDS" />
+    </ItemGroup>
+
 </Project>

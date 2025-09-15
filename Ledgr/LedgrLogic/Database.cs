@@ -14,12 +14,14 @@ public static class Database
     public static string GetDatabasePath()
     {
         string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        string ProjectRoot = Path.GetFullPath(Path.Combine(BaseDirectory, "../.."));
-        string DBPath = Path.Combine(ProjectRoot, "LedgerDB.db");
+        string rootDB = Path.GetFullPath("LedgerDB.db");
+        //string DBPath = Path.Combine(ProjectRoot, "LedgerDB.db");
+        
         
         Console.WriteLine(Environment.CurrentDirectory);
+        //Console.WriteLine("P Root: " + ProjectRoot);
 
-        return "Ledgr-SWE4713/Ledgr/LedgrLogic/LedgerDB.db";
+        return rootDB;
     }
     
     

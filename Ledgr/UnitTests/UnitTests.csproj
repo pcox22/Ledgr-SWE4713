@@ -17,4 +17,12 @@
         <PackageReference Include="coverlet.collector" Version="6.0.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\LedgrLogic\LedgrLogic.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="LedgrDS" />
+    </ItemGroup>
+
 </Project>

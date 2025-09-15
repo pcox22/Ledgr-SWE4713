@@ -1,6 +1,9 @@
+using LedgrLogic;
+
 namespace UnitTests;
 
-public class Tests
+//All unit tests relating to the Database Class
+public class DatabaseUnitTests
 {
     [SetUp]
     public void Setup()

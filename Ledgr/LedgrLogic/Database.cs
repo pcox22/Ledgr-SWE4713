@@ -5,7 +5,7 @@ using Microsoft.Data.Sqlite;
 namespace LedgrLogic;
 
 /*
- Collection of methods needed to query database, static because there will never be a need to 
+ Collection of methods needed to query database, static because there will never be a need to
  instantiate a Database object
  */
 public static class Database
@@ -14,14 +14,14 @@ public static class Database
     public static string GetDatabasePath()
     {
         string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        string rootDB = Path.GetFullPath("LedgerDB.db");
-        //string DBPath = Path.Combine(ProjectRoot, "LedgerDB.db");
+        string ProjectRoot = Path.GetFullPath(Path.Combine(BaseDirectory, "../../../.."));
+        string DBPath = Path.Combine(ProjectRoot, "LedgrLogic/LedgerDB.db");
         
         
         Console.WriteLine(Environment.CurrentDirectory);
         //Console.WriteLine("P Root: " + ProjectRoot);
 
-        return rootDB;
+        return DBPath;
     }
     
     

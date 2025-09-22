@@ -1,5 +1,60 @@
 @page "/Login"
-<h3>Login</h3>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEDGR — Sign In</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header class="site-header" role="banner" aria-label="LEDGR global header">
+    <div class="container header-inner">
+        <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business." class="brand-logo"/>
+
+        <!-- Optional nav for future pages -->
+        <!-- <nav aria-label="Primary">
+          <ul class="nav">
+            <li><a href="#" aria-current="page">User Management</a></li>
+          </ul>
+        </nav> -->
+
+    </div>
+</header>
+
+<main class="site-main" role="main">
+    <section class="auth" aria-labelledby="auth-title">
+        <div class="card" role="region" aria-label="Sign in form">
+            <h1 id="auth-title" class="auth-title">Sign In</h1>
+            <p class="auth-subtitle">Use your email and password.</p>
+
+            <form class="form" action="/login" method="post" novalidate>
+                <div class="field">
+                    <label for="email">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="email" placeholder="email@ledgr.com" required />
+                    <p class="field-help sr-only" id="email-help">Enter the email associated with your account.</p>
+                </div>
+
+                <div class="field">
+                    <div class="field-row">
+                        <label for="password">Password</label>
+                        <a class="link-small" href="/forgot-password">Forgot password?</a>
+                    </div>
+                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Sign in</button>
+
+                <p class="footer-line">
+                    <span class="muted">Need an account?</span>
+                    <a href="/create-account" class="link">Create one</a>
+                </p>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
 
 @code {
     

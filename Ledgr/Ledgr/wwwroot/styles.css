@@ -1,0 +1,183 @@
+/* =========================
+   LEDGR Login Page Styles
+   ========================= */
+
+/* Design tokens (mapped to your styles) */
+:root{
+  --brand-500: #0C1B2B;          /* Brand / 500 - Logo and Nav (approx) */
+  --brand-100: #E6EEF9;          /* Brand / 100 (hover background) */
+  --ui-100: #F5F5F5;             /* UI Accent / 100 - card bg in examples */
+  --ui-400: #D7D9DE;             /* UI Accent / 400 - borders */
+  --ui-600: #6B7280;             /* UI Accent / 600 - secondary text */
+  --ui-900: #111827;             /* UI Accent / 900 - near-black text */
+  --success-500: #14B85A;        /* placeholder if needed */
+  --error-500: #E11D2E;          /* placeholder if needed */
+  --info-500: #2563EB;           /* placeholder if needed */
+  --white: #FFFFFF;
+  --radius-card: 16px;
+  --radius-input: 8px;
+  --radius-button: 8px;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color:var(--ui-900);
+  background: var(--ui-100);
+}
+
+/* Accessibility helpers */
+.sr-only{
+  position:absolute !important;
+  clip:rect(1px,1px,1px,1px);
+  padding:0; border:0; height:1px; width:1px; overflow:hidden;
+}
+
+/* Layout containers */
+.container{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Header */
+.site-header{
+  background: var(--brand-500);
+  height: 120px;
+  display:flex;
+  align-items:center;
+}
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+}
+.brand-logo{
+  height: 56px; 
+  width: auto;
+  display:block;
+  filter: none;
+}
+
+/* Main auth section */
+.site-main{
+  display:flex;
+  align-items: flex-start; 
+  justify-content:center;
+  min-height: calc(100vh - 120px);
+  padding-top: 96px; 
+  padding-bottom: 96px;
+}
+
+.card{
+  width: 420px;
+  background: var(--white);
+  border: 1px solid var(--ui-400);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+}
+
+/* Typography */
+.auth-title{
+  margin:0 0 8px 0;
+  font-family: 'Oswald', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-weight: 700; /* H1 style */
+  font-size: 28px;  /* H2 style */
+  line-height: 36px;
+}
+.auth-subtitle{
+  margin:0 0 16px 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ui-600);
+}
+
+/* Form */
+.form{display:flex; flex-direction:column; gap:16px;}
+
+.field{display:flex; flex-direction:column; gap:8px;}
+.field-row{
+  display:flex; align-items:center; justify-content:space-between;
+}
+label{
+  font-size:14px;
+  line-height:20px;
+  font-weight:500; /* Inter Medium (Body 2) */
+  color: var(--ui-600);
+}
+
+input[type="email"],
+input[type="password"]{
+  padding: 12px 16px;
+  height: 44px;
+  border: 1px solid var(--ui-400);
+  border-radius: var(--radius-input);
+  font-size:16px;
+  line-height:24px;
+  color: var(--ui-900);
+  background: var(--white);
+  outline: none;
+}
+input::placeholder{ color: var(--ui-600); }
+input:focus{
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 2px rgba(12,27,43,0.15);
+}
+
+/* Button */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height: 48px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: var(--radius-button);
+  font-size:16px;
+  line-height:24px;
+  font-weight:500;
+  cursor:pointer;
+}
+.btn-primary{
+  background: var(--brand-500);
+  color: var(--white);
+}
+.btn-primary:hover{
+  background: #12243a; /* a hair lighter/darker */
+}
+
+/* Links */
+.link, .link-small{
+  text-decoration:none;
+  color: var(--brand-500);
+}
+.link:hover, .link-small:hover{
+  background: var(--brand-100);
+}
+
+/* Footer line in card */
+.footer-line{
+  margin: 8px 0 0 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 4px;
+  font-size:14px; line-height:20px;
+}
+.footer-line .muted{ color: var(--ui-600); }
+.footer-line .link{ font-weight:600; }
+
+/* Responsive tweaks */
+@media (max-width: 520px){
+  .card{
+    width: 100%;
+    margin: 0 16px;
+  }
+  .site-main{ padding-top: 48px; }
+  .brand-logo{ height: 44px; }
+}

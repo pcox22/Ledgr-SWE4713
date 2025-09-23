@@ -23,6 +23,8 @@
 
     <ItemGroup>
       <None Remove="LedgrDS" />
+      <None Remove="LedgrDB" />
+      <None Remove="Ledgr" />
     </ItemGroup>
 
 </Project>

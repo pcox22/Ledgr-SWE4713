@@ -33,9 +33,6 @@ public class Admin : User
                   "VALUES (@TEMPID, @TEMPFIRST, @TEMPLAST, @TEMPADMIN, @TEMPMANAGER)";
         try
         {
-            /*using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-            connection.Open();*/
-            
             using var connection = new SqliteConnection($"Data Source="+Database.GetDatabasePath());
             connection.Open();
 
@@ -51,10 +48,21 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine("Fuck");
             Successful = false;
         }
         //If the employee was successfully created, call CreateUser() and pass the EmployeeID to it to create a linked User
+    }
+
+    public string GenerateUsername(string TempFirst, string TempLast)
+    {
+        //Adds first letter of firstname to lastname
+        string Username = TempFirst.ToCharArray()[0] + TempLast;
+        string Today = DateTime.Now.ToString("yy-MM-dd");
+        
+        //Adding just the month and day to the username (MM DD)
+        Username += "" +Today.ToCharArray()[3] + "" +Today.ToCharArray()[4] + "" +Today.ToCharArray()[6] + ""+ Today.ToCharArray()[7] + "";
+
+        return Username;
     }
     public void CreateUser(int TempUserID,string TempUsername, string TempPassword, int TempEmployeeID)
     {
@@ -62,14 +70,166 @@ public class Admin : User
     }
     
     //Needs access to database, should be bool for user feedback
-    public void ActivateUser()
+    public bool ActivateUser(int TempUserID)
     {
         //Changes the IsActive attribute on a user type to true, updates the database
+        //Deletes entry from SuspendedUser Table
+        var UserSQL = "UPDATE User" +
+                      "IsActive = 1" +
+                      "WHERE ID = (@ID)";
+        var SuspendedUserSQL = "DELETE FROM SUSPENDEDUSER" +
+                               "WHERE UserID = @ID";
+        bool Successful = false;
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var UserTableCommand = new SqliteCommand(UserSQL, connection);
+            UserTableCommand.Parameters.AddWithValue("@ID", TempUserID);
+
+            using var SuspendedTableCommand = new SqliteCommand(SuspendedUserSQL, connection);
+            SuspendedTableCommand.Parameters.AddWithValue("@ID", TempUserID);
+
+            //Successful will only be true if no errors are thrown by the queries
+            Successful = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Successful;
     }
-    //Needs access to database, should be bool for user feedback
-    public void DeactivateUser()
+    //Dates given to this method should be formatted as a string (YYYY-MM-DD)
+    public bool DeactivateUser(int TempUserID, string TempStartDate, string TempEndDate)
     {
-        //Changes the IsActive attribute on a user type to false, updates the database
+        //Changes the IsActive attribute on a user type to false
+        //Creates a new entry in SuspendedUser Table
+        var UserSQL = "UPDATE User" +
+                  "IsActive = 0" +
+                  "WHERE ID = (@ID)";
+        var SuspendedUserSQL = "INSERT INTO SuspendedUserVALUES" +
+                               "(@TEMPID, @START, @END, @USERID)";
+        bool Successful = false;
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var UserTableCommand = new SqliteCommand(UserSQL, connection);
+            UserTableCommand.Parameters.AddWithValue("@ID", TempUserID);
+
+            using var SuspendedTableCommand = new SqliteCommand(SuspendedUserSQL, connection);
+            SuspendedTableCommand.Parameters.AddWithValue("@USERID", TempUserID);
+            SuspendedTableCommand.Parameters.AddWithValue("@START", TempStartDate);
+            SuspendedTableCommand.Parameters.AddWithValue("@END", TempEndDate);
+
+            UserTableCommand.ExecuteNonQuery();
+            SuspendedTableCommand.ExecuteNonQuery();
+            
+            //Successful will only be true if no errors are thrown by the queries
+            Successful = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Successful;
+    }
+
+    public bool PromoteToManager(int TempEmployeeID)
+    {
+        bool Successful = false;
+        var sql = "UPDATE Employee SET IsManager = 1 WHERE ID = @ID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", TempEmployeeID);
+
+            command.ExecuteNonQuery();
+            Successful = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Successful;
+    }
+    
+    public bool PromoteToAdmin(int TempEmployeeID)
+    {
+        bool Successful = false;
+        var sql = "UPDATE Employee SET IsAdmin = 1 WHERE ID = @ID";
+                  
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", TempEmployeeID);
+
+            command.ExecuteNonQuery();
+            Successful = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Successful;
+    }
+    
+    public bool DemoteFromAdmin(int TempEmployeeID)
+    {
+        bool Successful = false;
+        var sql = "UPDATE Employee SET IsAdmin = 0 WHERE ID = @ID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", TempEmployeeID);
+
+            command.ExecuteNonQuery();
+            Successful = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Successful;
+    }
+    
+    public bool DemoteFromManager(int TempEmployeeID)
+    {
+        bool Successful = false;
+        var sql = "UPDATE Employee SET IsManager = 0 WHERE ID = @ID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", TempEmployeeID);
+
+            command.ExecuteNonQuery();
+            Successful = true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return Successful;
     }
     
 }

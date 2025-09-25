@@ -18,10 +18,10 @@ public class AdminUnitTests
         //arrange
         Admin TempAdmin = new Admin();
         string Actual = "";
-        string Expected = "4TestTest00";
+        string Expected = "5TestTest00";
         
         //act
-        TempAdmin.CreateEmployee(4, "Test", "Test", false, false);
+        TempAdmin.CreateEmployee(5, "Test", "Test", false, false, 4, "PassW0rd...", "Test@Test.com");
         
         //assert
         var sql = "SELECT ID, FirstName, LastName, IsAdmin, IsManager " +
@@ -33,7 +33,7 @@ public class AdminUnitTests
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 4);
+            command.Parameters.AddWithValue("@ID", 5);
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -61,7 +61,7 @@ public class AdminUnitTests
     {
         //arrange
         Admin Temp = new Admin();
-        string Expected = "RStraiton0922";
+        string Expected = "RStraiton0925";
         
         //act
         string Actual = Temp.GenerateUsername("RJ", "Straiton");
@@ -204,6 +204,116 @@ public class AdminUnitTests
         
         //act
         Actual = Temp.DemoteFromManager(4);
+    
+        //assert
+        Assert.That(Actual, Is.EqualTo(Expected));
+    }
+
+    [Test]
+    public void DeactivateUser_ValidInput_UpdatesUserTable()
+    {
+        //arrange
+        Admin Temp = new Admin();
+        string Expected = "0";
+        string Actual = "";
+        string sql = "Select IsActive FROM User WHERE ID = @ID";
+        
+        
+        //act
+        Temp.DeactivateUser(1, "2025-09-24", "2025-09-25");
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", 1);
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    Actual += reader.GetString(0);
+                }
+            }
+
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        
+        //Assert
+        Assert.That(Actual, Is.EqualTo(Expected));
+    }
+    
+    [Test]
+    public void ActivateUser_ValidInput_UpdatesUserTable()
+    {
+        //arrange
+        Admin Temp = new Admin();
+        string Expected = "1";
+        string Actual = "";
+        string sql = "Select IsActive FROM User WHERE ID = @ID";
+        
+        
+        //act
+        Temp.ActivateUser(1);
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", 1);
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    Actual += reader.GetString(0);
+                }
+            }
+
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        
+        //Assert
+        Assert.That(Actual, Is.EqualTo(Expected));
+    }
+    
+    [Test]
+    public void DeactivateUser_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin Temp = new Admin();
+        bool Expected = true;
+        bool Actual;
+        string sql = "Select IsActive FROM User WHERE ID = @ID";
+        
+        //act
+        Actual = Temp.DeactivateUser(1, "2025-09-24","2025-09=25");
+    
+        //assert
+        Assert.That(Actual, Is.EqualTo(Expected));
+    }
+    
+    [Test]
+    public void ActivateUser_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin Temp = new Admin();
+        bool Expected = true;
+        bool Actual;
+        string sql = "Select IsActive FROM User WHERE ID = @ID";
+        
+        //act
+        Actual = Temp.ActivateUser(1);
     
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));

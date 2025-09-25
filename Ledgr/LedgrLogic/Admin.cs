@@ -5,7 +5,7 @@ namespace LedgrLogic;
 public class Admin : User
 {
     //Needs access to database, should be bool for user feedback
-    public void CreateEmployee(int TempID, string TempFirst, string TempLast, bool Admin, bool Manager)
+    public bool CreateEmployee(int TempID, string TempFirst, string TempLast, bool Admin, bool Manager, int TempUserID, string TempPassword, string TempEmail)
     {
         int TempAdmin;
         int TempManager;
@@ -48,9 +48,19 @@ public class Admin : User
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             Successful = false;
         }
+        
         //If the employee was successfully created, call CreateUser() and pass the EmployeeID to it to create a linked User
+        if (Successful)
+        {
+            //Reassign successful in case CreateUser() returns false
+            Successful = CreateUser(TempUserID, GenerateUsername(TempFirst, TempLast), TempPassword, TempID, TempEmail);
+        }
+
+        return Successful;
+
     }
 
     public string GenerateUsername(string TempFirst, string TempLast)
@@ -64,9 +74,38 @@ public class Admin : User
 
         return Username;
     }
-    public void CreateUser(int TempUserID,string TempUsername, string TempPassword, int TempEmployeeID)
+    public bool CreateUser(int TempUserID,string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
     {
         //Calls database to create a User, linked to an Employee
+        bool Successful = true;
+        if (LedgrLogic.Password.Validate(TempPassword).Equals("Success"))
+        {
+            string sql = "INSERT INTO User VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
+            try
+            {
+                using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+                connection.Open();
+
+                using var command = new SqliteCommand(sql, connection);
+                command.Parameters.AddWithValue("@ID", TempUserID);
+                command.Parameters.AddWithValue("@USERNAME", TempUsername);
+                command.Parameters.AddWithValue("@PASSWORD", TempPassword);
+                command.Parameters.AddWithValue("@EMAIL", TempEmail);
+                command.Parameters.AddWithValue("@NEWUSER", 1);
+                command.Parameters.AddWithValue("@ISACTIVE", 1);
+                command.Parameters.AddWithValue("@EMPLOYEEID", TempEmployeeID);
+                command.ExecuteNonQuery();
+                
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Successful = false;
+            }
+        }
+
+        return Successful;
     }
     
     //Needs access to database, should be bool for user feedback
@@ -74,11 +113,8 @@ public class Admin : User
     {
         //Changes the IsActive attribute on a user type to true, updates the database
         //Deletes entry from SuspendedUser Table
-        var UserSQL = "UPDATE User" +
-                      "IsActive = 1" +
-                      "WHERE ID = (@ID)";
-        var SuspendedUserSQL = "DELETE FROM SUSPENDEDUSER" +
-                               "WHERE UserID = @ID";
+        var UserSQL = "UPDATE User SET IsActive = 1 WHERE ID = @ID";
+        var SuspendedUserSQL = "DELETE FROM SUSPENDEDUSER WHERE UserID = @ID";
         bool Successful = false;
         try
         {
@@ -90,6 +126,9 @@ public class Admin : User
 
             using var SuspendedTableCommand = new SqliteCommand(SuspendedUserSQL, connection);
             SuspendedTableCommand.Parameters.AddWithValue("@ID", TempUserID);
+            
+            UserTableCommand.ExecuteNonQuery();
+            SuspendedTableCommand.ExecuteNonQuery();
 
             //Successful will only be true if no errors are thrown by the queries
             Successful = true;
@@ -106,11 +145,8 @@ public class Admin : User
     {
         //Changes the IsActive attribute on a user type to false
         //Creates a new entry in SuspendedUser Table
-        var UserSQL = "UPDATE User" +
-                  "IsActive = 0" +
-                  "WHERE ID = (@ID)";
-        var SuspendedUserSQL = "INSERT INTO SuspendedUserVALUES" +
-                               "(@TEMPID, @START, @END, @USERID)";
+        var UserSQL = "UPDATE User SET IsActive = 0 WHERE ID = @ID";
+        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (1, @START, @END, @USERID)";
         bool Successful = false;
         try
         {

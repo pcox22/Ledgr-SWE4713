@@ -89,10 +89,7 @@ public class User
         var sql = "select PASSWORD, ISMANAGER, ISADMIN, ISACTIVE, USERID from USER where USERNAME = @USERNAME";
         try
         {
-            //using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-            //Connection.Open();
-            
-            using var Connection = new SqliteConnection("jdbc:sqlite:LedgerDB.db");
+            using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             Connection.Open();
 
             using var Command = new SqliteCommand(sql, Connection);

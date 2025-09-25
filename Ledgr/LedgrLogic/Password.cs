@@ -11,7 +11,7 @@ public class Password
         bool hasNum = false;
         bool hasSpec = false;
 
-        if (password.Length < 8)
+        if (password.Length >= 8)
         {
             if (Char.IsLetter(password[0]))
             {

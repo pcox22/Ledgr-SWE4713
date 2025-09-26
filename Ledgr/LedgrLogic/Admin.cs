@@ -80,6 +80,8 @@ public class Admin : User
         bool Successful = true;
         if (LedgrLogic.Password.Validate(TempPassword).Equals("Success"))
         {
+            //Encrypt the password before storing to database
+            TempPassword = LedgrLogic.Password.Encrypt(TempPassword);
             string sql = "INSERT INTO User VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
             try
             {

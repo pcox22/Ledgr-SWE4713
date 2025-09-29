@@ -7,6 +7,7 @@ public class User
     protected string Username;
     protected string Password;
     protected int UserID;
+    protected int EmployeeID;
     protected bool IsActive;
     protected bool NewUser;
 
@@ -86,7 +87,7 @@ public class User
         int TempManager = -1;
         int UserID;
         int TempActive = -1;
-        var sql = "select PASSWORD, ISMANAGER, ISADMIN, ISACTIVE, USERID from USER where USERNAME = @USERNAME";
+        var sql = "select Password, IsActive, ID, EmployeeID from User where Username = @USERNAME";
         try
         {
             using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -103,12 +104,13 @@ public class User
                 while (reader.Read())
                 {
                     StoredPassword = reader.GetString(0); 
-                    TempManager = Convert.ToInt32(reader.GetString(1));
-                    TempAdmin = Convert.ToInt32(reader.GetString(2));
-                    TempActive = Convert.ToInt32(reader.GetString(3));
-                    UserID = Convert.ToInt32(reader.GetString(4));
+                    TempActive = Convert.ToInt32(reader.GetString(1));
+                    UserID = Convert.ToInt32(reader.GetString(2));
+                    EmployeeID = Convert.ToInt32(reader.GetString(3));
                 }
             }
+            StoredPassword = LedgrLogic.Password.Decrypt(StoredPassword);
+            Console.WriteLine(StoredPassword);
             Connection.Close();
         }
         catch (Exception e)

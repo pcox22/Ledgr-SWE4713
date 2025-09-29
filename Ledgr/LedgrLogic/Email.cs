@@ -5,7 +5,7 @@ using System.Net.Mime;
 
 public class Email
 {
-    public string SendEmail(string fromAddress, string toAddress, string fromName, string toName, string subject, string body, string toReply, string fromPW)
+    public static string SendEmail(string fromAddress, string toAddress, string fromName, string toName, string subject, string body, string toReply, string fromPW)
     {
         try
         {
@@ -17,10 +17,10 @@ public class Email
 
             // Must create a variable for the 2FA apps password (will need to be added to the database)
             System.Net.NetworkCredential basicAuthenticationInfo = new
-                System.Net.NetworkCredential(fromAddress, fromPW);
+                System.Net.NetworkCredential("ytglitchroxas@gmail.com", "ijdu oaja bryq jlut");
             mySmtpClient.Credentials = basicAuthenticationInfo;
             
-            MailAddress from = new MailAddress(fromAddress, fromName);
+            MailAddress from = new MailAddress("ytglitchroxas@gmail.com", "Ledgr Systems");
             MailAddress to = new MailAddress(toAddress, toName);
             MailMessage myMail = new System.Net.Mail.MailMessage(from, to);
 

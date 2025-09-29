@@ -12,7 +12,11 @@ public class EmailUnitTest
     [Test]
     public void Send_Email_Test()
     {
-        Console.WriteLine(Email.SendEmail("", "pcox21@students.kennesaw.edu", "Ledgr Systems", "Patrick Cox", "Test Subject",
+        string result = (Email.SendEmail("", "pcox21@students.kennesaw.edu", "Ledgr Systems", "Patrick Cox", "Test Subject",
             "Implementing Test Body...", "ytglitchroxas@gmail.com", "ijdu oaja bryq jlut"));
+
+        string expected = "Sucess";
+        
+        Assert.That(result, Is.EqualTo(expected));
     }
 }

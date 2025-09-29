@@ -45,7 +45,7 @@ public class Email
 
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Patrick", "10jonathancox@gmail.com"));
-            message.To.Add(new MailboxAddress("Another Patrick", "pcox21@students.kennesaw.edu"));
+            message.To.Add(new MailboxAddress("Ledgr Systems", "pcox21@students.kennesaw.edu"));
             message.Subject = "OAuth2 Gmail Test";
             message.Body = new TextPart("plain") { Text = "Hello from OAuth2 Gmail API!" };
 

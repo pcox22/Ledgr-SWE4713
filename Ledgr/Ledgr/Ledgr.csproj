@@ -10,4 +10,8 @@
       <None Include="wwwroot\logo-slogan.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Google.Apis.Auth" Version="1.71.0" />
+    </ItemGroup>
+
 </Project>

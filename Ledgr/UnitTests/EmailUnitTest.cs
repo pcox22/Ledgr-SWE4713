@@ -12,7 +12,7 @@ public class EmailUnitTest
     [Test]
     public void Send_Email_Test()
     {
-        Email.SendEmail("", "10jonathancox@gmail.com", "Ledgr Systems", "Patrick Cox", "Test Subject",
-            "Implementing Test Body...", "ytglitchroxas@gmail.com", "ijdu oaja bryq jlut");
+        Console.WriteLine(Email.SendEmail("", "pcox21@students.kennesaw.edu", "Ledgr Systems", "Patrick Cox", "Test Subject",
+            "Implementing Test Body...", "ytglitchroxas@gmail.com", "ijdu oaja bryq jlut"));
     }
 }

@@ -19,7 +19,7 @@ public class Email
     private static string ApplicationName = "My Gmail API App";
 
     public static string SendEmail(string fromAddress, string toAddress, string fromName, string toName, string subject,
-        string body, string toReply, string fromPW)
+        string body, string toReply)
     {
         try
         {

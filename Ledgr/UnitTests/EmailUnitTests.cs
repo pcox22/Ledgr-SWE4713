@@ -19,4 +19,9 @@ public class EmailUnitTest
         
         Assert.That(result, Is.EqualTo(expected));
     }
+
+    public void Send_Email_Async_Test()
+    {
+        
+    }
 }

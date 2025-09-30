@@ -227,9 +227,7 @@
     {
         try
         {
-            await Email.SendEmailAsync(From, To, "FromName", "ToName", Subject, Body);
-            Email.SendEmail("10jonathancox@gmail.com", "pcox21@students.kennesaw.edu", "Ledgr Systems", "Patrick Cox", "Test Subject",
-                "Implementing Test Body...");
+            await Email.SendEmailAsync(From, To, "Ledgr Systems", "Recipient", Subject, Body);
             Console.WriteLine("Sent email");
         }
         catch (Exception e)

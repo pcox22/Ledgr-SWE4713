@@ -1,0 +1,23 @@
+@page "/openD"
+
+<h1>Email dialog demo</h1>
+<button class="open-btn" @onclick="()=> showEmailDialog = true">Compose Email</button>
+
+<Modal Show="@showEmailDialog" ShowChanged="val => showEmailDialog = val" />
+
+@code {
+private bool showEmailDialog = false;
+}
+
+<style>
+    button.open-btn{
+        background:#2563eb;
+        color:#fff;
+        border:0;
+        border-radius:8px;
+        font-weight:600;
+        cursor:pointer;
+        box-shadow:0 6px 18px rgba(37,99,235,0.2);
+        padding: 10px 18px;
+    }
+</style>

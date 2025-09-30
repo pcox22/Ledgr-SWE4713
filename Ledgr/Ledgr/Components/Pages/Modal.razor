@@ -1,0 +1,243 @@
+@using LedgrLogic
+
+@if (Show)
+{
+    <div class="emailPage">
+        <div class="modal-backdrop">
+            <div class="dialog-card">
+                <div class="dialog-header">
+                    <h2 id="dialogTitle">New Message</h2>
+                    <button @onclick="Close" aria-label="Close dialog"
+                            style="background:none;border:0;font-size:18px;cursor:pointer">✕</button>
+                </div>
+
+                <div class="body">
+                    <EditForm Model="@this" OnValidSubmit="HandleSubmit">
+                        <div class="row">
+                            <div class="col">
+                                <label for="from" class="inputLabel">From</label>
+                                <InputText id="from" class="form-control" @bind-Value="From" type="email"></InputText>
+                            </div>
+
+                            <div class="col">
+                                <label for="to" class="inputLabel">To</label>
+                                <InputText id="to" class="form-control" @bind-Value="To" type="email" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="subject" class="inputLabel">Subject</label>
+                            <InputText id="subject" class="subject-control" @bind-Value="Subject" />
+                        </div>
+
+                        <div>
+                            <label for="body" class="inputLabel">Body</label>
+                            <InputTextArea id="body" class="body-control" @bind-Value="Body" />
+                        </div>
+
+                        <div class="dialog-footer">
+                            <button type="button" class="btn cancel" @onclick="Close">Cancel</button>
+                            <button type="submit" class="btn submit">Submit</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+<style>
+    body{
+      margin:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-width: 680px;
+      background:linear-gradient(180deg,#f6f8fa,#e9eef8);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    
+    .page {
+      width:100%;
+      text-align:center;
+    }
+    
+    .modal-backdrop {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.5);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index: 1000;
+    }
+    
+    .dialog-card {
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      width: min(680px, 96%);
+      box-shadow: 0 10px 40px rgba(2,6,23,0.2);
+    }
+    
+    .dialog-header{
+      padding:18px 20px;
+      border-bottom: 1px solid #eef2f7;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    
+    .dialog-header h2{
+      margin:0;
+      font-size:18px;
+    }
+    
+    .dialog-body{
+      padding:18px 20px;
+    }
+    
+    form {
+      display:grid;
+      gap:12px;
+    }
+    
+    label{
+      display:block;
+      font-size:13px;
+      color:#6b7280;
+      margin-bottom:6px;
+      text-align: left;
+    }
+    
+    .row{
+      display:flex;
+      gap:12px;
+    }
+    
+    .col{
+      flex:1;
+      min-width:0;
+    }
+    
+    .form-control {
+        width:100%;
+        max-width: 300px;
+        padding:10px 12px;
+        margin-left:  15px;
+        margin-right:  15px;
+        border-radius:8px;
+        border:1px solid #dbe5f3;
+        font-size:14px;
+        box-sizing:border-box;
+        background:#fff;
+        outline: none;
+    }
+    
+    .subject-control{
+        width:100%;
+        max-width: 600px;
+        justify-content: left;
+        padding:10px 12px;
+        margin-left:  15px;
+        margin-right:  15px;
+        border-radius:8px;
+        border:1px solid #dbe5f3;
+        font-size:14px;
+        box-sizing:border-box;
+        background:#fff;
+        outline: none;
+    }
+    
+    .body-control{
+        width:100%;
+        max-width: 600px;
+        min-height: 100px;
+        justify-content: flex-start;
+        padding:10px 12px;
+        margin-left:  15px;
+        margin-right:  15px;
+        border-radius:8px;
+        border:1px solid #dbe5f3;
+        font-size:14px;
+        box-sizing:border-box;
+        background:#fff;
+        outline: none;
+        }
+    
+    .textarea{
+      min-height:140px;
+      resize:vertical;
+    }
+    
+    .dialog-footer{
+      padding:14px 20px;
+      border-top:1px solid #eef2f7;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      background:linear-gradient(180deg, rgba(250,251,255,0.6), transparent);
+    }
+    
+    .btn {
+      padding:9px 14px;
+      border-radius:8px;
+      border:1px solid transparent;
+      cursor:pointer;
+      font-weight:600;
+    }
+    
+    .btn.cancel {
+      background:transparent;
+      color:#6b7280;
+      border-color:#e6eefb;
+    }
+    
+    .btn.submit {
+      background:#2563eb;
+      color:#fff;
+      border-color:transparent;
+    }
+    
+    .inputLabel{
+        margin-right: 15px;
+        margin-left: 15px;
+    }
+</style>
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+
+    public string From { get; set; } = string.Empty;
+    public string To { get; set; } = string.Empty;
+    public string Subject { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+
+    private async Task Close()
+    {
+    if (ShowChanged.HasDelegate)
+    await ShowChanged.InvokeAsync(false);
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await Email.SendEmailAsync(From, To, "FromName", "ToName", Subject, Body);
+            Email.SendEmail("10jonathancox@gmail.com", "pcox21@students.kennesaw.edu", "Ledgr Systems", "Patrick Cox", "Test Subject",
+                "Implementing Test Body...");
+            Console.WriteLine("Sent email");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Could not send email: " + e.Message);
+        }
+        Console.WriteLine($"From: {From}, To: {To}, Subject: {Subject}, Body: {Body}");
+        
+        await Close();
+    }
+}

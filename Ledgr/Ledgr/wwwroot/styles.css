@@ -181,3 +181,145 @@ input:focus{
   .site-main{ padding-top: 48px; }
   .brand-logo{ height: 44px; }
 }
+
+
+/* Styling for Email Dialog */
+.dialog-body{
+  margin:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#f6f8fa,#e9eef8);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.emailPage {
+  width:100%;
+  text-align:center;
+}
+
+button.open-btn{
+  background:#2563eb;
+  color:#fff;
+  border:0;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(37,99,235,0.2);
+}
+
+.dialog#emailDialog {
+  border: none;
+  border-radius: 10px;
+  width: min(680px, 96%);
+  padding: 0;
+  box-shadow: 0 10px 40px rgba(2,6,23,0.2);
+}
+
+.dialog-card {
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 360px;
+}
+
+.dialog-header{
+  padding:18px 20px;
+  border-bottom: 1px solid #eef2f7;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.dialog-header h2{
+  margin:0;
+  font-size:18px;
+}
+
+.dialog-body{
+  padding:18px 20px;
+}
+
+form.email-form {
+  display:grid;
+  gap:12px;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+.row{
+  display:flex;
+  gap:12px;
+}
+
+.col{
+  flex:1;
+  min-width:0;
+}
+
+input[type="email"],
+input[type="text"],
+textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1px solid #dbe5f3;
+  font-size:14px;
+  box-sizing:border-box;
+  background:#fff;
+  outline: none;
+}
+
+textarea{
+  min-height:140px;
+  resize:vertical;
+}
+
+.dialog-footer{
+  padding:14px 20px;
+  border-top:1px solid #eef2f7;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  background:linear-gradient(180deg, rgba(250,251,255,0.6), transparent);
+}
+
+.btn {
+  padding:9px 14px;
+  border-radius:8px;
+  border:1px solid transparent;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn.cancel {
+  background:transparent;
+  color:#6b7280;
+  border-color:#e6eefb;
+}
+
+.btn.submit {
+  background:#2563eb;
+  color:#fff;
+  border-color:transparent;
+}
+
+.fromLabel{
+  text-align: left;
+}
+.toLabel{
+  text-align: left;
+}
+.subjectLabel{
+  text-align: left;
+}
+.bodyLabel{
+  text-align: left;
+}

@@ -39,8 +39,13 @@ body{
 
 /* Layout containers */
 .container{
+  display:flex;
+  justify-content: center;
+  align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
   padding: 0 24px;
 }
 
@@ -82,6 +87,7 @@ body{
   padding: 24px;
 }
 
+
 /* Typography */
 .auth-title{
   margin:0 0 8px 0;
@@ -101,6 +107,7 @@ body{
 .form{display:flex; flex-direction:column; gap:16px;}
 
 .field{display:flex; flex-direction:column; gap:8px;}
+
 .field-row{
   display:flex; align-items:center; justify-content:space-between;
 }
@@ -180,6 +187,22 @@ input:focus{
   }
   .site-main{ padding-top: 48px; }
   .brand-logo{ height: 44px; }
+}
+
+/* Create User Section */
+.cardCreateUser{
+  justify-content: center;
+  align-items: center;
+  width: 680px;
+  background: var(--white);
+  border: 1px solid var(--ui-400);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+}
+
+.container-center{
+  align-content: center;
 }
 
 

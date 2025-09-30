@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+
+  <!-- Free fonts similar to Oswald (headings) + Inter (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="page page--login">
+  <!-- Header band (desktop-focused, responsive; rounded bottom corners) -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <!-- Image containing the Lion + LEDGR + Slogan -->
+      <img src="assets/img/logo.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="container container--center">
+    <section class="card login-card" aria-labelledby="loginTitle">
+      <h1 id="loginTitle" class="h2">Sign In</h1>
+      <p class="body1 muted">Use your email and password.</p>
+
+      <!-- ALERTS -->
+      <!-- Inline alert placeholder (hidden by default) -->
+      <div id="loginAlert" class="alert is-hidden" role="alert" aria-live="polite">
+        <!-- JS sets icon/color/text via classes .-error .-warning .-info .-success -->
+        <span class="alert__dot" aria-hidden="true"></span>
+        <span class="alert__text" id="loginAlertText"></span>
+      </div>
+
+      <form id="loginForm" class="form" novalidate>
+        <!-- Email -->
+        <label class="field">
+          <span class="field__label">Email address</span>
+          <!-- Helper/placeholder disappears on focus/type; label remains -->
+          <input
+            id="email"
+            name="email"
+            type="email"
+            class="input"
+            placeholder="email@ledgr.com"
+            autocomplete="username"
+            required
+          />
+        </label>
+
+        <!-- Password with eye toggle (click-only, no hover state) -->
+        <label class="field">
+            <span class="field__label">Password</span>
+            <div class="input input--with-addon">
+            <input id="password" type="password" class="input__control" placeholder="••••••••" />
+            <button type="button" class="icon-btn" id="togglePwd">
+                <img src="assets/icons/visible.svg" alt="" class="icon" />
+            </button>
+        </div>
+        </label>
+
+
+        <!-- Forgot password link -->
+        <div class="form__row form__row--link">
+          <a class="link" href="forgot-password-identify.html">Forgot password?</a>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <!-- Secondary (Clear) with hover/active states -->
+          <button type="reset" class="btn btn--secondary" id="btnClear">Clear</button>
+
+          <!-- Primary (Sign in) with hover/active states -->
+          <button type="submit" class="btn btn--primary" id="btnSignIn">Sign in</button>
+        </div>
+
+        <!-- Footer small print -->
+        <p class="body2 center muted">
+          Need an account?
+          <a class="link" href="create-new-user.html">Create one</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

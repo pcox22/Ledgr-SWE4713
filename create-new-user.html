@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create New User</title>
+
+  <!-- Free fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="page page--login"><!-- reuse header style like Figma -->
+
+  <!-- Header band w/ centered logo -->
+  <header class="app-header">
+    <div class="app-header__inner">
+      <img src="assets/img/logo.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
+    </div>
+  </header>
+
+  <main class="container container--center">
+    <section class="card" aria-labelledby="createTitle">
+      <p class="body1" style="margin:0 0 8px;">
+        <a class="link" href="login.html" aria-label="Return to previous page">← Return to Previous Page</a>
+      </p>
+
+      <h1 id="createTitle" class="h2">Create a New User</h1>
+      <p class="body1 muted" style="margin-top:0;">Please provide the following information</p>
+
+      <!-- Inline alert placeholder -->
+      <div id="createAlert" class="alert is-hidden" role="alert" aria-live="polite">
+        <span class="alert__dot" aria-hidden="true"></span>
+        <span class="alert__text" id="createAlertText"></span>
+      </div>
+
+      <form id="createForm" class="form" novalidate>
+        <!-- First Name -->
+        <label class="field">
+          <span class="field__label">First Name</span>
+          <input id="firstName" name="firstName" type="text" class="input" placeholder="John" required />
+        </label>
+
+        <!-- Last Name -->
+        <label class="field">
+          <span class="field__label">Last Name</span>
+          <input id="lastName" name="lastName" type="text" class="input" placeholder="Doe" required />
+        </label>
+
+        <!-- Email Address -->
+        <label class="field">
+          <span class="field__label">Email Address</span>
+          <input id="email" name="email" type="email" class="input" placeholder="email@ledgr.com" autocomplete="email" required />
+        </label>
+
+        <!-- DOB (MM/DD/YYYY only) -->
+        <label class="field">
+          <span class="field__label">Date of Birth</span>
+          <input
+            id="dob"
+            name="dob"
+            type="text"
+            class="input"
+            inputmode="numeric"
+            placeholder="MM/DD/YYYY"
+            aria-describedby="dobHint"
+            maxlength="10"
+            required
+          />
+          <p id="dobHint" class="caption muted">Format: MM/DD/YYYY</p>
+        </label>
+
+        <!-- Role -->
+        <label class="field">
+          <span class="field__label">Role</span>
+          <select id="role" name="role" class="input">
+            <option value="Admin">Admin</option>
+            <option value="Manager">Manager</option>
+            <option value="Accountant" selected>Accountant</option>
+          </select>
+        </label>
+
+        <!-- Status -->
+        <label class="field">
+          <span class="field__label">Status</span>
+          <select id="status" name="status" class="input">
+            <option value="Active">Active</option>
+            <option value="Inactive" selected>Inactive</option>
+          </select>
+        </label>
+
+        <!-- Auto-generated username (read-only preview) -->
+        <label class="field">
+          <span class="field__label">Auto-Generated Username</span>
+          <input id="username" name="username" type="text" class="input" placeholder="jdoe1025"readonly />
+          <p class="caption muted">
+            Rule: first initial + last name + <code>MMyy</code> of date of birth
+            (eg. jdoe1025)
+          </p>
+        </label>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button type="button" class="btn btn--secondary" id="btnClearCreate">Clear</button>
+          <button type="submit" class="btn btn--primary">Submit</button>
+        </div>
+
+        <p class="body2 center muted" style="margin-top:8px;">
+          Already have an account? <a class="link" href="login.html">Sign in</a>
+        </p>
+      </form>
+    </section>
+  </main>
+
+<script src="assets/js/app.js"></script>
+<script>
+(() => {
+  // Grab elements
+  const formEl  = document.getElementById('createForm');
+  const first   = document.getElementById('firstName');
+  const last    = document.getElementById('lastName');
+  const email   = document.getElementById('email');
+  const dob     = document.getElementById('dob');
+  const roleSel = document.getElementById('role');
+  const statSel = document.getElementById('status');
+  const user    = document.getElementById('username');
+  const prev    = document.getElementById('usernamePreview'); // optional
+  const btnClear = document.getElementById('btnClearCreate');
+
+  // Keep username empty so placeholder "jdoe1025" shows until valid handle is generated
+  if (user) {
+    user.value = '';
+    user.placeholder = 'jdoe1025';
+  }
+  if (prev) prev.textContent = 'jdoe1025';
+
+  // Enforce MM/DD/YYYY while typing
+  if (dob) {
+    dob.setAttribute('inputmode', 'numeric');
+    dob.setAttribute('maxlength', '10');
+    dob.addEventListener('input', () => {
+      let v = dob.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5)       dob.value = `${v.slice(0,2)}/${v.slice(2,4)}/${v.slice(4,8)}`;
+      else if (v.length >= 3)  dob.value = `${v.slice(0,2)}/${v.slice(2,4)}`;
+      else                     dob.value = v;
+      generate();
+    });
+    dob.addEventListener('blur', () => {
+      if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dob.value)) {
+        dob.value = '';
+        generate();
+      }
+    });
+  }
+
+  // Username generation (first initial + last name + MMyy from DOB)
+  const slug = (s) => (s || '').toLowerCase().replace(/[^a-z]/g, '');
+  const mmYyFromDob = () => {
+    const v = dob ? dob.value : '';
+    return /^\d{2}\/\d{2}\/\d{4}$/.test(v) ? v.slice(0,2) + v.slice(8,10) : '';
+  };
+  function generate() {
+    const fi   = slug(first && first.value).slice(0,1);
+    const ln   = slug(last && last.value);
+    const mmyy = mmYyFromDob();
+    const handle = (fi && ln && mmyy) ? (fi + ln + mmyy) : '';
+    if (user) user.value = handle;
+    if (prev) prev.textContent = handle || 'jdoe1025';
+  }
+  if (first) first.addEventListener('input', generate);
+  if (last)  last.addEventListener('input', generate);
+
+  // Clear button: wipe everything and restore defaults
+  if (btnClear && formEl) {
+    btnClear.addEventListener('click', () => {
+      formEl.reset();
+      if (first) first.value = '';
+      if (last)  last.value  = '';
+      if (email) email.value = '';
+      if (dob)   dob.value   = '';
+      if (roleSel) roleSel.value = 'Accountant';
+      if (statSel) statSel.value = 'Inactive';
+      if (user) { user.value = ''; user.placeholder = 'jdoe1025'; }
+      if (prev) prev.textContent = 'jdoe1025';
+      const alertBox = document.getElementById('createAlert');
+      if (alertBox) alertBox.classList.add('is-hidden');
+      if (first) first.focus();
+    });
+  }
+
+  // Submit hook (backend to replace)
+  hookSimpleSubmit('createForm', 'createAlert', 'createAlertText', () => {
+    const payload = {
+      firstName: (first && first.value.trim()) || '',
+      lastName:  (last  && last.value.trim())  || '',
+      email:     (email && email.value.trim()) || '',
+      dob:       (dob   && dob.value.trim())   || '',
+      role:      roleSel ? roleSel.value : '',
+      status:    statSel ? statSel.value : '',
+      username:  (user  && user.value)         || ''
+    };
+    // TODO: POST /api/users with payload
+    showInline('createAlert', 'success', 'User submitted. Awaiting approval.');
+  });
+})();
+</script>
+</body>
+</html>

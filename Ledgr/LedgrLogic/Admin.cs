@@ -4,6 +4,13 @@ namespace LedgrLogic;
 
 public class Admin : User
 {
+    
+    public Admin(string TempUsername, string TempPass, string TempEmail, int TempUserID, int TempEmployeeID, bool TempActive, bool TempNew) : base (TempUsername, TempPass, TempEmail, TempUserID, TempEmployeeID, TempActive, TempNew) {}
+
+    public Admin()
+    {
+    }
+
     //Needs access to database, should be bool for user feedback
     public bool CreateEmployee(int TempID, string TempFirst, string TempLast, bool Admin, bool Manager, int TempUserID, string TempPassword, string TempEmail)
     {

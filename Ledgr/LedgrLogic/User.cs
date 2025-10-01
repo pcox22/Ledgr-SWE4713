@@ -141,6 +141,19 @@ public class User
         //If password didn't match return false
         return false;
     }
+
+    // Change to async
+    public static bool CreateUser(string FirstName, string LastName, string Address, string Password)
+    {
+        string today = DateTime.Today.ToString("MM/dd/yyyy");
+        string formattedDate = string.Empty;
+        formattedDate += today[2] + today[3] + today[0] + today[1];
+
+        string Username = FirstName[0] + LastName + formattedDate;
+        return true;
+        // Error until I can finish writing an awaitable process.
+
+    }
     
     /*
      public bool ChangePassword(string TempPassword)

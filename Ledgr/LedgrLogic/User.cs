@@ -181,6 +181,54 @@ public class User
         return null;
     }
     
+    public string GenerateUsername(string TempFirst, string TempLast)
+    {
+        //Adds first letter of firstname to lastname
+        string Username = TempFirst.ToCharArray()[0] + TempLast;
+        string Today = DateTime.Now.ToString("yy-MM-dd");
+        
+        //Adding just the month and day to the username (MM DD)
+        Username += "" +Today.ToCharArray()[3] + "" +Today.ToCharArray()[4] + "" +Today.ToCharArray()[6] + ""+ Today.ToCharArray()[7] + "";
+
+        return Username;
+    }
+
+    public static bool CreatePotentialUser(string tempUsername, string tempPassword, string tempEmail, int tempNew,
+        int tempActive, string tempFirst, string tempLast, string tempDoB, string tempAddress, int tempAdmin,
+        int tempManager)
+    {
+        bool Successful = true;
+        var sql = "INSERT INTO PotentialUser" +
+                  "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@USERNAME", tempUsername);
+            command.Parameters.AddWithValue("@PASSWORD", tempPassword);
+            command.Parameters.AddWithValue("@NEWUSER", tempNew);
+            command.Parameters.AddWithValue("@ISACTIVE", tempActive);
+            command.Parameters.AddWithValue("@FIRSTNAME", tempFirst);
+            command.Parameters.AddWithValue("@LASTNAME", tempLast);
+            command.Parameters.AddWithValue("@DOB", tempDoB);
+            command.Parameters.AddWithValue("@ADDRESS", @tempAddress);
+            command.Parameters.AddWithValue("@ISADMIN", tempAdmin);
+            command.Parameters.AddWithValue("@ISMANAGER", tempManager);
+
+            using var reader = command.ExecuteReader();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Successful = false;
+        }
+        return Successful;
+    }
+    
     /*
      public bool ChangePassword(string TempPassword)
      {

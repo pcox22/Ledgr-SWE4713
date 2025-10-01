@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.Data.Sqlite;
 
 namespace LedgrLogic;
@@ -11,8 +12,9 @@ public class Admin : User
     {
     }
 
-    //Needs access to database, should be bool for user feedback
-    public bool CreateEmployee(int TempID, string TempFirst, string TempLast, bool Admin, bool Manager, int TempUserID, string TempPassword, string TempEmail)
+    //Admin approving a new user
+    //Needs to query potential user table, grab the info, and create a new employee and a new user
+    /*public bool CreateEmployee(int TempID, string TempFirst, string TempLast, bool Admin, bool Manager, int TempUserID, string TempPassword, string TempEmail)
     {
         int TempAdmin;
         int TempManager;
@@ -36,7 +38,7 @@ public class Admin : User
             TempManager = 0;
         }
 
-        var sql = "INSERT INTO Employee (ID, FirstName, LastName, IsAdmin, IsManager)" +
+        var sql = "INSERT INTO Employee (FirstName, LastName, IsAdmin, IsManager)" +
                   "VALUES (@TEMPID, @TEMPFIRST, @TEMPLAST, @TEMPADMIN, @TEMPMANAGER)";
         try
         {
@@ -44,7 +46,6 @@ public class Admin : User
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@TEMPID", TempID);
             command.Parameters.AddWithValue("@TEMPFIRST", TempFirst);
             command.Parameters.AddWithValue("@TEMPLAST", TempLast);
             command.Parameters.AddWithValue("@TEMPADMIN", TempAdmin);
@@ -63,25 +64,79 @@ public class Admin : User
         if (Successful)
         {
             //Reassign successful in case CreateUser() returns false
-            Successful = CreateUser(TempUserID, GenerateUsername(TempFirst, TempLast), TempPassword, TempID, TempEmail);
+            Successful = CreateUser( GenerateUsername(TempFirst, TempLast), TempPassword, TempID, TempEmail);
         }
 
         return Successful;
 
-    }
+    }*/
 
-    public string GenerateUsername(string TempFirst, string TempLast)
+    public bool ApproveUser(int TempUserID)
     {
-        //Adds first letter of firstname to lastname
-        string Username = TempFirst.ToCharArray()[0] + TempLast;
-        string Today = DateTime.Now.ToString("yy-MM-dd");
-        
-        //Adding just the month and day to the username (MM DD)
-        Username += "" +Today.ToCharArray()[3] + "" +Today.ToCharArray()[4] + "" +Today.ToCharArray()[6] + ""+ Today.ToCharArray()[7] + "";
+        bool Successful = true;
 
-        return Username;
+        try
+        {
+            var PotentialUserSQL = "SELECT * FROM PotentialUser WHERE ID = @ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var PotentialUserCommand = new SqliteCommand(PotentialUserSQL, connection);
+            PotentialUserCommand.Parameters.AddWithValue("@ID", TempUserID);
+
+            using var reader = PotentialUserCommand.ExecuteReader();
+            string Username;
+            string Password;
+            string Email;
+            int NewUser;
+            int IsActive;
+            string FirstName;
+            string LastName;
+            string DoB;
+            string Address;
+            int IsAdmin;
+            int IsManager;
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    Username = reader.GetString(1);
+                    Password = reader.GetString(2);
+                    Email = reader.GetString(3);
+                    NewUser = int.Parse(reader.GetString(4));
+                    IsActive = int.Parse(reader.GetString(5));
+                    FirstName = reader.GetString(6);
+                    LastName = reader.GetString(7);
+                    DoB = reader.GetString(8);
+                    Address = reader.GetString(9);
+                    IsAdmin = int.Parse(reader.GetString(10));
+                    IsManager = int.Parse(reader.GetString(11));
+                }
+            }
+
+            var EmployeeSQL = "INSERT INTO Employee " +
+                              "VALUES (@FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+
+            var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME)";
+
+            //creating a new user will require the EmployeeID Foreign key, which is not created until the employee is created
+            var UserSQL = "INSERT INTO User " +
+                          "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
+            
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Successful = false;
+        }
+
+        return Successful;
     }
-    public bool CreateUser(int TempUserID,string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
+    
+    public bool CreateUser(string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
     {
         //Calls database to create a User, linked to an Employee
         bool Successful = true;
@@ -89,14 +144,13 @@ public class Admin : User
         {
             //Encrypt the password before storing to database
             TempPassword = LedgrLogic.Password.Encrypt(TempPassword);
-            string sql = "INSERT INTO User VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
+            string sql = "INSERT INTO User VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
             try
             {
                 using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
                 connection.Open();
 
                 using var command = new SqliteCommand(sql, connection);
-                command.Parameters.AddWithValue("@ID", TempUserID);
                 command.Parameters.AddWithValue("@USERNAME", TempUsername);
                 command.Parameters.AddWithValue("@PASSWORD", TempPassword);
                 command.Parameters.AddWithValue("@EMAIL", TempEmail);

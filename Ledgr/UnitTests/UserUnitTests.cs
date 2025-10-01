@@ -26,4 +26,18 @@ public class UserUnitTests
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
     }
+    
+    [Test]
+    public void GenerateUsername_ValidUsername_ReturnsTrue()
+    {
+        //arrange
+        User Temp = new User();
+        string Expected = "RStraiton0930";
+        
+        //act
+        string Actual = Temp.GenerateUsername("RJ", "Straiton");
+        
+        //assert
+        Assert.That(Actual, Is.EqualTo(Expected));
+    }
 }

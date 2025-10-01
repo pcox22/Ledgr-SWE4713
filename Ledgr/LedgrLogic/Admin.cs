@@ -85,17 +85,18 @@ public class Admin : User
             PotentialUserCommand.Parameters.AddWithValue("@ID", TempUserID);
 
             using var reader = PotentialUserCommand.ExecuteReader();
-            string Username;
-            string Password;
-            string Email;
-            int NewUser;
-            int IsActive;
-            string FirstName;
-            string LastName;
-            string DoB;
-            string Address;
-            int IsAdmin;
-            int IsManager;
+            string Username = "";
+            string Password = "";
+            string Email = "";
+            int NewUser = -1;
+            int IsActive = -1;
+            string FirstName = "";
+            string LastName = "";
+            string DoB = "";
+            string Address = "";
+            int IsAdmin = -1;
+            int IsManager = -1;
+            int EmployeeID = -1;
 
             if (reader.HasRows)
             {
@@ -114,16 +115,41 @@ public class Admin : User
                     IsManager = int.Parse(reader.GetString(11));
                 }
             }
-
+            //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
                               "VALUES (@FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
-
-            var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME)";
+            using var InsertEmployeeCommand = new SqliteCommand(EmployeeSQL, connection);
+            InsertEmployeeCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
+            InsertEmployeeCommand.Parameters.AddWithValue("@LASTNAME", LastName);
+            InsertEmployeeCommand.Parameters.AddWithValue("@DOB", DoB);
+            InsertEmployeeCommand.Parameters.AddWithValue("@ADDRESS", Address);
+            InsertEmployeeCommand.Parameters.AddWithValue("@ISADMIN", IsAdmin);
+            InsertEmployeeCommand.Parameters.AddWithValue("@ISMANAGER", IsManager);
+            InsertEmployeeCommand.ExecuteNonQuery();
 
             //creating a new user will require the EmployeeID Foreign key, which is not created until the employee is created
+            var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME)";
+            using var GetEmployeeIDCommand = new SqliteCommand(GetEmployeeIDSQL, connection);
+            GetEmployeeIDCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
+            using var EmployeeIDReader = GetEmployeeIDCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    EmployeeID = int.Parse(reader.GetString(0));
+                }
+            }
+            
             var UserSQL = "INSERT INTO User " +
                           "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
-            
+            using var UserSQLCommand = new SqliteCommand(UserSQL, connection);
+            UserSQLCommand.Parameters.AddWithValue("@USERNAME", Username);
+            UserSQLCommand.Parameters.AddWithValue("@PASSWORD", Password);
+            UserSQLCommand.Parameters.AddWithValue("@EMAIL", Email);
+            UserSQLCommand.Parameters.AddWithValue("@NEWUSER", NewUser);
+            UserSQLCommand.Parameters.AddWithValue("ISACTIVE", IsActive);
+            UserSQLCommand.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+            UserSQLCommand.ExecuteNonQuery();
             
             connection.Close();
         }
@@ -132,11 +158,11 @@ public class Admin : User
             Console.WriteLine(e);
             Successful = false;
         }
-
+        
         return Successful;
     }
     
-    public bool CreateUser(string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
+    /*public bool CreateUser(string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
     {
         //Calls database to create a User, linked to an Employee
         bool Successful = true;
@@ -169,7 +195,7 @@ public class Admin : User
         }
 
         return Successful;
-    }
+    }*/
     
     //Needs access to database, should be bool for user feedback
     public bool ActivateUser(int TempUserID)

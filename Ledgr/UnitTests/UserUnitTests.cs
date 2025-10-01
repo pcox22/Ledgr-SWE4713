@@ -16,11 +16,10 @@ public class UserUnitTests
         //arrange
         string tempUsername = "TTest0926";
         string tempPassword = "PassW0rd...";
-        User tempUser = new User();
         string Expected = "TTest0926";
         
         //act
-        User returnedUser = tempUser.VerifyLogin(tempUsername, tempPassword);
+        User returnedUser = User.VerifyLogin(tempUsername, tempPassword);
         string Actual = returnedUser.GetUserName();
         
         //assert
@@ -31,11 +30,36 @@ public class UserUnitTests
     public void GenerateUsername_ValidUsername_ReturnsTrue()
     {
         //arrange
-        User Temp = new User();
-        string Expected = "RStraiton0930";
+        string Expected = "RStraiton1001";
         
         //act
-        string Actual = Temp.GenerateUsername("RJ", "Straiton");
+        string Actual = User.GenerateUsername("RJ", "Straiton");
+        
+        //assert
+        Assert.That(Actual, Is.EqualTo(Expected));
+    }
+
+    [Test]
+    public void CreatePotentialUser_ValidInputs_ReturnsTrue()
+    {
+        //arrange
+        string FirstName = "Michael";
+        string LastName = "Liu";
+        string Username = User.GenerateUsername(FirstName, LastName);
+        string Password = "PassW0rd...";
+        string email = "email@email.com";
+        int NewUser = 0;
+        int IsActive = 1;
+        string DoB = "2025-10-10";
+        string Address = "123 Main Street, Marietta GA";
+        int Admin = 0;
+        int Manager = 0;
+
+        bool Expected = true;
+        
+        //act
+        bool Actual = User.CreatePotentialUser(Username, Password, email, NewUser, IsActive, FirstName, LastName, DoB,
+            Address, Admin, Manager);
         
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));

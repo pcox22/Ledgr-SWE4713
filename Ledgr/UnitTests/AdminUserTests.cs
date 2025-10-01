@@ -304,4 +304,46 @@ public class AdminUnitTests
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
     }
+
+    [Test]
+    public void UserReport_ReadsDatabase()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool Expected = true;
+        bool Actual;
+        
+        //act
+        if (temp.UserReport().Contains("Test@Test.com"))
+        {
+            Actual = true;
+        }
+        else
+        {
+            Actual = false;
+        }
+         //Assert
+         Assert.That(Actual, Is.EqualTo(Actual));
+    }
+
+    [Test]
+    public void ExpiredPasswordReport_ReadsDatabase()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool Expected = true;
+        bool Actual;
+        
+        //act
+        if (temp.ExpiredPasswordReport().Contains("O1D_PassW0rd"))
+        {
+            Actual = true;
+        }
+        else
+        {
+            Actual = false;
+        }
+        //Assert
+        Assert.That(Actual, Is.EqualTo(Actual));
+    }
 }

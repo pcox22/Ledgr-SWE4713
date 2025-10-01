@@ -86,7 +86,7 @@ public class User
     
     //VerifyLogin takes in a temp username and password, queries the database to find that username and,
     //if valid and user is not suspended, then instantiate and return a new User 
-    public User VerifyLogin(string TempUsername, string TempPassword)
+    public static User VerifyLogin(string TempUsername, string TempPassword)
     {
         string StoredPassword = "";
         int StoredUserID = -1;
@@ -181,7 +181,7 @@ public class User
         return null;
     }
     
-    public string GenerateUsername(string TempFirst, string TempLast)
+    public static string GenerateUsername(string TempFirst, string TempLast)
     {
         //Adds first letter of firstname to lastname
         string Username = TempFirst.ToCharArray()[0] + TempLast;
@@ -198,8 +198,8 @@ public class User
         int tempManager)
     {
         bool Successful = true;
-        var sql = "INSERT INTO PotentialUser" +
-                  "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+        var sql = "INSERT INTO PotentialUser " +
+                  "VALUES (2, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
         try
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -208,6 +208,7 @@ public class User
             using var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@USERNAME", tempUsername);
             command.Parameters.AddWithValue("@PASSWORD", tempPassword);
+            command.Parameters.AddWithValue("@EMAIL", tempEmail);
             command.Parameters.AddWithValue("@NEWUSER", tempNew);
             command.Parameters.AddWithValue("@ISACTIVE", tempActive);
             command.Parameters.AddWithValue("@FIRSTNAME", tempFirst);
@@ -230,8 +231,9 @@ public class User
     }
     
     /*
-     public bool ChangePassword(string TempPassword)
+     public static bool ChangePassword(string TempPassword)
      {
       //check if the given password is equal to current password or an older password, as well as if it satisfies the password requirements
+     }
      */
 }

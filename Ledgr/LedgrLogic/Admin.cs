@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Data;
 using Microsoft.Data.Sqlite;
 
@@ -97,7 +98,7 @@ public class Admin : User
             int IsAdmin = -1;
             int IsManager = -1;
             int EmployeeID = -1;
-
+            //assigning stored values to local variables for querying other tables
             if (reader.HasRows)
             {
                 while (reader.Read())
@@ -115,6 +116,7 @@ public class Admin : User
                     IsManager = int.Parse(reader.GetString(11));
                 }
             }
+            
             //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
                               "VALUES (@FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
@@ -140,6 +142,7 @@ public class Admin : User
                 }
             }
             
+            //Creating a new row in the User table
             var UserSQL = "INSERT INTO User " +
                           "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
             using var UserSQLCommand = new SqliteCommand(UserSQL, connection);
@@ -356,5 +359,64 @@ public class Admin : User
 
         return Successful;
     }
-    
+
+    public ArrayList UserReport()
+    {
+        ArrayList UserReport = new ArrayList();
+        try
+        {
+            var PotentialUserSQL = "SELECT * FROM User INNER JOIN Employee on User.EmployeeID = Employee.ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var PotentialUserCommand = new SqliteCommand(PotentialUserSQL, connection);
+
+            using var reader = PotentialUserCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < UserReport.Count; i++)
+                    {
+                        UserReport.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return UserReport;
+    }
+
+    public ArrayList ExpiredPasswordReport()
+    {
+        ArrayList ExpiredPasswordReport = new ArrayList();
+        try
+        {
+            var ExpiredPasswordSQL = "SELECT * FROM ExpiredPassword";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var PotentialUserCommand = new SqliteCommand(ExpiredPasswordSQL, connection);
+
+            using var reader = PotentialUserCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < ExpiredPasswordReport.Count; i++)
+                    {
+                        ExpiredPasswordReport.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return ExpiredPasswordReport;
+    }
 }

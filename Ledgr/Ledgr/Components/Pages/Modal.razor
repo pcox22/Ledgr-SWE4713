@@ -208,34 +208,34 @@
 </style>
 }
 
-@code {
-    [Parameter] public bool Show { get; set; }
-    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    @code {
+        [Parameter] public bool Show { get; set; }
+        [Parameter] public EventCallback<bool> ShowChanged { get; set; }
 
-    public string From { get; set; } = string.Empty;
-    public string To { get; set; } = string.Empty;
-    public string Subject { get; set; } = string.Empty;
-    public string Body { get; set; } = string.Empty;
+        public string From { get; set; } = string.Empty;
+        public string To { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
 
-    private async Task Close()
-    {
-    if (ShowChanged.HasDelegate)
-    await ShowChanged.InvokeAsync(false);
-    }
-
-    private async Task HandleSubmit()
-    {
-        try
+        private async Task Close()
         {
-            await Email.SendEmailAsync(From, To, "Ledgr Systems", "Recipient", Subject, Body);
-            Console.WriteLine("Sent email");
+            if (ShowChanged.HasDelegate)
+            await ShowChanged.InvokeAsync(false);
         }
-        catch (Exception e)
+
+        private async Task HandleSubmit()
         {
-            Console.WriteLine("Could not send email: " + e.Message);
+            try
+            {
+                await Email.SendEmailAsync(From, To, "Ledgr Systems", "Recipient", Subject, Body);
+                Console.WriteLine("Sent email");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not send email: " + e.Message);
+            }
+            Console.WriteLine($"From: {From}, To: {To}, Subject: {Subject}, Body: {Body}");
+            
+            await Close();
         }
-        Console.WriteLine($"From: {From}, To: {To}, Subject: {Subject}, Body: {Body}");
-        
-        await Close();
     }
-}

@@ -18,12 +18,9 @@
       <img src="/logo-slogan.png" alt="LEDGR — The smart way to balance business" class="brand-logo" />
     </div>
   </header>
-
+  <NavLink class="link" href="/" aria-label="Return to previous page">← Return to Previous Page</NavLink>
   <main class="container container-center">
     <section class="cardCreateUser" aria-labelledby="createTitle">
-      <p class="body1" style="margin:0 0 8px;">
-        <NavLink class="link" href="/Login" aria-label="Return to previous page"><button class="btn btn-primary">← Return to Previous Page</button></NavLink>
-      </p>
 
       <h1 id="createTitle" class="h2">Create a New User</h1>
       <p class="body1 muted" style="margin-top:0;">Please provide the following information</p>
@@ -38,25 +35,26 @@
         <!-- First Name -->
         <label class="field">
           <span class="field__label">First Name</span>
-          <input id="firstName" name="firstName" type="text" class="input" placeholder="John" required />
+          <InputText @bind-Value="FirstName" id="firstName" name="firstName" type="text" class="input" placeholder="John" required />
         </label>
 
         <!-- Last Name -->
         <label class="field">
           <span class="field__label">Last Name</span>
-          <input id="lastName" name="lastName" type="text" class="input" placeholder="Doe" required />
+          <InputText @bind-Value="LastName" id="lastName" name="lastName" type="text" class="input" placeholder="Doe" required />
         </label>
 
         <!-- Email Address -->
         <label class="field">
           <span class="field__label">Email Address</span>
-          <input id="email" name="email" type="email" class="input" placeholder="email@ledgr.com" autocomplete="email" required />
+          <InputText @bind-Value="EmailAddress" id="email" name="email" type="email" class="input" placeholder="email@ledgr.com" autocomplete="email" required />
         </label>
 
         <!-- DOB (MM/DD/YYYY only) -->
         <label class="field">
           <span class="field__label">Date of Birth</span>
-          <input
+          <InputText
+            @bind-Value="DOB"
             id="dob"
             name="dob"
             type="text"
@@ -70,7 +68,7 @@
           <p id="dobHint" class="caption muted">Format: MM/DD/YYYY</p>
         </label>
 
-        <!-- Role -->
+        <!-- Role [REDACTED]
         <label class="field">
           <span class="field__label">Role</span>
           <select id="role" name="role" class="input">
@@ -79,6 +77,7 @@
             <option value="Accountant" selected>Accountant</option>
           </select>
         </label>
+        -->
 
         <!-- Status - [REDACTED]
         <label class="field">
@@ -106,14 +105,15 @@
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
 
-        <p class="body2 center muted" style="margin-top:8px;">Already have an account? </p>
-        <NavLink class="link" href="/Login">
-            <button class="btn btn-primary">Sign in</button>
-        </NavLink>
+        <p class="center" style="margin-top:8px;"><span class="muted">Already have an account? </span>
+          <NavLink class="link" href="/">
+            Sign in
+          </NavLink>
+        </p>
       </form>
     </section>
   </main>
-
+  <!--
 <script src="assets/js/app.js"></script>
 <script>
 (() => {
@@ -206,5 +206,29 @@
   });
 })();
 </script>
+-->
 </body>
 </html>
+
+@code {
+  public string FirstName { get; set; } = string.Empty;
+  public string LastName { get; set; } = string.Empty;
+  public string EmailAddress { get; set; } = string.Empty;
+  public string DOB { get; set; } = string.Empty;
+  
+  public string Date = DateTime.Today.ToString();
+  public string FormattedDate = string.Empty;
+
+  public async Task VerifyUserData()
+  {
+    FormattedDate += Date[8] + Date[9] + Date[2] + Date[3];
+    // Debug
+    Console.WriteLine(FormattedDate);
+    string userName = FirstName[0] + LastName + FormattedDate;
+    
+    // Function currently dne - need to take data from this function and verify against requirements; success would create a row in the database where "isActive" is 0
+    
+  }
+
+
+}

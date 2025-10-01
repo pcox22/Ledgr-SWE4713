@@ -1,4 +1,8 @@
-@page "/Login"
+@using System.Reflection.Metadata
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+@page "/"
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -29,10 +33,10 @@
             <h1 id="auth-title" class="auth-title">Sign In</h1>
             <p class="auth-subtitle">Use your email and password.</p>
 
-            <form class="form" action="/login" method="post" novalidate>
+            <form class="form" action="" method="get" novalidate>
                 <div class="field">
                     <label for="email">Username</label>
-                    <input id="email" name="email" type="email" autocomplete="email" placeholder="Username" required />
+                    <InputText id="email" name="email" type="email" autocomplete="email" placeholder="Username" required @bind-Value="Username" />
                     <p class="field-help sr-only" id="email-help">Enter your username.</p>
                 </div>
 
@@ -41,15 +45,16 @@
                         <label for="password">Password</label>
                         <a class="link-small" href="/forgot-password">Forgot password?</a>
                     </div>
-                    <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required />
+                    <InputText id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required @bind-Value="Password"/>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Sign in</button>
+                <button @onclick="VerifyLoginAsync" type="button" class="btn btn-primary">Sign in</button>
 
                 <p class="footer-line">
                     <span class="muted">Need an account?</span>
                     <NavLink href="/cUser" class="link">Create one</NavLink>
                 </p>
+                <AntiforgeryToken/>
             </form>
         </div>
     </section>
@@ -57,5 +62,32 @@
 </body>
 
 @code {
-    
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+
+    public void VerifyLoginAsync()
+    {
+        try
+        {
+            Task<bool> verify = User.VerifyLogin(Username, Password);
+            bool v = verify.Result;
+            if (v)
+            {
+                NavigationManager.NavigateTo($"/home/{Username}");
+            }
+            else
+            {
+                // Insert Code to let them know login failed
+                // Consider:
+                // Create a field aligned to the right, blank text by default, red "invalid username or password" when failed
+                // Overwrite input fields with invalidity message
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Process Failed: " + e.Message);
+        }
+
+    }
+
 }

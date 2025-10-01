@@ -79,20 +79,21 @@ public class User
     
     //VerifyLogin takes in a temp username and password, queries the database to find that username and,
     //if its found, returns the password stored in the database (STILL NEEDS TO BE ENCRYPTED AND THEN DECRYPTED)
-    public bool VerifyLogin(string TempUsername, string TempPassword)
+    public static async Task<bool> VerifyLogin(string TempUsername, string TempPassword)
     {
         string StoredPassword = "";
         int TempAdmin = -1;
         int TempManager = -1;
         int UserID;
         int TempActive = -1;
-        var sql = "select PASSWORD, ISMANAGER, ISADMIN, ISACTIVE, USERID from USER where USERNAME = @USERNAME";
+        var sql = "select PASSWORD, ISACTIVE from USER where ID = 1";
         try
         {
             //using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             //Connection.Open();
-            
-            using var Connection = new SqliteConnection("jdbc:sqlite:LedgerDB.db");
+            string path = Directory.GetCurrentDirectory();
+            var dbPath = Path.Combine(path, "LedgerDB.db");
+            using var Connection = new SqliteConnection($"Data Source={dbPath}");
             Connection.Open();
 
             using var Command = new SqliteCommand(sql, Connection);
@@ -106,13 +107,13 @@ public class User
                 while (reader.Read())
                 {
                     StoredPassword = reader.GetString(0); 
-                    TempManager = Convert.ToInt32(reader.GetString(1));
-                    TempAdmin = Convert.ToInt32(reader.GetString(2));
-                    TempActive = Convert.ToInt32(reader.GetString(3));
-                    UserID = Convert.ToInt32(reader.GetString(4));
+                    //TempManager = Convert.ToInt32(reader.GetString(1));
+                    //TempAdmin = Convert.ToInt32(reader.GetString(1));
+                    TempActive = Convert.ToInt32(reader.GetString(1));
+                    //UserID = Convert.ToInt32(reader.GetString(2));
                 }
             }
-            Connection.Close();
+            await Connection.CloseAsync();
         }
         catch (Exception e)
         {
@@ -123,6 +124,7 @@ public class User
         //If password is verified and the user is not inactive
         if (StoredPassword.Equals(TempPassword) && TempActive == 1)
         {
+            Console.WriteLine("Login Successful");
             if (TempAdmin == 1)
             {
                 

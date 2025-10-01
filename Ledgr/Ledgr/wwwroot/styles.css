@@ -53,16 +53,19 @@ body{
 .site-header{
   background: var(--brand-500);
   height: 120px;
+  margin: 0;
   display:flex;
   align-items:center;
 }
 .header-inner{
+  margin: 0;
   display:flex;
   align-items:center;
   justify-content: space-between;
 }
 .brand-logo{
   height: 56px; 
+  margin: 0;
   width: auto;
   display:block;
   filter: none;
@@ -154,6 +157,7 @@ input:focus{
   background: var(--brand-500);
   color: var(--white);
 }
+
 .btn-primary:hover{
   background: #12243a; /* a hair lighter/darker */
 }

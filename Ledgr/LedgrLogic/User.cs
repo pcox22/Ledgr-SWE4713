@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+using System.Data;
+using Microsoft.Data.Sqlite;
 
 namespace LedgrLogic;
 
@@ -6,15 +7,21 @@ public class User
 {
     protected string Username;
     protected string Password;
+    protected string Email;
     protected int UserID;
+    protected int EmployeeID;
     protected bool IsActive;
     protected bool NewUser;
 
-    public User(string TempUsername, string TempPass, int TempID)
+    public User(string TempUsername, string TempPass, string TempEmail, int TempUserID, int TempEmployeeID, bool TempActive, bool TempNew)
     {
         Username = TempUsername;
         Password = TempPass;
-        UserID = TempID;
+        UserID = TempUserID;
+        EmployeeID = TempEmployeeID;
+        IsActive = TempActive;
+        NewUser = TempNew;
+        Email = TempEmail;
     }
     
     public User()
@@ -78,68 +85,101 @@ public class User
     }
     
     //VerifyLogin takes in a temp username and password, queries the database to find that username and,
-    //if its found, returns the password stored in the database (STILL NEEDS TO BE ENCRYPTED AND THEN DECRYPTED)
-    public static async Task<bool> VerifyLogin(string TempUsername, string TempPassword)
+    //if valid and user is not suspended, then instantiate and return a new User 
+    public User VerifyLogin(string TempUsername, string TempPassword)
     {
         string StoredPassword = "";
+        int StoredUserID = -1;
+        string StoredEmail = "";
+        int StoredNew = -1;
+        int StoredActive = -1;
+        int StoredEmployeeID = -1;
         int TempAdmin = -1;
         int TempManager = -1;
-        int UserID;
-        int TempActive = -1;
-        var sql = "select PASSWORD, ISACTIVE from USER where ID = 1";
+        
+        var UserSQL = "select * from User where Username = @USERNAME";
+        var EmployeeSQL = "select IsAdmin, IsManager from Employee where ID = @EMPLOYEEID";
         try
         {
-            //using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-            //Connection.Open();
-            string path = Directory.GetCurrentDirectory();
-            var dbPath = Path.Combine(path, "LedgerDB.db");
-            using var Connection = new SqliteConnection($"Data Source={dbPath}");
+            using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             Connection.Open();
 
-            using var Command = new SqliteCommand(sql, Connection);
-            Command.Parameters.AddWithValue("@USERNAME", TempUsername);
+            using var UserCommand = new SqliteCommand(UserSQL, Connection);
+            UserCommand.Parameters.AddWithValue("@USERNAME", TempUsername);
 
-            using var reader = Command.ExecuteReader();
+            using var reader = UserCommand.ExecuteReader();
             //If there was a match in username, read out the string and assign values to compare password,
             //and determine if the user is an admin or manager or neither
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    StoredPassword = reader.GetString(0); 
-                    //TempManager = Convert.ToInt32(reader.GetString(1));
-                    //TempAdmin = Convert.ToInt32(reader.GetString(1));
-                    TempActive = Convert.ToInt32(reader.GetString(1));
-                    //UserID = Convert.ToInt32(reader.GetString(2));
+                    StoredUserID = Int32.Parse(reader.GetString(0));
+                    StoredPassword = reader.GetString(2);
+                    StoredEmail = reader.GetString(3);
+                    StoredNew = Int32.Parse(reader.GetString(4));
+                    StoredActive = Int32.Parse(reader.GetString(5));
+                    StoredEmployeeID = Int32.Parse(reader.GetString(6));
                 }
             }
-            await Connection.CloseAsync();
+            StoredPassword = LedgrLogic.Password.Decrypt(StoredPassword);
+            
+            //Querying the Employee table to see if user is an admin or a manager
+            using var EmployeeCommand = new SqliteCommand(EmployeeSQL, Connection);
+            EmployeeCommand.Parameters.AddWithValue("@EMPLOYEEID", StoredEmployeeID);
+
+            using var EmployeeReader = EmployeeCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    TempAdmin = Int32.Parse(EmployeeReader.GetString(0));
+                    TempManager = Int32.Parse(EmployeeReader.GetString(1));
+                }
+            }
+            Connection.Close();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            //return false for failed login
-            return false;
+        }
+        //Turning the IsActive and NewUser into booleans as they are stored in the database as integers
+        bool Active;
+        bool NewUser;
+        if (StoredActive == 1)
+        {
+            Active = true;
+        }
+        else
+        {
+            Active = false;
+        }
+
+        if (StoredNew == 1)
+        {
+            NewUser = true;
+        }
+        else
+        {
+            NewUser = false;
         }
         //If password is verified and the user is not inactive
-        if (StoredPassword.Equals(TempPassword) && TempActive == 1)
+        if (StoredPassword.Equals(TempPassword) && Active)
         {
             Console.WriteLine("Login Successful");
             if (TempAdmin == 1)
             {
-                
-                return true;
+                return new Admin(TempUsername, TempPassword, StoredEmail, StoredUserID, StoredEmployeeID, Active, NewUser);
             }
             else if (TempManager == 1)
             {
-                //If the user is a manager, then call the manager login method, which will instantiate a manager, then return true
-                return true;
-            } 
-            //If the user is neither an admin nor a manager, call the login method for a typical user then, return true
-            return true;
+                return new Manager(TempUsername, TempPassword, StoredEmail, StoredUserID, StoredEmployeeID, Active, NewUser);
+            }
+
+            return new User(TempUsername, TempPassword, StoredEmail, StoredUserID, StoredEmployeeID, Active, NewUser);
         }
-        //If password didn't match return false
-        return false;
+        //If password didn't match return null? Should probably just throw an error
+        return null;
     }
 
     // Change to async
@@ -153,6 +193,54 @@ public class User
         return true;
         // Error until I can finish writing an awaitable process.
 
+    }
+    
+    public string GenerateUsername(string TempFirst, string TempLast)
+    {
+        //Adds first letter of firstname to lastname
+        string Username = TempFirst.ToCharArray()[0] + TempLast;
+        string Today = DateTime.Now.ToString("yy-MM-dd");
+        
+        //Adding just the month and day to the username (MM DD)
+        Username += "" +Today.ToCharArray()[3] + "" +Today.ToCharArray()[4] + "" +Today.ToCharArray()[6] + ""+ Today.ToCharArray()[7] + "";
+
+        return Username;
+    }
+
+    public static bool CreatePotentialUser(string tempUsername, string tempPassword, string tempEmail, int tempNew,
+        int tempActive, string tempFirst, string tempLast, string tempDoB, string tempAddress, int tempAdmin,
+        int tempManager)
+    {
+        bool Successful = true;
+        var sql = "INSERT INTO PotentialUser" +
+                  "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@USERNAME", tempUsername);
+            command.Parameters.AddWithValue("@PASSWORD", tempPassword);
+            command.Parameters.AddWithValue("@NEWUSER", tempNew);
+            command.Parameters.AddWithValue("@ISACTIVE", tempActive);
+            command.Parameters.AddWithValue("@FIRSTNAME", tempFirst);
+            command.Parameters.AddWithValue("@LASTNAME", tempLast);
+            command.Parameters.AddWithValue("@DOB", tempDoB);
+            command.Parameters.AddWithValue("@ADDRESS", @tempAddress);
+            command.Parameters.AddWithValue("@ISADMIN", tempAdmin);
+            command.Parameters.AddWithValue("@ISMANAGER", tempManager);
+
+            using var reader = command.ExecuteReader();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            Successful = false;
+        }
+        return Successful;
     }
     
     /*

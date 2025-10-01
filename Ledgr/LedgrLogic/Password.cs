@@ -5,7 +5,6 @@ using System.Text;
 
 public class Password
 {
-    
     public static string Validate(string password)
     {
         bool hasNum = false;

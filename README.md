@@ -23,4 +23,3 @@ Ledgr is a web based Accounting application that will allow users to track and s
 - Creating an income statement, a balance sheet, and cash flow statement for the selected accounting year
 
 ## Documentation
-- [Sprint 1 Coverage Report](Ledgr-Sprint1.html)

@@ -335,10 +335,11 @@ public class User
       }
       
       //Check that the Password is not equal to current password
+      string storedPassword = "";
+      int StoredUserID = -1;
       try
       {
-          string storedPassword = "";
-          var sql = "SELECT Password From User WHERE Username = @USERNAME";
+          var sql = "SELECT Password, UserID From User WHERE Username = @USERNAME";
           using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
           connection.Open();
 
@@ -348,6 +349,7 @@ public class User
           if (reader.HasRows)
           {
               storedPassword = LedgrLogic.Password.Decrypt(reader.GetString(0));
+              StoredUserID = int.Parse(reader.GetString(1));
           }
 
           if (storedPassword.Equals(TempPassword))
@@ -357,6 +359,32 @@ public class User
       }
       catch (Exception e)
       {
+          return false;
+      }
+      
+      //Updating new password, old password now stored in expired password table
+      try
+      {
+          var UserSQL = "UPDATE User SET Password = @NEWPASSWORD WHERE Username = @USERNAME";
+          using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+          connection.Open();
+
+          using var UserCommand = new SqliteCommand(UserSQL, connection);
+          UserCommand.Parameters.AddWithValue("@NEWUSER", TempPassword);
+          UserCommand.Parameters.AddWithValue("@USERNAME", TempUsername);
+
+          var ExpiredPasswordSQL = "INSERT INTO ExpiredPassword " +
+                                   "VALUES (@STOREDPASSWORD, @USERID)";
+          using var PasswordCommand = new SqliteCommand(ExpiredPasswordSQL, connection);
+          PasswordCommand.Parameters.AddWithValue("@STOREDPASSWORD", storedPassword);
+          PasswordCommand.Parameters.AddWithValue("@USERID", StoredUserID);
+
+          UserCommand.ExecuteNonQuery();
+          PasswordCommand.ExecuteNonQuery();
+      }
+      catch (Exception e)
+      {
+          Console.WriteLine(e);
           return false;
       }
       

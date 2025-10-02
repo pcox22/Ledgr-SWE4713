@@ -206,14 +206,14 @@ public class AdminUnitTests
         
         
         //act
-        Temp.DeactivateUser(1, "2025-09-24", "2025-09-25");
+        Temp.DeactivateUser(4, "2025-10-02", "2025-10-03");
         try
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 1);
+            command.Parameters.AddWithValue("@ID", 4);
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -245,14 +245,14 @@ public class AdminUnitTests
         
         
         //act
-        Temp.ActivateUser(1);
+        Temp.ActivateUser(4);
         try
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 1);
+            command.Parameters.AddWithValue("@ID", 4);
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -283,7 +283,7 @@ public class AdminUnitTests
         string sql = "Select IsActive FROM User WHERE ID = @ID";
         
         //act
-        Actual = Temp.DeactivateUser(1, "2025-09-24","2025-09=25");
+        Actual = Temp.DeactivateUser(4, "2025-10-02","2025-10-03");
     
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
@@ -346,4 +346,155 @@ public class AdminUnitTests
         //Assert
         Assert.That(Actual, Is.EqualTo(Actual));
     }
+
+    /*[Test]
+    public void UpdateEmployeeID_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateEmployeeID(4, 100, 5);
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }*/
+    
+    [Test]
+    public void UpdateFirstName_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateFirstName(4, "John");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    public void UpdateLastName_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateLastName(4, "Smith");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    public void UpdateDoB_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateDoB(4, "2025-10-02");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    public void UpdateAddress_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateAddress(4, "756 Evil Street");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    /*[Test]
+    public void UpdateUserID_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateUserID(4, 100);
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }*/
+    
+    [Test]
+    public void UpdateUsername_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateUsername(4, "TTest1002");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    public void UpdateEmail_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateEmail(4, "TTest1002@Ledgr.com");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    public void Update_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateNewUser(4, 0);
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void ApproveUser_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+
+        //act
+        actual = temp.ApproveUser(2);
+
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
 }
+

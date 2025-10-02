@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Runtime.InteropServices.JavaScript;
 using LedgrLogic;
 
 namespace UnitTests;
@@ -14,9 +16,9 @@ public class UserUnitTests
     public void VerifyLogin_ValidInput_ReturnsCorrectUsername()
     {
         //arrange
-        string tempUsername = "TTest0926";
+        string tempUsername = "TTest1003";
         string tempPassword = "PassW0rd...";
-        string Expected = "TTest0926";
+        string Expected = "TTest1003";
         
         //act
         User returnedUser = User.VerifyLogin(tempUsername, tempPassword);
@@ -30,7 +32,7 @@ public class UserUnitTests
     public void GenerateUsername_ValidUsername_ReturnsTrue()
     {
         //arrange
-        string Expected = "RStraiton1001";
+        string Expected = "RStraiton1002";
         
         //act
         string Actual = User.GenerateUsername("RJ", "Straiton");
@@ -64,4 +66,47 @@ public class UserUnitTests
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
     }
+
+    [Test]
+    public void GetUserID_ValidInput_ReturnsCorrectID()
+    {
+        //arrange
+        int expected = 4;
+        int actual;
+
+        //act
+        actual = User.GetUserID("TTest1003");
+
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void GetSecurityQuestions_ValidInput_ReturnsCorrectQuestion()
+    {
+        //arrange
+        bool expected = true;
+        
+        //act
+        ArrayList temp = User.GetSecurityQuestions(4);
+        bool actual = temp.Contains("What was your first car?");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void ChangePassword_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        string newPassword = "N3w_PassW0rd...";
+        bool expected = true;
+
+        //act
+        bool actual = User.ChangePassword("TTest1003", newPassword);
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
 }

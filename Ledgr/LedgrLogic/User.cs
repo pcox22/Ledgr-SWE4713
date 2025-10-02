@@ -247,6 +247,7 @@ public class User
             {
                 path = reader.GetString(0);
             }
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -257,6 +258,7 @@ public class User
         return path;
     }
 
+    //No idea why this doesn't run correctly
     public static int GetUserID(string tempUsername)
     {
         int tempUserID = -1;
@@ -271,8 +273,12 @@ public class User
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
-                tempUserID = int.Parse(reader.GetString(0));
+                while (reader.Read())
+                {
+                    tempUserID = int.Parse(reader.GetString(0));
+                }
             }
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -298,10 +304,14 @@ public class User
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
-                for (int i = 0; i < 2; i++)
+                while (reader.Read())
                 {
-                    SecurityQuestions.Add(reader.GetString(i));
+                    for (int i = 0; i < 2; i++)
+                    {
+                        SecurityQuestions.Add(reader.GetString(i));
+                    }
                 }
+                
             }
             
             connection.Close();
@@ -339,7 +349,7 @@ public class User
       int StoredUserID = -1;
       try
       {
-          var sql = "SELECT Password, UserID From User WHERE Username = @USERNAME";
+          var sql = "SELECT Password, ID From User WHERE Username = @USERNAME";
           using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
           connection.Open();
 
@@ -348,17 +358,22 @@ public class User
           using var reader = command.ExecuteReader();
           if (reader.HasRows)
           {
-              storedPassword = LedgrLogic.Password.Decrypt(reader.GetString(0));
-              StoredUserID = int.Parse(reader.GetString(1));
+              while (reader.Read())
+              {
+                  storedPassword = LedgrLogic.Password.Decrypt(reader.GetString(0));
+                  StoredUserID = int.Parse(reader.GetString(1));
+              }
           }
 
           if (storedPassword.Equals(TempPassword))
           {
               return false;
           }
+          connection.Close();
       }
       catch (Exception e)
       {
+          Console.WriteLine(e);
           return false;
       }
       
@@ -370,17 +385,19 @@ public class User
           connection.Open();
 
           using var UserCommand = new SqliteCommand(UserSQL, connection);
-          UserCommand.Parameters.AddWithValue("@NEWUSER", TempPassword);
+          UserCommand.Parameters.AddWithValue("@NEWPASSWORD", TempPassword);
           UserCommand.Parameters.AddWithValue("@USERNAME", TempUsername);
 
           var ExpiredPasswordSQL = "INSERT INTO ExpiredPassword " +
-                                   "VALUES (@STOREDPASSWORD, @USERID)";
+                                   "VALUES (2, @STOREDPASSWORD, @USERID)";
           using var PasswordCommand = new SqliteCommand(ExpiredPasswordSQL, connection);
           PasswordCommand.Parameters.AddWithValue("@STOREDPASSWORD", storedPassword);
           PasswordCommand.Parameters.AddWithValue("@USERID", StoredUserID);
 
           UserCommand.ExecuteNonQuery();
           PasswordCommand.ExecuteNonQuery();
+          
+          connection.Close();
       }
       catch (Exception e)
       {

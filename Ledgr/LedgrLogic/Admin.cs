@@ -119,7 +119,7 @@ public class Admin : User
             
             //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
-                              "VALUES (@FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+                              "VALUES (567, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
             using var InsertEmployeeCommand = new SqliteCommand(EmployeeSQL, connection);
             InsertEmployeeCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
             InsertEmployeeCommand.Parameters.AddWithValue("@LASTNAME", LastName);
@@ -130,21 +130,22 @@ public class Admin : User
             InsertEmployeeCommand.ExecuteNonQuery();
 
             //creating a new user will require the EmployeeID Foreign key, which is not created until the employee is created
-            var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME)";
+            var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME";
             using var GetEmployeeIDCommand = new SqliteCommand(GetEmployeeIDSQL, connection);
             GetEmployeeIDCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
             using var EmployeeIDReader = GetEmployeeIDCommand.ExecuteReader();
-            if (reader.HasRows)
+            
+            if (EmployeeIDReader.HasRows)
             {
-                while (reader.Read())
+                while (EmployeeIDReader.Read())
                 {
-                    EmployeeID = int.Parse(reader.GetString(0));
+                    EmployeeID = int.Parse(EmployeeIDReader.GetString(0));
                 }
             }
             
             //Creating a new row in the User table
             var UserSQL = "INSERT INTO User " +
-                          "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
+                          "VALUES (13, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
             using var UserSQLCommand = new SqliteCommand(UserSQL, connection);
             UserSQLCommand.Parameters.AddWithValue("@USERNAME", Username);
             UserSQLCommand.Parameters.AddWithValue("@PASSWORD", Password);
@@ -224,6 +225,8 @@ public class Admin : User
 
             //Successful will only be true if no errors are thrown by the queries
             Successful = true;
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -258,6 +261,8 @@ public class Admin : User
             
             //Successful will only be true if no errors are thrown by the queries
             Successful = true;
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -281,6 +286,8 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             Successful = true;
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -305,6 +312,8 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             Successful = true;
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -328,6 +337,8 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             Successful = true;
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -351,6 +362,8 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             Successful = true;
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -382,6 +395,7 @@ public class Admin : User
                     }
                 }
             }
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -412,6 +426,7 @@ public class Admin : User
                     }
                 }
             }
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -421,7 +436,7 @@ public class Admin : User
     }
 
     //Admin updating employee/user info
-    public bool UpdateEmployeeID(int currentEmployeeID, int newEmployeeID, int tempUserID)
+    /*public bool UpdateEmployeeID(int currentEmployeeID, int newEmployeeID, int tempUserID)
     {
         bool Successful = true;
         try
@@ -441,6 +456,8 @@ public class Admin : User
             using var UserCommand = new SqliteCommand(UserSQL, connection);
             UserCommand.Parameters.AddWithValue("@NEWID", newEmployeeID);
             UserCommand.Parameters.AddWithValue("@USERID", tempUserID);
+
+            UserCommand.ExecuteNonQuery();
         }
         catch (Exception e)
         {
@@ -449,7 +466,7 @@ public class Admin : User
         }
 
         return Successful;
-    }
+    }*/
     
     public bool UpdateFirstName(int EmployeeID, string tempFirst)
     {
@@ -465,6 +482,8 @@ public class Admin : User
             command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -485,10 +504,12 @@ public class Admin : User
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@NEWFIRST", tempLast);
+            command.Parameters.AddWithValue("@NEWLAST", tempLast);
             command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -513,6 +534,8 @@ public class Admin : User
             command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -536,6 +559,8 @@ public class Admin : User
             command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -546,7 +571,7 @@ public class Admin : User
         return Successful;
     }
     
-    public bool UpdateUserID(int currentUserID, int newUserID)
+    /*public bool UpdateUserID(int currentUserID, int newUserID)
     {
         bool Successful = true;
         try
@@ -568,7 +593,7 @@ public class Admin : User
         }
 
         return Successful;
-    }
+    }*/
     
     public bool UpdateUsername(int currentUserID, string tempUsername)
     {
@@ -580,10 +605,12 @@ public class Admin : User
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@NEWUSERNAME", tempUsername);
+            command.Parameters.AddWithValue("@USERNAME", tempUsername);
             command.Parameters.AddWithValue("@USERID", currentUserID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -608,6 +635,8 @@ public class Admin : User
             command.Parameters.AddWithValue("@USERID", currentUserID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -632,6 +661,8 @@ public class Admin : User
             command.Parameters.AddWithValue("@USERID", currentUserID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {

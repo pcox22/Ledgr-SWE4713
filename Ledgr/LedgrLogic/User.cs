@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using Microsoft.Data.Sqlite;
 
 namespace LedgrLogic;
@@ -229,11 +230,137 @@ public class User
         }
         return Successful;
     }
+
+    public string GetProfilePicturePath()
+    {
+        string path = "";
+        string sql = "SELECT ImagePath FROM ProfilePicture WHERE UserID = @USERID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@USERID", UserID);
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                path = reader.GetString(0);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return path;
+        }
+
+        return path;
+    }
+
+    public static int GetUserID(string tempUsername)
+    {
+        int tempUserID = -1;
+        var sql = "SELECT ID FROM User WHERE Username = @USERNAME";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@USERNAME", tempUsername);
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                tempUserID = int.Parse(reader.GetString(0));
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return tempUserID;
+        }
+
+        return tempUserID;
+    }
     
-    /*
-     public static bool ChangePassword(string TempPassword)
+    //Method to get the security questions and their answers
+    public static ArrayList GetSecurityQuestions(int tempUserID)
+    {
+        ArrayList SecurityQuestions = new ArrayList();
+        var sql = "SELECT Question, Answer FROM SecurityQuestion WHERE UserID = @USERID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@USERID", tempUserID);
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    SecurityQuestions.Add(reader.GetString(i));
+                }
+            }
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return null;
+        }
+
+        return SecurityQuestions;
+    }
+
+    public static bool CheckSecurityQuestion(string Answer, string UserInput)
+    {
+        if (Answer.Equals(UserInput))
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+     public static bool ChangePassword(string TempUsername, string TempPassword)
      {
-      //check if the given password is equal to current password or an older password, as well as if it satisfies the password requirements
+      bool Successful = true;
+      //Validate the password first
+      if (!LedgrLogic.Password.Validate(TempPassword).Equals("Success"))
+      {
+          return false;
+      }
+      
+      //Check that the Password is not equal to current password
+      try
+      {
+          string storedPassword = "";
+          var sql = "SELECT Password From User WHERE Username = @USERNAME";
+          using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+          connection.Open();
+
+          using var command = new SqliteCommand(sql, connection);
+          command.Parameters.AddWithValue("@USERNAME", TempUsername);
+          using var reader = command.ExecuteReader();
+          if (reader.HasRows)
+          {
+              storedPassword = LedgrLogic.Password.Decrypt(reader.GetString(0));
+          }
+
+          if (storedPassword.Equals(TempPassword))
+          {
+              return false;
+          }
+      }
+      catch (Exception e)
+      {
+          return false;
+      }
+      
+      return Successful;
      }
-     */
+     
 }

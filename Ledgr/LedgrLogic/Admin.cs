@@ -419,4 +419,226 @@ public class Admin : User
         }
         return ExpiredPasswordReport;
     }
+
+    //Admin updating employee/user info
+    public bool UpdateEmployeeID(int currentEmployeeID, int newEmployeeID, int tempUserID)
+    {
+        bool Successful = true;
+        try
+        {
+            var EmployeeSQL = "UPDATE Employee SET ID = @NEWID WHERE ID = @CURRENTEMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var EmployeeCommand = new SqliteCommand(EmployeeSQL, connection);
+            EmployeeCommand.Parameters.AddWithValue("@NEWID", newEmployeeID);
+            EmployeeCommand.Parameters.AddWithValue("@CURRENTEMPLOYEEID", currentEmployeeID);
+
+            EmployeeCommand.ExecuteNonQuery();
+
+            //Foreign key EmployeeID in User must also get updated
+            var UserSQL = "UPDATE User Set EmployeeID = @NEWID WHERE ID = @USERID";
+            using var UserCommand = new SqliteCommand(UserSQL, connection);
+            UserCommand.Parameters.AddWithValue("@NEWID", newEmployeeID);
+            UserCommand.Parameters.AddWithValue("@USERID", tempUserID);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateFirstName(int EmployeeID, string tempFirst)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET FirstName = @NEWFIRST WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWFIRST", tempFirst);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateLastName(int EmployeeID, string tempLast)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET LastName = @NEWLAST WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWFIRST", tempLast);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateDoB(int EmployeeID, string tempDoB)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET DoB = @NEWDOB WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWDOB", tempDoB);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    public bool UpdateAddress(int EmployeeID, string tempAddress)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET Address = @NEWADDRESS WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWADDRESS", tempAddress);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateUserID(int currentUserID, int newUserID)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET ID = @NEWID WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWID", newUserID);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateUsername(int currentUserID, string tempUsername)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET Username = @USERNAME WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWUSERNAME", tempUsername);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateEmail(int currentUserID, string tempEmail)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET Email = @NEWEMAIL WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWEMAIL", tempEmail);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateNewUser(int currentUserID, int tempNew)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET NewUser = @NEWUSER WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWUSER", tempNew);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
 }

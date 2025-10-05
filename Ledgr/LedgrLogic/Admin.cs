@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 
 namespace LedgrLogic;
 
+
 public class Admin : User
 {
     
@@ -71,7 +72,82 @@ public class Admin : User
 
     }*/
 
-    public bool ApproveUser(int TempUserID)
+    public static List<string> GetAllUsers()
+    {
+        List<string> users = new List<string>();
+        try
+        {
+            var sql = "SELECT * FROM User";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var sqlCommand = new SqliteCommand(sql, connection);
+            using var reader = sqlCommand.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 7; i++)
+                    {
+                        users.Add(reader.GetString(i));
+                    }
+                }
+            }
+            return users;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        return null;
+    }
+
+    public static List<string> GetAllPotentialUsers()
+    {
+        List<string> users = new List<string>();
+        string Username = "";
+        string Password = "";
+        string Email = "";
+        int NewUser = -1;
+        int IsActive = -1;
+        string FirstName = "";
+        string LastName = "";
+        string DoB = "";
+        string Address = "";
+        int IsAdmin = -1;
+        int IsManager = -1;
+        int EmployeeID = -1;
+
+        try
+        {
+            var sql = "SELECT * FROM PotentialUser";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var sqlCommand = new SqliteCommand(sql, connection);
+            using var reader = sqlCommand.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 12; i++)
+                    {
+                        users.Add(reader.GetString(i));
+                    }
+                }
+            }
+            return users;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        return null;
+    }
+    
+    public static bool ApproveUser(int TempUserID)
     {
         bool Successful = true;
 
@@ -85,6 +161,7 @@ public class Admin : User
             PotentialUserCommand.Parameters.AddWithValue("@ID", TempUserID);
 
             using var reader = PotentialUserCommand.ExecuteReader();
+            int PotentialUserID = -1;
             string Username = "";
             string Password = "";
             string Email = "";
@@ -102,6 +179,7 @@ public class Admin : User
             {
                 while (reader.Read())
                 {
+                    PotentialUserID = Convert.ToInt32(reader.GetInt32(0));
                     Username = reader.GetString(1);
                     Password = reader.GetString(2);
                     Email = reader.GetString(3);
@@ -115,10 +193,26 @@ public class Admin : User
                     IsManager = int.Parse(reader.GetString(11));
                 }
             }
+
+            int empID = 1;
+            var sql = "SELECT * FROM EMPLOYEE";
+            using var GetIDSQLCommand = new SqliteCommand(sql, connection);
+            
+            using var GetIDReader = GetIDSQLCommand.ExecuteReader();
+            if (GetIDReader.HasRows)
+            {
+                while (GetIDReader.Read())
+                {
+                    empID++;
+                }
+            }
+            
+            
             //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
-                              "VALUES (@FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+                              "VALUES (@ID, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
             using var InsertEmployeeCommand = new SqliteCommand(EmployeeSQL, connection);
+            InsertEmployeeCommand.Parameters.AddWithValue("@ID", empID);
             InsertEmployeeCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
             InsertEmployeeCommand.Parameters.AddWithValue("@LASTNAME", LastName);
             InsertEmployeeCommand.Parameters.AddWithValue("@DOB", DoB);
@@ -128,30 +222,56 @@ public class Admin : User
             InsertEmployeeCommand.ExecuteNonQuery();
 
             //creating a new user will require the EmployeeID Foreign key, which is not created until the employee is created
+            /*
             var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME)";
             using var GetEmployeeIDCommand = new SqliteCommand(GetEmployeeIDSQL, connection);
             GetEmployeeIDCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
             using var EmployeeIDReader = GetEmployeeIDCommand.ExecuteReader();
-            if (reader.HasRows)
+            if (EmployeeIDReader.HasRows)
             {
-                while (reader.Read())
+                while (EmployeeIDReader.Read())
                 {
                     EmployeeID = int.Parse(reader.GetString(0));
                 }
             }
+            */
+            
+            int userID = 1;
+            var userSQL = "SELECT * FROM EMPLOYEE";
+            using var GetUserIDSQLCommand = new SqliteCommand(sql, connection);
+            
+            using var GetUserIDReader = GetUserIDSQLCommand.ExecuteReader();
+            if (GetUserIDReader.HasRows)
+            {
+                while (GetUserIDReader.Read())
+                {
+                    userID++;
+                }
+            }
             
             var UserSQL = "INSERT INTO User " +
-                          "VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
+                          "VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
             using var UserSQLCommand = new SqliteCommand(UserSQL, connection);
+            UserSQLCommand.Parameters.AddWithValue("@ID", userID);
             UserSQLCommand.Parameters.AddWithValue("@USERNAME", Username);
             UserSQLCommand.Parameters.AddWithValue("@PASSWORD", Password);
             UserSQLCommand.Parameters.AddWithValue("@EMAIL", Email);
             UserSQLCommand.Parameters.AddWithValue("@NEWUSER", NewUser);
             UserSQLCommand.Parameters.AddWithValue("ISACTIVE", IsActive);
-            UserSQLCommand.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+            UserSQLCommand.Parameters.AddWithValue("@EMPLOYEEID", empID);
             UserSQLCommand.ExecuteNonQuery();
             
+            var RemoveSQL = "DELETE FROM PotentialUser WHERE ID = @ID";
+            using var RemoveSQLCommand = new SqliteCommand(RemoveSQL, connection);
+
+            RemoveSQLCommand.Parameters.AddWithValue("@ID", PotentialUserID);
+            int rows = RemoveSQLCommand.ExecuteNonQuery();
+            Console.WriteLine("Users Removed: " + rows);
+
+            LedgrLogic.Email.SendEmail("ledgrsystems@gmail.com", Email, "Ledgr", (FirstName + " " + LastName), "Login Verified", $"You may log in using {Username} as your username, and {Password} as your password.");
             connection.Close();
+            
+            
         }
         catch (Exception e)
         {
@@ -161,6 +281,7 @@ public class Admin : User
         
         return Successful;
     }
+    
     
     /*public bool CreateUser(string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
     {
@@ -262,6 +383,37 @@ public class Admin : User
         }
 
         return Successful;
+    }
+    
+    public static List<string> ExpiredPasswordReport()
+    {
+        List<string> ExpiredPasswordReport = new List<string>();
+        try
+        {
+            var sql = "SELECT * FROM ExpiredPassword";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var PotentialUserCommand = new SqliteCommand(sql, connection);
+
+            using var reader = PotentialUserCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    ExpiredPasswordReport.Add(reader.GetString(0));
+                    ExpiredPasswordReport.Add(reader.GetString(1));
+                    ExpiredPasswordReport.Add(reader.GetString(2));
+                }
+            }
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return null;
+        }
+        return ExpiredPasswordReport;
     }
 
     public bool PromoteToManager(int TempEmployeeID)

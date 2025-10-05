@@ -65,6 +65,7 @@ public class Email
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             return ex.Message;
         }
     }
@@ -98,7 +99,7 @@ public class Email
             });
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(fromName, fromAddress));
+            message.From.Add(new MailboxAddress("Ledgr", "ledgrsystems@gmail.com"));
             message.To.Add(new MailboxAddress(toName, toAddress));
             message.Subject = subject;
             message.Body = new TextPart("plain") { Text = body };

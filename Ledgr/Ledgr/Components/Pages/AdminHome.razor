@@ -1,0 +1,130 @@
+﻿@page "/adminHome/{Username}"
+@using LedgrLogic
+@using MudBlazor
+@inherits LayoutComponentBase
+
+<PageTitle>Home</PageTitle>
+
+<link rel="stylesheet" href="styles.css" />
+
+
+
+
+<!-- Header -->
+<header class="site-header">
+    <div class="container header-inner">
+        <img src="/logo-slogan.png" alt="LEDGR — The smart way to balance business" class="brand-logo"/>
+    </div>
+</header>
+
+<div class="homeDisplay">
+    <div class="homeRow">
+        <button @onclick="OpenReport" type="button" class="btn btn-primary reportButton">PW Report</button>
+        <div class="logged-in-data">
+            <p><strong>@Username</strong></p>
+            <img src="profile.png" alt="PFP" class="pfp"/>
+        </div>
+    </div>
+
+    <div>
+        <!-- Existing Users Table -->
+        <h3>User Data</h3>
+        <table class="user-table">
+            <thead>
+            <tr>
+                <th>UserID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Active?</th>
+                <th>EmployeeID</th>
+            </tr>
+            @for (int i = 0; i < users.Count; i += 7)
+            {
+                int index = i;
+                <tr>
+                    <td style="width: 100px;">@users[index]</td>
+                    <td style="width: 300px">@users[index + 1]</td>
+                    <td style="width: 400px">
+                        <MudButton class="btn-email" OnClick="() => OpenDialog(index)">
+                            @users[index + 3]
+                        </MudButton>
+                    </td>
+                    <td style="width: 100px">@users[index + 5]</td>
+                    <td style="width: 300px">@users[index + 6]</td>
+                </tr>
+            }
+            </thead>
+        </table>
+
+        <!-- Pending Users Table -->
+        <h3>Pending Users</h3>
+        <table class="pendingUsers-table">
+            <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Date of Birth</th>
+                <th>Address</th>
+                <th>Confirm</th>
+            </tr>
+            @for (int i = 0; i < potentialUsers.Count; i += 12)
+            {
+                int index = i;
+                int id = int.Parse(potentialUsers[index]);
+                <tr>
+                    <td style="width: 150px;">@potentialUsers[index + 6]</td>
+                    <td style="width: 150px">@potentialUsers[index + 7]</td>
+                    <td style="width: 300px">@potentialUsers[index + 3]</td>
+                    <td style="width: 200px">@potentialUsers[index + 8]</td>
+                    <td style="width: 200px">@potentialUsers[index + 9]</td>
+                    <td style="width: 200px">
+                            <button @onclick="@(() => RejectUserCommand(id))" type="button" class="btn btn-secondary">Reject</button>
+                            <button onclick="@(() => AcceptUser(id))" type="button" class="btn btn-primary">Confirm</button>
+                    </td>
+                </tr>
+            }
+            </thead>
+        </table>
+
+        <!-- Email Dialog -->
+        <EmailDialog Show="@showEmailDialog" ShowChanged="val => showEmailDialog = val" Recipient="@selectedRecipient"/>
+        <PasswordReport ShowReport="@showPWR" ShowChanged="val => showPWR = val"></PasswordReport>
+    </div>
+</div>
+
+
+@code {
+    [Parameter] public string? Username { get; set; } = string.Empty;
+
+    List<string> users = Admin.GetAllUsers();
+    List<string> potentialUsers = Admin.GetAllPotentialUsers();
+
+    private bool showEmailDialog = false;
+    private bool showPWR = false;
+    private string? selectedRecipient;
+
+    private void OpenDialog(int index)
+    {
+        selectedRecipient = users[index + 3];
+        showEmailDialog = true;
+    }
+
+    private void OpenReport()
+    {
+        showPWR = true;
+    }
+
+    private async void RejectUserCommand(int id)
+    {
+        User.RejectUser(id);
+        potentialUsers = Admin.GetAllPotentialUsers();
+    }
+
+    private async void AcceptUser(int id)
+    {
+        Admin.ApproveUser(id);
+        users = Admin.GetAllUsers();
+        potentialUsers = Admin.GetAllPotentialUsers();
+    }
+}

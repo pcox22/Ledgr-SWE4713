@@ -1,4 +1,7 @@
 @page "/cUser"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -44,6 +47,12 @@
           <InputText @bind-Value="LastName" id="lastName" name="lastName" type="text" class="input" placeholder="Doe" required />
         </label>
 
+        <!-- Password -->
+        <label class="field">
+          <span class="field__label">Password</span>
+          <InputText @bind-Value="Password" id="password" name="password" type="text" class="input" placeholder="PW" required />
+        </label>
+
         <!-- Email Address -->
         <label class="field">
           <span class="field__label">Email Address</span>
@@ -66,6 +75,12 @@
             required
           />
           <p id="dobHint" class="caption muted">Format: MM/DD/YYYY</p>
+        </label>
+
+        <!-- Address -->
+        <label class="field">
+          <span class="field__label">Address</span>
+          <InputText @bind-Value="Address" id="address" name="address" class="input" placeholder="Home Address" required />
         </label>
 
         <!-- Role [REDACTED]
@@ -92,17 +107,19 @@
         <!-- Auto-generated username (read-only preview) -->
         <label class="field">
           <span class="field__label">Auto-Generated Username</span>
-          <input id="username" name="username" type="text" class="input" placeholder="jdoe1025"readonly />
+          <InputText @bind-Value="Username" id="username" name="username" type="text" class="input" placeholder="jdoe1025" readonly />
           <p class="caption muted">
-            Rule: first initial + last name + <code>MMyy</code> of date of birth
-            (eg. jdoe1025)
+            Rule: first initial + last name + <code>MMyy</code> of date registered
+            (eg. jdoe0101)
           </p>
+          <button @onclick="UpdateUsername" type="button" class="btn btn-secondary" id="updateUsername">Generate</button>
+
         </label>
 
         <!-- Actions -->
         <div class="actions">
           <button type="button" class="btn btn-secondary" id="btnClearCreate">Clear</button>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button @onclick="VerifyUserData" type="button" class="btn btn-primary">Submit</button>
         </div>
 
         <p class="center" style="margin-top:8px;"><span class="muted">Already have an account? </span>
@@ -113,100 +130,7 @@
       </form>
     </section>
   </main>
-  <!--
-<script src="assets/js/app.js"></script>
-<script>
-(() => {
-  // Grab elements
-  const formEl  = document.getElementById('createForm');
-  const first   = document.getElementById('firstName');
-  const last    = document.getElementById('lastName');
-  const email   = document.getElementById('email');
-  const dob     = document.getElementById('dob');
-  const roleSel = document.getElementById('role');
-  const statSel = document.getElementById('status');
-  const user    = document.getElementById('username');
-  const prev    = document.getElementById('usernamePreview'); // optional
-  const btnClear = document.getElementById('btnClearCreate');
 
-  // Keep username empty so placeholder "jdoe1025" shows until valid handle is generated
-  if (user) {
-    user.value = '';
-    user.placeholder = 'jdoe1025';
-  }
-  if (prev) prev.textContent = 'jdoe1025';
-
-  // Enforce MM/DD/YYYY while typing
-  if (dob) {
-    dob.setAttribute('inputmode', 'numeric');
-    dob.setAttribute('maxlength', '10');
-    dob.addEventListener('input', () => {
-      let v = dob.value.replace(/\D/g, '').slice(0, 8);
-      if (v.length >= 5)       dob.value = `${v.slice(0,2)}/${v.slice(2,4)}/${v.slice(4,8)}`;
-      else if (v.length >= 3)  dob.value = `${v.slice(0,2)}/${v.slice(2,4)}`;
-      else                     dob.value = v;
-      generate();
-    });
-    dob.addEventListener('blur', () => {
-      if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dob.value)) {
-        dob.value = '';
-        generate();
-      }
-    });
-  }
-
-  // Username generation (first initial + last name + MMyy from DOB)
-  const slug = (s) => (s || '').toLowerCase().replace(/[^a-z]/g, '');
-  const mmYyFromDob = () => {
-    const v = dob ? dob.value : '';
-    return /^\d{2}\/\d{2}\/\d{4}$/.test(v) ? v.slice(0,2) + v.slice(8,10) : '';
-  };
-  function generate() {
-    const fi   = slug(first && first.value).slice(0,1);
-    const ln   = slug(last && last.value);
-    const mmyy = mmYyFromDob();
-    const handle = (fi && ln && mmyy) ? (fi + ln + mmyy) : '';
-    if (user) user.value = handle;
-    if (prev) prev.textContent = handle || 'jdoe1025';
-  }
-  if (first) first.addEventListener('input', generate);
-  if (last)  last.addEventListener('input', generate);
-
-  // Clear button: wipe everything and restore defaults
-  if (btnClear && formEl) {
-    btnClear.addEventListener('click', () => {
-      formEl.reset();
-      if (first) first.value = '';
-      if (last)  last.value  = '';
-      if (email) email.value = '';
-      if (dob)   dob.value   = '';
-      if (roleSel) roleSel.value = 'Accountant';
-      if (statSel) statSel.value = 'Inactive';
-      if (user) { user.value = ''; user.placeholder = 'jdoe1025'; }
-      if (prev) prev.textContent = 'jdoe1025';
-      const alertBox = document.getElementById('createAlert');
-      if (alertBox) alertBox.classList.add('is-hidden');
-      if (first) first.focus();
-    });
-  }
-
-  // Submit hook (backend to replace)
-  hookSimpleSubmit('createForm', 'createAlert', 'createAlertText', () => {
-    const payload = {
-      firstName: (first && first.value.trim()) || '',
-      lastName:  (last  && last.value.trim())  || '',
-      email:     (email && email.value.trim()) || '',
-      dob:       (dob   && dob.value.trim())   || '',
-      role:      roleSel ? roleSel.value : '',
-      status:    statSel ? statSel.value : '',
-      username:  (user  && user.value)         || ''
-    };
-    // TODO: POST /api/users with payload
-    showInline('createAlert', 'success', 'User submitted. Awaiting approval.');
-  });
-})();
-</script>
--->
 </body>
 </html>
 
@@ -215,16 +139,47 @@
   public string LastName { get; set; } = string.Empty;
   public string EmailAddress { get; set; } = string.Empty;
   public string DOB { get; set; } = string.Empty;
+  public string Address { get; set; } = string.Empty;
+  public string Password { get; set; } = string.Empty;
+
+  public string Username { get; set; } = "jdoe0101";
   
-  public string Date = DateTime.Today.ToString();
+  public string Date = DateTime.Today.ToString("yyyy-MM-dd");
   public string FormattedDate = string.Empty;
+
+  public void UpdateUsername()
+  {
+    if (FirstName != string.Empty)
+    {
+      if (LastName != string.Empty)
+      {
+        FormattedDate += Convert.ToString(Date[5]);
+        FormattedDate += Convert.ToString(Date[6]);
+        FormattedDate += Convert.ToString(Date[8]);
+        FormattedDate += Convert.ToString(Date[9]);
+
+        Console.WriteLine($"{Date[5]} , {Date[6]} , {Date[8]} , {Date[9]}");
+        Console.WriteLine(FormattedDate);
+        Username = FirstName[0] + LastName + FormattedDate;
+      }
+    }
+  }
 
   public async Task VerifyUserData()
   {
-    FormattedDate += Date[8] + Date[9] + Date[2] + Date[3];
     // Debug
-    Console.WriteLine(FormattedDate);
-    string userName = FirstName[0] + LastName + FormattedDate;
+    string userName = FirstName[0] + LastName + Convert.ToString(Date[5]) + Convert.ToString(Date[6]) + Convert.ToString(Date[8]) + Convert.ToString(Date[9]);
+    
+    // Create input validation before proceeding
+    
+    if (User.CreatePotentialUser(userName, Password, EmailAddress, FirstName, LastName, DOB, Address))
+    {
+      NavigationManager.NavigateTo($"/");
+    }
+    else
+    {
+      
+    }
     
     // Function currently dne - need to take data from this function and verify against requirements; success would create a row in the database where "isActive" is 0
     

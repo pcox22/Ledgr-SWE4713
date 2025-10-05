@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="Google.Apis.Auth" Version="1.71.0" />
+      <PackageReference Include="MudBlazor" Version="8.13.0" />
     </ItemGroup>
 
     <ItemGroup>

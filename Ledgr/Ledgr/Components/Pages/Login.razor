@@ -1,5 +1,6 @@
 @using System.Reflection.Metadata
 @using LedgrLogic
+@using MudBlazor
 @inject NavigationManager NavigationManager
 @page "/"
 
@@ -31,31 +32,95 @@
     <section class="auth" aria-labelledby="auth-title">
         <div class="card" role="region" aria-label="Sign in form">
             <h1 id="auth-title" class="auth-title">Sign In</h1>
-            <p class="auth-subtitle">Use your email and password.</p>
+            <p class="auth-subtitle">Use your username and password.</p>
 
-            <form class="form" action="" method="get" novalidate>
-                <div class="field">
-                    <label for="email">Username</label>
-                    <InputText id="email" name="email" type="email" autocomplete="email" placeholder="Username" required @bind-Value="Username" />
-                    <p class="field-help sr-only" id="email-help">Enter your username.</p>
-                </div>
-
-                <div class="field">
-                    <div class="field-row">
-                        <label for="password">Password</label>
-                        <a class="link-small" href="/forgot-password">Forgot password?</a>
+            @if (FormEnabled)
+            {
+                <!-- Need to insert proper code for an alerts system -->
+                @if (MissingRole != string.Empty)
+                {
+                    
+                }
+                @if (AccountMismatch != string.Empty)
+                {
+                    
+                }
+                @if (IncorrectLoginDetails != string.Empty)
+                {
+                    
+                }
+                <form class="form" action="" method="get" novalidate>
+                    <div class="field">
+                        <label for="email">Username</label>
+                        <InputText id="email" name="email" type="email" autocomplete="email" placeholder="Username" required @bind-Value="Username"/>
+                        <p class="field-help sr-only" id="email-help">Enter your username.</p>
                     </div>
-                    <InputText id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required @bind-Value="Password"/>
-                </div>
 
-                <button @onclick="VerifyLoginAsync" type="button" class="btn btn-primary">Sign in</button>
+                    <div class="field">
+                        <div class="field-row">
+                            <label for="password">Password</label>
+                            <NavLink class="link-small" href="/fpwIdentify">Forgot password?</NavLink>
+                        </div>
+                        <InputText id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required @bind-Value="Password"/>
+                        <p>You have @Attempts attempts remaining</p>
+                    </div>
 
-                <p class="footer-line">
-                    <span class="muted">Need an account?</span>
-                    <NavLink href="/cUser" class="link">Create one</NavLink>
-                </p>
-                <AntiforgeryToken/>
-            </form>
+                    <!-- Role -->
+                    <label class="field">
+                        <span class="field__label">Role</span>
+                        <InputSelect @bind-Value="Role" id="role" name="role" class="input">
+                            <option value="Admin">Administrator</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Accountant" selected>Accountant</option>
+                        </InputSelect>
+                    </label>
+
+                    <button @onclick="VerifyLoginAsync" type="button" class="btn btn-primary">Sign in</button>
+
+                    <p class="footer-line">
+                        <span class="muted">Need an account?</span>
+                        <NavLink href="/cUser" class="link">Create one</NavLink>
+                    </p>
+                    <AntiforgeryToken/>
+                </form>
+            }
+            else
+            {
+                <form class="form" action="" method="get" novalidate>
+                    <div class="field">
+                        <label for="email">Username</label>
+                        <InputText id="email" style="background-color: #A7A7A7" name="email" type="email" autocomplete="email" placeholder="Username" required @bind-Value="Username" readonly/>
+                        <p class="field-help sr-only" id="email-help">Enter your username.</p>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-row">
+                            <label for="password">Password</label>
+                            <NavLink class="link-small" href="/fpwIdentify">Forgot password?</NavLink>
+                        </div>
+                        <InputText id="password" style="background-color: #A7A7A7" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required @bind-Value="Password" readonly/>
+                        <p>You have @Attempts attempts remaining</p>
+                    </div>
+
+                    <!-- Role -->
+                    <label class="field">
+                        <span class="field__label">Role</span>
+                        <InputSelect @bind-Value="Role" id="role" name="role" disabled>
+                            <option value="Admin">Administrator</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Accountant" selected>Accountant</option>
+                        </InputSelect>
+                    </label>
+                    
+                    <button type="button" class="btn btn-primary">Sign in</button>
+
+                    <p class="footer-line">
+                        <span class="muted">Need an account?</span>
+                        <NavLink href="/cUser" class="link">Create one</NavLink>
+                    </p>
+                    <AntiforgeryToken/>
+                </form>
+            }
         </div>
     </section>
 </main>
@@ -64,23 +129,75 @@
 @code {
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+    public int Attempts = 3;
+    public bool FormEnabled { get; set; } = true;
+    public string Role { get; set; } = string.Empty;
+    
+    // Errors / Alerts
+    public string MissingRole = string.Empty;
+    public string AccountMismatch = string.Empty;
+    public string IncorrectLoginDetails = string.Empty;
 
     public void VerifyLoginAsync()
     {
         try
         {
-            Task<bool> verify = User.VerifyLogin(Username, Password);
-            bool v = verify.Result;
-            if (v)
+            // Reset Alerts
+            AccountMismatch = string.Empty;
+            IncorrectLoginDetails = string.Empty;
+            MissingRole = string.Empty;
+
+            if (Role != string.Empty)
             {
-                NavigationManager.NavigateTo($"/home/{Username}");
+                Task<User> verify = User.VerifyLogin(Username, Password);
+                User currentUser = verify.Result;
+                if (currentUser != null)
+                {
+                    if (currentUser is Admin)
+                    {
+                        if (Role == "Administrator")
+                        {
+                            NavigationManager.NavigateTo($"/adminHome/{Username}");
+                        }
+                        else
+                        {
+                            AccountMismatch = "Login Credentials do not match an account of the specified Role";
+                        }
+                    }
+                    else if (currentUser is Manager)
+                    {
+                        if (Role == "Manager")
+                        {
+                            // Navigate to Manager Home
+                        }
+                        else
+                        {
+                            AccountMismatch = "Login Credentials do not match an account of the specified Role";
+                        }
+                    }
+                    else
+                    {
+                        if (Role == "Accountant")
+                        {
+                            // Nav to acct home
+                            AccountMismatch = "Login Credentials do not match an account of the specified Role";
+                        }
+                    }
+                }
+                else
+                {
+                    // Insert Code to let them know login failed
+                    IncorrectLoginDetails = "Username or Password is invalid \n Please try again";
+                    Attempts--;
+                    if (Attempts <= 0)
+                    {
+                        DisableForm();
+                    }
+                }
             }
             else
             {
-                // Insert Code to let them know login failed
-                // Consider:
-                // Create a field aligned to the right, blank text by default, red "invalid username or password" when failed
-                // Overwrite input fields with invalidity message
+                MissingRole = "Please select an account role";
             }
         }
         catch (Exception e)
@@ -88,6 +205,12 @@
             Console.WriteLine("Process Failed: " + e.Message);
         }
 
+    }
+    public void DisableForm()
+    {
+        Username = string.Empty;
+        Password = string.Empty;
+        FormEnabled = false;
     }
 
 }

@@ -1,0 +1,72 @@
+@page "/fpwIdentify"
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Forgot Password — Identify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page page--login">
+
+<!-- Header -->
+<header class="site-header">
+    <div class="container header-inner">
+        <img src="/logo-slogan.png" alt="LEDGR — The smart way to balance business" class="brand-logo" />
+    </div>
+</header>
+
+<!-- Back link -->
+<p class="body">
+    <NavLink class="link" href="/" aria-label="Return to previous page">← Return to Previous Page</NavLink>
+</p>
+
+<main class="container" style="max-width:980px;">
+
+    <!-- Top alert (show or hide via JS) -->
+@if (Alert){
+    <div id="fpAlert1" class="alert -error is-hidden" role="alert" aria-live="polite" style="max-width:480px; margin:20px auto 0;">
+        <span class="alert__dot" aria-hidden="true"></span>
+        <span class="alert__text" id="fpAlert1Text">User not found. Please try again.</span>
+    </div>
+    }
+    
+
+    <!-- Card -->
+    <section class="card" aria-labelledby="fpTitle" style="max-width:480px; margin:24px auto;">
+        <h1 id="fpTitle" class="h2" style="margin-top:8px;">Forgot Password</h1>
+        <p class="body1 muted" style="margin-top:0;">Enter your User ID and registered email to verify your account.</p>
+
+        <form id="fpFormIdentify" class="form" novalidate>
+            <label class="field">
+                <span class="field__label">User ID</span>
+                <InputText @bind-Value="UserID" id="fpUserId" type="text" class="input" placeholder="JDoeMMYY" required />
+            </label>
+
+            <label class="field">
+                <span class="field__label">Email Address</span>
+                <InputText @bind-Value="Email" id="fpEmail" type="email" class="input" placeholder="email@ledgr.com" required />
+            </label>
+
+            <div class="actions">
+                <button type="button" class="btn btn-secondary" id="btnFpClear">Clear</button>
+                <button type="submit" class="btn btn-primary">Continue</button>
+                <NavLink class="link" href="/fpwVerify">Next</NavLink>
+            </div>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>
+
+@code{
+    
+    public bool Alert { get; set; } = false;
+    public string UserID { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    
+    
+}

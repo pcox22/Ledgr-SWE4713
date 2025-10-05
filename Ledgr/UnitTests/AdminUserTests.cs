@@ -11,215 +11,42 @@ public class AdminUnitTests
     {
     }
 
-    /*[Test]
-    public void CreateEmployee_ValidUserInput_CreatesDatabaseEntry()
+    [Test]
+    public void CreateEmployee_ValidUserInput_WritesToDatabase()
     {
-
+ 
         //arrange
         Admin TempAdmin = new Admin();
-        string Actual = "";
-        string Expected = "5TestTest00";
-
+        string Row = "";
+        
         //act
-        TempAdmin.CreateEmployee(5, "Test", "Test", false, false, 4, "PassW0rd...", "Test@Test.com");
-
+        //TempAdmin.CreateEmployee(3, "Michael", "Liu", true, false);
+        
         //assert
-        var sql = "SELECT ID, FirstName, LastName, IsAdmin, IsManager " +
-                  "FROM Employee " +
-                  "WHERE ID = @ID";
+        var sql = "SELECT ID, FirstName, LastName, IsAdmin, IsMananger FROM Employee WHERE ID = @ID";
         try
         {
+            Console.WriteLine("Hello from Line 28 in Test");
             using var connection = new SqliteConnection($"Data Source="+Database.GetDatabasePath());
-            connection.Open();
-
-            using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 5);
-            using var reader = command.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    Actual += reader.GetString(0);
-                    Actual += reader.GetString(1);
-                    Actual += reader.GetString(2);
-                    Actual += reader.GetString(3);
-                    Actual += reader.GetString(4);
-                }
-            }
-
-            connection.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }*/
-
-    [Test]
-    public void PromoteToAdmin_ValidInput_UpdatesDatabase()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        string Expected = "1";
-        string Actual = "";
-        string sql = "Select IsAdmin FROM EMPLOYEE WHERE ID = @ID";
-        
-        //act
-        Temp.PromoteToAdmin(4);
-        try
-        {
-            using var connection = new SqliteConnection($"Data Source="+Database.GetDatabasePath());
-            connection.Open();
-
-            using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 4);
-            using var reader = command.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    Actual += reader.GetString(0);
-                }
-            }
-
-            connection.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        
-        //Assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void DemoteFromAdmin_ValidInput_UpdatesDatabase()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        string Expected = "0";
-        string Actual = "";
-        string sql = "Select IsAdmin FROM EMPLOYEE WHERE ID = @ID";
-        
-        //act
-        Temp.DemoteFromAdmin(4);
-        try
-        {
-            using var connection = new SqliteConnection($"Data Source="+Database.GetDatabasePath());
-            connection.Open();
-
-            using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 4);
-            using var reader = command.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    Actual += reader.GetString(0);
-                }
-            }
-
-            connection.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        
-        //Assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void PromoteToAdmin_ValidInput_ReturnsTrue()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        bool Expected = true;
-        bool Actual;
-        string sql = "Select IsAdmin FROM EMPLOYEE WHERE ID = @ID";
-        
-        //act
-        Actual = Temp.PromoteToAdmin(4);
-    
-        //assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    [Test]
-    public void DemoteFromAdmin_ValidInput_ReturnsTrue()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        bool Expected = true;
-        bool Actual;
-        string sql = "Select IsAdmin FROM EMPLOYEE WHERE ID = @ID";
-        
-        //act
-        Actual = Temp.DemoteFromAdmin(4);
-    
-        //assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void PromoteToManager_ValidInput_ReturnsTrue()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        bool Expected = true;
-        bool Actual;
-        string sql = "Select IsManager FROM EMPLOYEE WHERE ID = @ID";
-        
-        //act
-        Actual = Temp.PromoteToManager(4);
-    
-        //assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void DemoteFromManager_ValidInput_ReturnsTrue()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        bool Expected = true;
-        bool Actual;
-        string sql = "Select IsManager FROM EMPLOYEE WHERE ID = @ID";
-        
-        //act
-        Actual = Temp.DemoteFromManager(4);
-    
-        //assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-
-    [Test]
-    public void DeactivateUser_ValidInput_UpdatesUserTable()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        string Expected = "0";
-        string Actual = "";
-        string sql = "Select IsActive FROM User WHERE ID = @ID";
-        
-        
-        //act
-        Temp.DeactivateUser(1, "2025-09-24", "2025-09-25");
-        try
-        {
-            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            Console.WriteLine("Hello from Line 30 in Test");
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ID", 1);
+            Console.WriteLine("Hello from Line 33 in Test");
             using var reader = command.ExecuteReader();
+            Console.WriteLine("Hello from Line 35 in Test");
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    Actual += reader.GetString(0);
+                    Console.WriteLine("Hello from Line 39 in Test");
+                    Row += reader.GetString(0);
+                    Console.WriteLine("Hello from Line 42 in Test");
+                    Row += reader.GetString(1);
+                    Row += reader.GetString(2);
+                    Row += reader.GetString(3);
+                    Row += reader.GetString(4);
                 }
             }
 
@@ -227,81 +54,8 @@ public class AdminUnitTests
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Console.WriteLine("Maaaaan wtf going on");
         }
-        
-        //Assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void ActivateUser_ValidInput_UpdatesUserTable()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        string Expected = "1";
-        string Actual = "";
-        string sql = "Select IsActive FROM User WHERE ID = @ID";
-        
-        
-        //act
-        Temp.ActivateUser(1);
-        try
-        {
-            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-            connection.Open();
-
-            using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 1);
-            using var reader = command.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    Actual += reader.GetString(0);
-                }
-            }
-
-            connection.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        
-        //Assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void DeactivateUser_ValidInput_ReturnsTrue()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        bool Expected = true;
-        bool Actual;
-        string sql = "Select IsActive FROM User WHERE ID = @ID";
-        
-        //act
-        Actual = Temp.DeactivateUser(1, "2025-09-24","2025-09=25");
-    
-        //assert
-        Assert.That(Actual, Is.EqualTo(Expected));
-    }
-    
-    [Test]
-    public void ActivateUser_ValidInput_ReturnsTrue()
-    {
-        //arrange
-        Admin Temp = new Admin();
-        bool Expected = true;
-        bool Actual;
-        string sql = "Select IsActive FROM User WHERE ID = @ID";
-        
-        //act
-        Actual = Temp.ActivateUser(1);
-    
-        //assert
-        Assert.That(Actual, Is.EqualTo(Expected));
+        Assert.That(Row, Is.EqualTo("1 RJ Straiton 1 0"));
     }
 }

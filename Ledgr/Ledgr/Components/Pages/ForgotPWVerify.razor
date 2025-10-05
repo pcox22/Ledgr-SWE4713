@@ -1,0 +1,81 @@
+@page "/fpwVerify"
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forgot Password — Verify</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page page--login">
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container header-inner">
+    <img src="/logo-slogan.png" alt="LEDGR — The smart way to balance business" class="brand-logo" />
+  </div>
+</header>
+
+<!-- Back link -->
+<p class="body1">
+  <NavLink class="link" href="/fpwIdentify" aria-label="Return to previous page">← Return to Previous Page</NavLink>
+</p>
+
+<main class="container" style="max-width:980px;">
+
+  <!-- Top alert (toggle via JS) -->
+  @if (Alert)
+  {
+    <div id="fpAlert2" class="alert -error is-hidden" role="alert" aria-live="polite" style="max-width:480px; margin:20px auto 0;">
+      <span class="alert__dot" aria-hidden="true"></span>
+      <span class="alert__text" id="fpAlert2Text">Your answers do not match our records. Please try again.</span>
+    </div>
+  }
+
+
+  <!-- Card -->
+  <section class="card" aria-labelledby="verifyTitle" style="max-width:480px; margin:24px auto;">
+    <h1 id="verifyTitle" class="h2" style="margin-top:8px;">Verify Your Identity</h1>
+    <p class="body1 muted" style="margin-top:0;">Answer your security questions to reset your password.</p>
+
+      
+    <!-- These need to be replaced with interactive backend provisions -->
+    <form id="fpFormVerify" class="form" novalidate>
+      <label class="field">
+        <span class="field__label">What is the name of your first pet?</span>
+        <input id="q1" class="input" placeholder="Type your answer." required />
+      </label>
+
+      <label class="field">
+        <span class="field__label">What city were you born in?</span>
+        <input id="q2" class="input" placeholder="Type your answer." required />
+      </label>
+
+      <label class="field">
+        <span class="field__label">What was the model of your first car?</span>
+        <input id="q3" class="input" placeholder="Type your answer." required />
+      </label>
+
+    <!-- Disabled message for now, interpretation is that it should be on the original password page
+      <p class="caption muted">You have 3 attempts before temporary suspension.</p>
+    -->
+    
+      <div class="actions">
+        <button type="button" class="btn btn--secondary" id="btnSecQClear">Clear</button>
+        <button type="submit" class="btn btn--primary">Verify</button>
+        <NavLink href="/fpwReset">To Reset</NavLink>
+      </div>
+    </form>
+  </section>
+</main>
+
+</body>
+</html>
+
+@code{
+
+  public bool Alert { get; set; } = false;
+
+}

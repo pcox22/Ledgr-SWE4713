@@ -15,10 +15,11 @@ public class PasswordUnitTests
     public void Encrypt_ValidInput_ReturnsDifferentString()
     {
         //arrange
-        string UserInput = "PassW0rd...";
+        string UserInput = "AppD0m4!N";
         
         //act
         string Actual = Password.Encrypt(UserInput);
+        Console.WriteLine(Actual);
         
         //assert
         Assert.That(Actual, !Is.EqualTo(UserInput));

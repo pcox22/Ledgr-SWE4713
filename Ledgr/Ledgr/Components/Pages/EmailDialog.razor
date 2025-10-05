@@ -1,51 +1,9 @@
 @using LedgrLogic
+@using Microsoft.AspNetCore.Components.Forms
 
 @if (Show)
 {
-    <div class="emailPage">
-        <div class="modal-backdrop">
-            <div class="dialog-card">
-                <div class="dialog-header">
-                    <h2 id="dialogTitle">New Message</h2>
-                    <button @onclick="Close" aria-label="Close dialog"
-                            style="background:none;border:0;font-size:18px;cursor:pointer">✕</button>
-                </div>
-
-                <div class="body">
-                    <EditForm Model="@this" OnValidSubmit="HandleSubmit">
-                        <div class="row">
-                            <div class="col">
-                                <label for="from" class="inputLabel">From</label>
-                                <InputText id="from" class="form-control" @bind-Value="From" type="email"></InputText>
-                            </div>
-
-                            <div class="col">
-                                <label for="to" class="inputLabel">To</label>
-                                <InputText id="to" class="form-control" @bind-Value="To" type="email">@Recipient</InputText>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="subject" class="inputLabel">Subject</label>
-                            <InputText id="subject" class="subject-control" @bind-Value="Subject" />
-                        </div>
-
-                        <div>
-                            <label for="body" class="inputLabel">Body</label>
-                            <InputTextArea id="body" class="body-control" @bind-Value="Body" />
-                        </div>
-
-                        <div class="dialog-footer">
-                            <button type="button" class="btn cancel" @onclick="Close">Cancel</button>
-                            <button type="submit" class="btn submit">Submit</button>
-                        </div>
-                    </EditForm>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-<style>
+    <style>
     body{
       margin:0;
       display:flex;
@@ -206,37 +164,86 @@
         margin-left: 15px;
     }
 </style>
+    
+    <div class="modal-backdrop">
+        <div class="dialog-card">
+            <div class="dialog-header">
+                <h2>New Message</h2>
+                <button @onclick="Close" aria-label="Close dialog"
+                        style="background:none;border:0;font-size:18px;cursor:pointer">✕</button>
+            </div>
+
+            <div class="dialog-body">
+                <EditForm Model="@_formData" OnValidSubmit="HandleSubmit">
+                    <div class="row">
+                        <div class="col">
+                            <label for="from">From</label>
+                            <InputText id="from" class="form-control" @bind-Value="_formData.From" type="email" />
+                        </div>
+                        <div class="col">
+                            <label for="to">To</label>
+                            <InputText id="to" class="form-control" @bind-Value="Recipient" Disabled="true" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="subject">Subject</label>
+                        <InputText id="subject" class="subject-control" @bind-Value="_formData.Subject" />
+                    </div>
+
+                    <div>
+                        <label for="body">Body</label>
+                        <InputTextArea id="body" class="body-control" @bind-Value="_formData.Body" />
+                    </div>
+
+                    <div class="dialog-footer">
+                        <button type="button" class="btn cancel" @onclick="Close">Cancel</button>
+                        <button type="submit" class="btn submit">Submit</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+    
 }
 
-    @code {
-        [Parameter] public bool Show { get; set; }
-        [Parameter] public EventCallback<bool> ShowChanged { get; set; }
-        [Parameter] public string? Recipient { get; set; }
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    [Parameter] public string? Recipient { get; set; }
 
+    private FormData _formData = new FormData();
+
+    private async Task Close()
+    {
+        if (ShowChanged.HasDelegate)
+            await ShowChanged.InvokeAsync(false);
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await Email.SendEmailAsync(_formData.From, Recipient, "Ledgr Systems", Recipient, _formData.Subject, _formData.Body);
+            ResetForm();
+            Console.WriteLine("Sent email");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Could not send email: " + e.Message);
+        }
+        await Close();
+    }
+
+    public void ResetForm()
+    {
+        _formData = new FormData();
+    }
+
+    public class FormData
+    {
         public string From { get; set; } = string.Empty;
-        public string To { get; set; } = string.Empty;
         public string Subject { get; set; } = string.Empty;
         public string Body { get; set; } = string.Empty;
-
-        private async Task Close()
-        {
-            if (ShowChanged.HasDelegate)
-            await ShowChanged.InvokeAsync(false);
-        }
-
-        private async Task HandleSubmit()
-        {
-            try
-            {
-                await Email.SendEmailAsync(From, To, "Ledgr Systems", "Recipient", Subject, Body);
-                Console.WriteLine("Sent email");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Could not send email: " + e.Message);
-            }
-            Console.WriteLine($"From: {From}, To: {To}, Subject: {Subject}, Body: {Body}");
-            
-            await Close();
-        }
     }
+}

@@ -351,25 +351,45 @@ public class Admin : User
         return Successful;
     }
     //Dates given to this method should be formatted as a string (YYYY-MM-DD)
-    public bool DeactivateUser(int TempUserID, string TempStartDate, string TempEndDate)
+    public static bool DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate)
     {
+        
         //Changes the IsActive attribute on a user type to false
         //Creates a new entry in SuspendedUser Table
-        var UserSQL = "UPDATE User SET IsActive = 0 WHERE ID = @ID";
+        var UserSQL = "UPDATE User SET IsActive = 0 WHERE Username = @USERNAME";
         var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (1, @START, @END, @USERID)";
         bool Successful = false;
         try
         {
+            int targetID = -1;
+            
+            
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
             using var UserTableCommand = new SqliteCommand(UserSQL, connection);
-            UserTableCommand.Parameters.AddWithValue("@ID", TempUserID);
+            UserTableCommand.Parameters.AddWithValue("@USERNAME", TempUsername);
+            
+            var GetUserIDSQL = "SELECT ID FROM User WHERE Username = @USERNAME";
+            var GetUserIDCommand = new SqliteCommand(GetUserIDSQL, connection);
+            
+            GetUserIDCommand.Parameters.AddWithValue("@USERNAME", TempUsername);
+            
+            var reader = GetUserIDCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    targetID = int.Parse(reader.GetString(0));
+                }
+            }
 
             using var SuspendedTableCommand = new SqliteCommand(SuspendedUserSQL, connection);
-            SuspendedTableCommand.Parameters.AddWithValue("@USERID", TempUserID);
             SuspendedTableCommand.Parameters.AddWithValue("@START", TempStartDate);
             SuspendedTableCommand.Parameters.AddWithValue("@END", TempEndDate);
+            SuspendedTableCommand.Parameters.AddWithValue("@USERID", targetID);
+
+            Console.WriteLine("Target ID: " + targetID);
 
             UserTableCommand.ExecuteNonQuery();
             SuspendedTableCommand.ExecuteNonQuery();

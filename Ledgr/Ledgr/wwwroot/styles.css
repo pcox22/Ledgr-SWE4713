@@ -22,6 +22,7 @@
   --success-500: #22C55E;
   --warning-400: #FACC15;
   --error-500:   #EF4444;
+  --error-fill-500: #FFC0CB;
   --info-500:    #3B82F6;
 
   /* === Misc === */
@@ -75,7 +76,7 @@ body{
 .app-header__inner{
   max-width: 1440px;
   margin: 0 auto;
-  padding: 12px 24px;
+  /*padding: 12px 24px;*/
 
   /* solid centering */
   display: grid;
@@ -83,7 +84,9 @@ body{
   text-align: center;
 }
 .app-header__logo{
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 64px;
   object-fit: contain;
   margin: 0 auto;
@@ -243,16 +246,28 @@ body{
 
 /* ========= Alerts ========= */
 .alert{
+  /*
   display: grid;
   grid-template-columns: 16px 1fr;
-  align-items: center;
   gap: 12px;
-  border-radius: 8px;
-  border: 1px solid;
   padding: 10px 12px;
   margin: 10px 0 4px;
-  background: var(--ui-100);
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid;
+  height: 40px;
+  color: #000000;
+  border-color: var(--error-500);
+  background: var(--error-fill-500);
   font-size: 14px;
+}
+
+.alert p{
+  margin: 0;
 }
 .alert__dot{ width: 12px; height: 12px; border-radius: 999px; background: currentColor; }
 .alert.-error{   color: var(--error-500);   border-color: var(--error-500); }
@@ -439,7 +454,6 @@ body{
   height: 56px; 
   margin: 0;
   width: auto;
-  /*display:block;*/
   filter: none;
 }
 

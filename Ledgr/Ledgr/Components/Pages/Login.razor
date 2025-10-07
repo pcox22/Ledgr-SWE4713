@@ -1,4 +1,5 @@
 @using System.Reflection.Metadata
+@using Google.Apis.Gmail.v1
 @using LedgrLogic
 @using MudBlazor
 @inject NavigationManager NavigationManager
@@ -15,16 +16,8 @@
 </head>
 <body>
 <header class="site-header" role="banner" aria-label="LEDGR global header">
-    <div class="container header-inner">
+    <div class="header-inner">
         <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business." class="brand-logo"/>
-
-        <!-- Optional nav for future pages -->
-        <!-- <nav aria-label="Primary">
-          <ul class="nav">
-            <li><a href="#" aria-current="page">User Management</a></li>
-          </ul>
-        </nav> -->
-
     </div>
 </header>
 
@@ -37,17 +30,35 @@
             @if (FormEnabled)
             {
                 <!-- Need to insert proper code for an alerts system -->
+                @if (SuspendedAccount != string.Empty)
+                {
+                    <div class="alert">
+                        <p><strong>@SuspendedAccount</strong></p>
+                    </div>
+                }
                 @if (MissingRole != string.Empty)
                 {
-                    
+                    <div class="alert">
+                        <p><strong>@MissingRole</strong></p>
+                    </div>
+                }
+                @if (IncorrectUsername != string.Empty)
+                {
+                    <div class="alert">
+                        <p><strong>@IncorrectUsername</strong></p>
+                    </div>
                 }
                 @if (AccountMismatch != string.Empty)
                 {
-                    
+                    <div class="alert">
+                        <p><strong>@AccountMismatch</strong></p>
+                    </div>
                 }
-                @if (IncorrectLoginDetails != string.Empty)
+                @if (IncorrectPassword != string.Empty)
                 {
-                    
+                    <div class="alert">
+                        <p><strong>@IncorrectPassword</strong></p>
+                    </div>
                 }
                 <form class="form" action="" method="get" novalidate>
                     <div class="field">
@@ -69,7 +80,7 @@
                     <label class="field">
                         <span class="field__label">Role</span>
                         <InputSelect @bind-Value="Role" id="role" name="role" class="input">
-                            <option value="Admin">Administrator</option>
+                            <option value="Administrator">Administrator</option>
                             <option value="Manager">Manager</option>
                             <option value="Accountant" selected>Accountant</option>
                         </InputSelect>
@@ -86,6 +97,9 @@
             }
             else
             {
+                <div class="alert">
+                    <p><strong>@AccountDisabled</strong></p>
+                </div>
                 <form class="form" action="" method="get" novalidate>
                     <div class="field">
                         <label for="email">Username</label>
@@ -136,23 +150,32 @@
     // Errors / Alerts
     public string MissingRole = string.Empty;
     public string AccountMismatch = string.Empty;
-    public string IncorrectLoginDetails = string.Empty;
+    public string IncorrectPassword = string.Empty;
+    public string IncorrectUsername = string.Empty;
+    public string AccountDisabled = string.Empty;
+    public string SuspendedAccount = string.Empty;
 
-    public void VerifyLoginAsync()
+    User currentUser = new User();
+
+    public async Task VerifyLoginAsync()
     {
         try
         {
             // Reset Alerts
             AccountMismatch = string.Empty;
-            IncorrectLoginDetails = string.Empty;
+            IncorrectPassword = string.Empty;
+            IncorrectUsername = string.Empty;
             MissingRole = string.Empty;
+            SuspendedAccount = string.Empty;
 
             if (Role != string.Empty)
             {
-                Task<User> verify = User.VerifyLogin(Username, Password);
-                User currentUser = verify.Result;
+                currentUser = await User.VerifyLogin(Username, Password);
+                User cur = await User.VerifyLogin(Username, Password);
+                Console.WriteLine(currentUser.GetType().Name);
                 if (currentUser != null)
                 {
+                    // Role verification
                     if (currentUser is Admin)
                     {
                         if (Role == "Administrator")
@@ -161,7 +184,7 @@
                         }
                         else
                         {
-                            AccountMismatch = "Login Credentials do not match an account of the specified Role";
+                            AccountMismatch = "Login credentials do not match specified role";
                         }
                     }
                     else if (currentUser is Manager)
@@ -172,7 +195,7 @@
                         }
                         else
                         {
-                            AccountMismatch = "Login Credentials do not match an account of the specified Role";
+                            AccountMismatch = "Login credentials do not match specified role";
                         }
                     }
                     else
@@ -180,19 +203,15 @@
                         if (Role == "Accountant")
                         {
                             // Nav to acct home
-                            AccountMismatch = "Login Credentials do not match an account of the specified Role";
+                        }
+                        else
+                        {
+                            AccountMismatch = "Login credentials do not match specified role";
                         }
                     }
-                }
-                else
-                {
-                    // Insert Code to let them know login failed
-                    IncorrectLoginDetails = "Username or Password is invalid \n Please try again";
-                    Attempts--;
-                    if (Attempts <= 0)
-                    {
-                        DisableForm();
-                    }
+
+
+                    // Report to the user whether the username or password was incorrect
                 }
             }
             else
@@ -200,17 +219,63 @@
                 MissingRole = "Please select an account role";
             }
         }
+        catch (InvalidUsernameException e)
+        {
+            SuspendedAccount = string.Empty;
+            AccountMismatch = string.Empty;
+            MissingRole = string.Empty;
+            IncorrectUsername = "No user found with this username";
+            Console.WriteLine("Process Failed: " + e.Message);
+        }
+        catch (InvalidPasswordException e)
+        {
+            SuspendedAccount = string.Empty;
+            AccountMismatch = string.Empty;
+            MissingRole = string.Empty;
+            IncorrectPassword = "Password is invalid";
+            Attempts--;
+            if (Attempts <= 0)
+            {
+                DisableForm(currentUser);
+            }
+        }
+        catch (InactiveUserException e)
+        {
+            AccountMismatch = string.Empty;
+            MissingRole = string.Empty;
+            SuspendedAccount = e.Message;
+        }
         catch (Exception e)
         {
-            Console.WriteLine("Process Failed: " + e.Message);
+            Console.WriteLine("Error: " + e.Message);
         }
 
     }
-    public void DisableForm()
+    public void DisableForm(User cur)
     {
-        Username = string.Empty;
-        Password = string.Empty;
+        // Clear form
         FormEnabled = false;
+        
+        // Disable prior alerts
+        AccountMismatch = string.Empty;
+        IncorrectPassword = string.Empty;
+        IncorrectUsername = string.Empty;
+        MissingRole = string.Empty;
+
+        Console.WriteLine(cur.GetUserName());
+        Console.WriteLine(cur.GetUserID());
+        SuspendUser(cur);
+
+    }
+
+    public void SuspendUser(User cur)
+    {
+        // Suspend the account of the user trying to log in
+        string startDate = DateTime.Today.ToString("yyyy-MM-dd");
+        string endDate = DateTime.Today.AddDays(3).ToString("yyyy-MM-dd");
+
+        Admin.DeactivateUser(Username, startDate, endDate);
+        AccountDisabled = "Too many failed attempts - Account has been suspended";
     }
 
 }

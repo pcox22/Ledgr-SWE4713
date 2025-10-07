@@ -185,6 +185,7 @@ public class User
     public static async Task<User> VerifyLogin(string TempUsername, string TempPassword)
     {
         string StoredPassword = "";
+        string StoredUsername = "";
         int StoredUserID = -1;
         string StoredEmail = "";
         int StoredNew = -1;
@@ -194,7 +195,7 @@ public class User
         int TempManager = -1;
         
         var UserSQL = "select * from User where Username = @USERNAME";
-        var EmployeeSQL = "select IsAdmin, IsManager from Employee where ID = @EMPLOYEEID";
+        var EmployeeSQL = "Select * from Employee where ID = @EMPLOYEEID";
         try
         {
             using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -211,12 +212,19 @@ public class User
                 while (reader.Read())
                 {
                     StoredUserID = Int32.Parse(reader.GetString(0));
+                    StoredUsername = reader.GetString(1);
                     StoredPassword = reader.GetString(2);
                     StoredEmail = reader.GetString(3);
                     StoredNew = Int32.Parse(reader.GetString(4));
                     StoredActive = Int32.Parse(reader.GetString(5));
                     StoredEmployeeID = Int32.Parse(reader.GetString(6));
                 }
+            }
+
+            Console.WriteLine("Stored Username: " + StoredUsername);
+            if (StoredUsername != TempUsername)
+            {
+                throw new InvalidUsernameException("No user exists with that username.");
             }
             StoredPassword = LedgrLogic.Password.Decrypt(StoredPassword);
             
@@ -225,17 +233,17 @@ public class User
             EmployeeCommand.Parameters.AddWithValue("@EMPLOYEEID", StoredEmployeeID);
 
             using var EmployeeReader = EmployeeCommand.ExecuteReader();
-            if (reader.HasRows)
+            if (EmployeeReader.HasRows)
             {
-                while (reader.Read())
+                while (EmployeeReader.Read())
                 {
-                    TempAdmin = Int32.Parse(EmployeeReader.GetString(0));
-                    TempManager = Int32.Parse(EmployeeReader.GetString(1));
+                    TempAdmin = Int32.Parse(EmployeeReader.GetString(5));
+                    TempManager = Int32.Parse(EmployeeReader.GetString(6));
                 }
             }
             await Connection.CloseAsync();
         }
-        catch (Exception e)
+        catch (SqliteException e)
         {
             Console.WriteLine(e);
         }
@@ -249,6 +257,7 @@ public class User
         else
         {
             Active = false;
+            throw new InactiveUserException("The account you are trying to access is suspended. Please contract an administrator for support.");
         }
 
         if (StoredNew == 1)
@@ -275,7 +284,7 @@ public class User
             return new User(TempUsername, TempPassword, StoredEmail, StoredUserID, StoredEmployeeID, Active, NewUser);
         }
         //If password didn't match return null? Should probably just throw an error
-        return null;
+        throw new InvalidPasswordException("Password is incorrect.");
     }
     
     public static string GenerateUsername(string TempFirst, string TempLast)

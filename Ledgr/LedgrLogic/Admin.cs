@@ -672,4 +672,331 @@ public class Admin : User
 
         return Successful;
     }
+
+    //Admin Edit Account methods
+    public bool EditAccountName(int tempAccountNumber, string tempAccountName)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Name = @NAME WHERE Number = @ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NAME", tempAccountName);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountDescription(int tempAccountNumber, string tempAccountDesc)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Description = @DESC WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@DESC", tempAccountDesc);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    //Because Normal Side has to be either left or right (L or R in the database) ensure the char given is L or R
+    public bool EditAccountNormalSIde(int tempAccountNumber, char tempNormalSide)
+    {
+        if (tempNormalSide != 'L' || tempNormalSide != 'R')
+        {
+            return false;
+        }
+        try
+        {
+            var sql = "UPDATE Account SET NormalSide = @NORMALSIDE WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NORMALSIDE", tempNormalSide);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountCategory(int tempAccountNumber, string tempAccountCategory)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Category = @CATEGORY WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@CATEGORY", tempAccountCategory);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountSubCategory(int tempAccountNumber, string tempAccountSubCategory)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET SubCategory = @SUBCATEGORY WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@CATEGORY", tempAccountSubCategory);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    //Need to call method to turn given double into a value with only two decimal spaces
+    public bool EditAccountInitialBalance(int tempAccountNumber, double tempInitialBalance)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET InitialBalance = @INITIALBALANCE WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@INITIALBALANCE", tempInitialBalance);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountDebit(int tempAccountNumber, double tempDebit)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Debit = @DEBIT WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@DEBIT", tempDebit);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountCredit(int tempAccountNumber, double tempCredit)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Credit = @CREDIT WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@CREDIT", tempCredit);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    public bool EditAccountBalance(int tempAccountNumber, double tempBalance)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Balance = @BALANCE WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@BALANCE", tempBalance);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    public bool EditAccountOrder(int tempAccountNumber, int tempOrder)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Order = @ORDER WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ORDER", tempOrder);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountStatement(int tempAccountNumber, string tempStatement)
+    {
+        if (tempStatement != "IS" && tempStatement != "BS" && tempStatement != "RE")
+        {
+            return false;
+        }
+        try
+        {
+            var sql = "UPDATE Account SET Statement = @STATEMENT WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@Statement", tempStatement);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    //Deactivate an account
+    //Needs to check if account balance != 0
+    public bool DeactivateAccount(int tempAccountNumber)
+    {
+        try
+        {
+            var deactivateSql = "UPDATE Account SET Active = 0 WHERE Number = @ID";
+            var getBalanceSql = "SELECT BALANCE FROM  Account WHERE Number = @ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            
+            var getBalanceCommand = new SqliteCommand(getBalanceSql, connection);
+            getBalanceCommand.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            var deactivateCommand = new SqliteCommand(deactivateSql, connection);
+            deactivateCommand.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+            
+            //checking that balance != 0
+            using var reader = getBalanceCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    double storedBalance = double.Parse(reader.GetString(0));
+                    if (storedBalance > 0)
+                    {
+                        //Needs to throw error
+                        return false;
+                    }
+                }
+            }
+
+            deactivateCommand.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            //needs to throw error
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    public bool ActivateAccount(int tempAccountNumber)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Active = 1 WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
 }

@@ -496,5 +496,21 @@ public class AdminUnitTests
         //assert
         Assert.That(actual, Is.EqualTo(expected));
     }
+
+    [Test]
+    public void EditAccountDescription_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        
+        //act
+        bool actual = temp.EditAccountDescription(12345, "Had to change the method lmao!");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
 }
+
 

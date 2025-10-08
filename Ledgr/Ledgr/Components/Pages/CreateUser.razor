@@ -1,6 +1,9 @@
 @page "/cUser"
+@using System.Reflection
 @using LedgrLogic
+@using MudBlazor
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <!doctype html>
 <html lang="en">
@@ -33,6 +36,25 @@
         <span class="alert__dot" aria-hidden="true"></span>
         <span class="alert__text" id="createAlertText"></span>
       </div>
+
+      @if (InvalidPassword != string.Empty)
+      {
+      <div class="alert">
+        <p><strong>@InvalidPassword</strong></p>
+      </div>
+      }
+      @if (MissingField != string.Empty)
+      {
+      <div class="alert">
+        <p><strong>@MissingField</strong></p>
+      </div>
+      }
+      @if (EmptyAnswer != string.Empty)
+      {
+      <div class="alert">
+        <p><strong>@EmptyAnswer</strong></p>
+      </div>
+      }
 
       <form id="createForm" class="form" novalidate>
         <!-- First Name -->
@@ -82,27 +104,7 @@
           <span class="field__label">Address</span>
           <InputText @bind-Value="Address" id="address" name="address" class="input" placeholder="Home Address" required />
         </label>
-
-        <!-- Role [REDACTED]
-        <label class="field">
-          <span class="field__label">Role</span>
-          <select id="role" name="role" class="input">
-            <option value="Admin">Admin</option>
-            <option value="Manager">Manager</option>
-            <option value="Accountant" selected>Accountant</option>
-          </select>
-        </label>
-        -->
-
-        <!-- Status - [REDACTED]
-        <label class="field">
-          <span class="field__label">Status</span>
-          <select id="status" name="status" class="input">
-            <option value="Active">Active</option>
-            <option value="Inactive" selected>Inactive</option>
-          </select>
-        </label>
-        -->
+        
 
         <!-- Auto-generated username (read-only preview) -->
         <label class="field">
@@ -113,12 +115,60 @@
             (eg. jdoe0101)
           </p>
           <button @onclick="UpdateUsername" type="button" class="btn btn-secondary" id="updateUsername">Generate</button>
+        </label>
 
+        <!-- Security Questions -->
+        <label class="field">
+          <span class="field__label">Security Question 1</span>
+          <InputSelect @bind-Value="Q1" id="Q1" name="role">
+            <option value="1" selected>Question 1</option>
+            <option value="2">Question 2</option>
+            <option value="3">Question 3</option>
+            <option value="4">Question 4</option>
+            <option value="5">Question 5</option>
+          </InputSelect>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Answer</span>
+          <InputText @bind-Value="A1" id="Q1 Answer" class="input" placeholder="Answer to Security Question 1" required />
+        </label>
+        
+        <label class="field">
+          <span class="field__label">Security Question 2</span>
+          <InputSelect @bind-Value="Q2" id="Q2" name="role" class="SecurityQuestion">
+            <option value="6" selected>Question 6</option>
+            <option value="7">Question 7</option>
+            <option value="8">Question 8</option>
+            <option value="9">Question 9</option>
+            <option value="10">Question 10</option>
+          </InputSelect>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Answer</span>
+          <InputText @bind-Value="A2" id="Q2 Answer" class="input" placeholder="Answer to Security Question 2" required />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Security Question 3</span>
+          <InputSelect @bind-Value="Q3" id="Q3" name="role">
+            <option value="11" selected>Question 11</option>
+            <option value="12">Question 12</option>
+            <option value="13">Question 13</option>
+            <option value="14">Question 14</option>
+            <option value="15">Question 15</option>
+          </InputSelect>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Answer</span>
+          <InputText @bind-Value="A1" id="Q3 Answer" class="input" placeholder="Answer to Security Question 3" required />
         </label>
 
         <!-- Actions -->
         <div class="actions">
-          <button type="button" class="btn btn-secondary" id="btnClearCreate">Clear</button>
+          <button @onclick="ClearForm" type="button" class="btn btn-secondary" id="btnClearCreate">Clear</button>
           <button @onclick="VerifyUserData" type="button" class="btn btn-primary">Submit</button>
         </div>
 
@@ -130,60 +180,141 @@
       </form>
     </section>
   </main>
-
+  <script>
+    function scrollToTop() {
+      document.documentElement.scrollTop = 0; // For modern browsers
+      document.body.scrollTop = 0; // For older browsers
+    }
+  </script>
 </body>
 </html>
 
 @code {
+  // Data fields
   public string FirstName { get; set; } = string.Empty;
   public string LastName { get; set; } = string.Empty;
   public string EmailAddress { get; set; } = string.Empty;
   public string DOB { get; set; } = string.Empty;
   public string Address { get; set; } = string.Empty;
   public string Password { get; set; } = string.Empty;
+  
+  // Security Question IDs & Answers
+  public string Q1 { get; set; } = "1";
+  public string Q2 { get; set; } = "2";
+  public string Q3 { get; set; } = "3";
 
+  public string A1 { get; set; } = string.Empty;
+  public string A2 { get; set; } = string.Empty;
+  public string A3 { get; set; } = string.Empty;
+
+  
+  // Will be their username if approved
   public string Username { get; set; } = "jdoe0101";
   
+  // Precursor to Username generation
   public string Date = DateTime.Today.ToString("yyyy-MM-dd");
   public string FormattedDate = string.Empty;
 
+  
+  // Alerts
+  public string InvalidPassword { get; set; } = string.Empty;
+  public string MissingField { get; set; } = string.Empty;
+  public string EmptyAnswer { get; set; } = string.Empty;
+  
   public void UpdateUsername()
   {
     if (FirstName != string.Empty)
     {
       if (LastName != string.Empty)
       {
+        FormattedDate = string.Empty;
         FormattedDate += Convert.ToString(Date[5]);
         FormattedDate += Convert.ToString(Date[6]);
         FormattedDate += Convert.ToString(Date[8]);
         FormattedDate += Convert.ToString(Date[9]);
 
-        Console.WriteLine($"{Date[5]} , {Date[6]} , {Date[8]} , {Date[9]}");
-        Console.WriteLine(FormattedDate);
+        //Console.WriteLine($"{Date[5]} , {Date[6]} , {Date[8]} , {Date[9]}");
+        //Console.WriteLine(FormattedDate);
         Username = FirstName[0] + LastName + FormattedDate;
+        Username = Username.ToLower();
       }
     }
   }
 
   public async Task VerifyUserData()
   {
-    // Debug
-    string userName = FirstName[0] + LastName + Convert.ToString(Date[5]) + Convert.ToString(Date[6]) + Convert.ToString(Date[8]) + Convert.ToString(Date[9]);
-    
-    // Create input validation before proceeding
-    
-    if (User.CreatePotentialUser(userName, Password, EmailAddress, FirstName, LastName, DOB, Address))
+    // Reset Alerts
+    MissingField = string.Empty;
+    EmptyAnswer = string.Empty;
+    InvalidPassword = string.Empty;
+
+    if (FirstName != string.Empty && LastName != string.Empty && EmailAddress != string.Empty && DOB != String.Empty && Address != FilterOperator.String.Empty)
     {
-      NavigationManager.NavigateTo($"/");
+      if (A1 != string.Empty && A2 != string.Empty && A3 != string.Empty)
+      {
+        string userName = FirstName[0] + LastName + Convert.ToString(Date[5]) + Convert.ToString(Date[6]) + Convert.ToString(Date[8]) + Convert.ToString(Date[9]);
+        userName = userName.ToLower();
+
+        // Create input validation before proceeding
+        try
+        {
+          string encryptedPassword = string.Empty;
+          encryptedPassword = await LedgrLogic.Password.Validate(Password);
+          if (encryptedPassword != string.Empty)
+          {
+            if (User.CreatePotentialUser(userName, encryptedPassword, EmailAddress, FirstName, LastName, DOB, Address))
+            {
+              NavigationManager.NavigateTo($"/");
+            }
+          }
+        }
+        catch (PasswordRequirementsViolationException e)
+        {
+          await ScrollTop();
+          InvalidPassword = e.Message;
+        }
+        catch (Exception e)
+        {
+          InvalidPassword = "An unknown error occurred. Please try again later";
+          await ScrollTop();
+        }
+      }
+      else
+      {
+        EmptyAnswer = "Please select and answer each security question to continue";
+        await ScrollTop();
+      }
     }
     else
     {
-      
+      MissingField = "Please fill out all fields to continue";
+      await ScrollTop();
     }
-    
-    // Function currently dne - need to take data from this function and verify against requirements; success would create a row in the database where "isActive" is 0
-    
   }
 
+  // When there is an error - Scroll to top of page so User can see what's wrong
+  private async Task ScrollTop()
+  {
+    await JSRuntime.InvokeVoidAsync("scrollToTop");
+  }
 
+  private async void ClearForm()
+  {
+    // Reset all data
+    FirstName  = string.Empty;
+    LastName  = string.Empty;
+    EmailAddress  = string.Empty;
+    DOB = string.Empty;
+    Address = string.Empty;
+    Password  = string.Empty;
+    
+    Q1 = "1";
+    Q2 = "2";
+    Q3 = "3";
+
+    A1 = string.Empty;
+    A2 = string.Empty;
+    A3 = string.Empty;
+    await ScrollTop();
+  }
 }

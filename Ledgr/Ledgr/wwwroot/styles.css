@@ -829,3 +829,7 @@ textarea{
   margin: 0;
   font-weight: bold;
 }
+
+.SecurityQuestion{
+  height: 40px;
+}

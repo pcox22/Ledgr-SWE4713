@@ -1,4 +1,4 @@
-@page "/fpwVerify"
+@page "/fpwVerify/{Username}"
 
 <!doctype html>
 <html lang="en">
@@ -65,7 +65,7 @@
       <div class="actions">
         <button type="button" class="btn btn--secondary" id="btnSecQClear">Clear</button>
         <button type="submit" class="btn btn--primary">Verify</button>
-        <NavLink href="/fpwReset">To Reset</NavLink>
+        <NavLink href="@($"/fpwReset/{Username}")">To Reset</NavLink>
       </div>
     </form>
   </section>
@@ -75,7 +75,7 @@
 </html>
 
 @code{
-
+  [Parameter] public string Username { get; set; } = string.Empty;
   public bool Alert { get; set; } = false;
 
 }

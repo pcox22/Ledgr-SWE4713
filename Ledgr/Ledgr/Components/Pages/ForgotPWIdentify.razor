@@ -1,4 +1,7 @@
 @page "/fpwIdentify"
+@using LedgrLogic
+@inject NavigationManager NavigationManger
+@inject IJSRuntime JSRuntime
 
 <!doctype html>
 <html lang="en">
@@ -25,20 +28,19 @@
 
 <main class="container" style="max-width:980px;">
 
-    <!-- Top alert (show or hide via JS) -->
-@if (Alert){
-    <div id="fpAlert1" class="alert -error is-hidden" role="alert" aria-live="polite" style="max-width:480px; margin:20px auto 0;">
-        <span class="alert__dot" aria-hidden="true"></span>
-        <span class="alert__text" id="fpAlert1Text">User not found. Please try again.</span>
-    </div>
-    }
-    
-
     <!-- Card -->
     <section class="card" aria-labelledby="fpTitle" style="max-width:480px; margin:24px auto;">
         <h1 id="fpTitle" class="h2" style="margin-top:8px;">Forgot Password</h1>
         <p class="body1 muted" style="margin-top:0;">Enter your User ID and registered email to verify your account.</p>
 
+        <!-- Top alert (show or hide via JS) -->
+        @if (Alert != string.Empty)
+        {
+        <div class="alert">
+            <p><strong>@Alert</strong></p>
+        </div>
+        }
+        
         <form id="fpFormIdentify" class="form" novalidate>
             <label class="field">
                 <span class="field__label">User ID</span>
@@ -51,22 +53,52 @@
             </label>
 
             <div class="actions">
-                <button type="button" class="btn btn-secondary" id="btnFpClear">Clear</button>
-                <button type="submit" class="btn btn-primary">Continue</button>
+                <button @onclick="ClearForm" type="button" class="btn btn-secondary" id="btnFpClear">Clear</button>
+                <button @onclick="IdentifyUser" type="button" class="btn btn-primary">Continue</button>
                 <NavLink class="link" href="/fpwVerify">Next</NavLink>
             </div>
         </form>
     </section>
 </main>
-
+<script>
+    function scrollToTop() {
+        document.documentElement.scrollTop = 0; // For modern browsers
+        document.body.scrollTop = 0; // For older browsers
+    }
+</script>
 </body>
 </html>
 
 @code{
     
-    public bool Alert { get; set; } = false;
+    public string Alert { get; set; } = string.Empty;
     public string UserID { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+
+    public async void IdentifyUser()
+    {
+        Alert = string.Empty;
+        if (User.IdentifyUser(UserID, Email).Result)
+        {
+            NavigationManger.NavigateTo($"/fpwVerify/{UserID}");
+        }
+        else
+        {
+            Alert = "Identification Failed. Please try again";
+            await ScrollTop();
+        }
+    }
+
+    private void ClearForm()
+    {
+        Alert = string.Empty;
+        UserID = string.Empty;
+        Email = string.Empty;
+    }
     
+    private async Task ScrollTop()
+    {
+        await JSRuntime.InvokeVoidAsync("scrollToTop");
+    }
     
 }

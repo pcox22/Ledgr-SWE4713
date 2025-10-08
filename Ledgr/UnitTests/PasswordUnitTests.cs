@@ -46,7 +46,7 @@ public class PasswordUnitTests
         string UserInput = "PassW0rd...";
         
         //act
-        string Actual = LedgrLogic.Password.Validate(UserInput);
+        string Actual =  LedgrLogic.Password.Validate(UserInput).Result;
         
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
@@ -60,7 +60,7 @@ public class PasswordUnitTests
         string UserInput = "1PassW0rd...";
         
         //act
-        string Actual = Password.Validate(UserInput);
+        string Actual = Password.Validate(UserInput).Result;
         
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
@@ -74,7 +74,7 @@ public class PasswordUnitTests
         string UserInput = "Seven7.";
         
         //act
-        string Actual = Password.Validate(UserInput);
+        string Actual = Password.Validate(UserInput).Result;
         
         //assert
         Assert.That(Actual,Is.EqualTo(Expected));
@@ -88,7 +88,7 @@ public class PasswordUnitTests
         string UserInput = "Password...";
         
         //act
-        string Actual = Password.Validate(UserInput);
+        string Actual = Password.Validate(UserInput).Result;
         
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
@@ -102,7 +102,7 @@ public class PasswordUnitTests
         string UserInput = "PassW0rd";
         
         //act
-        string Actual = Password.Validate(UserInput);
+        string Actual = Password.Validate(UserInput).Result;
         
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));

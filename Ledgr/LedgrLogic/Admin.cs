@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Data;
 using Microsoft.Data.Sqlite;
 
@@ -12,65 +13,6 @@ public class Admin : User
     public Admin()
     {
     }
-
-    //Admin approving a new user
-    //Needs to query potential user table, grab the info, and create a new employee and a new user
-    /*public bool CreateEmployee(int TempID, string TempFirst, string TempLast, bool Admin, bool Manager, int TempUserID, string TempPassword, string TempEmail)
-    {
-        int TempAdmin;
-        int TempManager;
-        bool Successful = true;
-        //Turning bool into integer as SQL cannot store a bool, only 0 or 1
-        if (Admin)
-        {
-            TempAdmin = 1;
-        }
-        else
-        {
-            TempAdmin = 0;
-        }
-
-        if (Manager)
-        {
-            TempManager = 1;
-        }
-        else
-        {
-            TempManager = 0;
-        }
-
-        var sql = "INSERT INTO Employee (FirstName, LastName, IsAdmin, IsManager)" +
-                  "VALUES (@TEMPID, @TEMPFIRST, @TEMPLAST, @TEMPADMIN, @TEMPMANAGER)";
-        try
-        {
-            using var connection = new SqliteConnection($"Data Source="+Database.GetDatabasePath());
-            connection.Open();
-
-            using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@TEMPFIRST", TempFirst);
-            command.Parameters.AddWithValue("@TEMPLAST", TempLast);
-            command.Parameters.AddWithValue("@TEMPADMIN", TempAdmin);
-            command.Parameters.AddWithValue("@TEMPMANAGER", TempManager);
-
-            command.ExecuteNonQuery();
-            connection.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            Successful = false;
-        }
-        
-        //If the employee was successfully created, call CreateUser() and pass the EmployeeID to it to create a linked User
-        if (Successful)
-        {
-            //Reassign successful in case CreateUser() returns false
-            Successful = CreateUser( GenerateUsername(TempFirst, TempLast), TempPassword, TempID, TempEmail);
-        }
-
-        return Successful;
-
-    }*/
 
     public static List<string> GetAllUsers()
     {
@@ -174,6 +116,12 @@ public class Admin : User
             int IsAdmin = -1;
             int IsManager = -1;
             int EmployeeID = -1;
+            string Question1 = "";
+            string Answer1 = "";
+            string Question2 = "";
+            string Answer2 = "";
+            string Question3 = "";
+            string Answer3 = "";
 
             if (reader.HasRows)
             {
@@ -191,28 +139,21 @@ public class Admin : User
                     Address = reader.GetString(9);
                     IsAdmin = int.Parse(reader.GetString(10));
                     IsManager = int.Parse(reader.GetString(11));
+                    Question1 = reader.GetString(12);
+                    Answer1 = reader.GetString(13);
+                    Question2 = reader.GetString(14);
+                    Answer2 = reader.GetString(15);
+                    Question3 = reader.GetString(16);
+                    Answer3 = reader.GetString(17);
                 }
             }
 
-            int empID = 1;
-            var sql = "SELECT * FROM EMPLOYEE";
-            using var GetIDSQLCommand = new SqliteCommand(sql, connection);
-            
-            using var GetIDReader = GetIDSQLCommand.ExecuteReader();
-            if (GetIDReader.HasRows)
-            {
-                while (GetIDReader.Read())
-                {
-                    empID++;
-                }
-            }
             
             
             //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
-                              "VALUES (@ID, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+                              "VALUES (NULL, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
             using var InsertEmployeeCommand = new SqliteCommand(EmployeeSQL, connection);
-            InsertEmployeeCommand.Parameters.AddWithValue("@ID", empID);
             InsertEmployeeCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
             InsertEmployeeCommand.Parameters.AddWithValue("@LASTNAME", LastName);
             InsertEmployeeCommand.Parameters.AddWithValue("@DOB", DoB);
@@ -220,58 +161,79 @@ public class Admin : User
             InsertEmployeeCommand.Parameters.AddWithValue("@ISADMIN", IsAdmin);
             InsertEmployeeCommand.Parameters.AddWithValue("@ISMANAGER", IsManager);
             InsertEmployeeCommand.ExecuteNonQuery();
-
-            //creating a new user will require the EmployeeID Foreign key, which is not created until the employee is created
-            /*
-            var GetEmployeeIDSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME)";
-            using var GetEmployeeIDCommand = new SqliteCommand(GetEmployeeIDSQL, connection);
-            GetEmployeeIDCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
-            using var EmployeeIDReader = GetEmployeeIDCommand.ExecuteReader();
-            if (EmployeeIDReader.HasRows)
+            
+            // Get that new Employee ID; we need a more viable system; no guarantee first, last name will work
+            var getEmployeeIdSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME and LastName = @LASTNAME";
+            var getEmployeeIdCommand = new SqliteCommand(getEmployeeIdSQL, connection);
+            
+            using var getEmpIDReader = getEmployeeIdCommand.ExecuteReader();
+            if (getEmpIDReader.HasRows)
             {
-                while (EmployeeIDReader.Read())
+                while (getEmpIDReader.Read())
                 {
-                    EmployeeID = int.Parse(reader.GetString(0));
+                    EmployeeID = Convert.ToInt32(getEmpIDReader.GetInt32(0));
                 }
             }
-            */
             
-            int userID = 1;
-            var userSQL = "SELECT * FROM EMPLOYEE";
-            using var GetUserIDSQLCommand = new SqliteCommand(sql, connection);
-            
-            using var GetUserIDReader = GetUserIDSQLCommand.ExecuteReader();
-            if (GetUserIDReader.HasRows)
-            {
-                while (GetUserIDReader.Read())
-                {
-                    userID++;
-                }
-            }
             
             var UserSQL = "INSERT INTO User " +
-                          "VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
+                          "VALUES (NULL, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
             using var UserSQLCommand = new SqliteCommand(UserSQL, connection);
-            UserSQLCommand.Parameters.AddWithValue("@ID", userID);
             UserSQLCommand.Parameters.AddWithValue("@USERNAME", Username);
             UserSQLCommand.Parameters.AddWithValue("@PASSWORD", Password);
             UserSQLCommand.Parameters.AddWithValue("@EMAIL", Email);
             UserSQLCommand.Parameters.AddWithValue("@NEWUSER", NewUser);
             UserSQLCommand.Parameters.AddWithValue("ISACTIVE", IsActive);
-            UserSQLCommand.Parameters.AddWithValue("@EMPLOYEEID", empID);
+            UserSQLCommand.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
             UserSQLCommand.ExecuteNonQuery();
             
             var RemoveSQL = "DELETE FROM PotentialUser WHERE ID = @ID";
             using var RemoveSQLCommand = new SqliteCommand(RemoveSQL, connection);
 
             RemoveSQLCommand.Parameters.AddWithValue("@ID", PotentialUserID);
-            int rows = RemoveSQLCommand.ExecuteNonQuery();
-            Console.WriteLine("Users Removed: " + rows);
+            RemoveSQLCommand.ExecuteNonQuery();
 
             LedgrLogic.Email.SendEmail("ledgrsystems@gmail.com", Email, "Ledgr", (FirstName + " " + LastName), "Login Verified", $"You may log in using {Username} as your username, and {Password} as your password.");
+
+            var getUserIdSQL = "SELECT ID FROM User WHERE EmployeeID = @EMPID";
+            var getUserIdCommand = new SqliteCommand(getUserIdSQL, connection);
+            getUserIdCommand.Parameters.AddWithValue("@EMPID", EmployeeID);
+
+            int userID = -1;
+            using var getUserIDReader = getEmployeeIdCommand.ExecuteReader();
+            if (getUserIDReader.HasRows)
+            {
+                while (getUserIDReader.Read())
+                {
+                    userID = Convert.ToInt32(getEmpIDReader.GetInt32(0));
+                }
+            }
+            
+            var SecQuestionsSQL1 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL2 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL3 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
+            
+            var SQ1Command = new SqliteCommand(SecQuestionsSQL1, connection);
+            SQ1Command.Parameters.AddWithValue("@QUESTION", Question1);
+            SQ1Command.Parameters.AddWithValue("@ANSWER", Answer1);
+            SQ1Command.Parameters.AddWithValue("@USERID", userID);
+            
+            var SQ2Command = new SqliteCommand(SecQuestionsSQL2, connection);
+            SQ2Command.Parameters.AddWithValue("@QUESTION", Question2);
+            SQ2Command.Parameters.AddWithValue("@ANSWER", Answer2);
+            SQ2Command.Parameters.AddWithValue("@USERID", userID);
+
+            var SQ3Command = new SqliteCommand(SecQuestionsSQL3, connection);
+            SQ3Command.Parameters.AddWithValue("@QUESTION", Question3);
+            SQ3Command.Parameters.AddWithValue("@ANSWER", Answer3);
+            SQ3Command.Parameters.AddWithValue("@USERID", userID);
+
+            SQ1Command.ExecuteNonQuery();
+            SQ2Command.ExecuteNonQuery();
+            SQ3Command.ExecuteNonQuery();
+
             connection.Close();
-            
-            
+
         }
         catch (Exception e)
         {
@@ -282,43 +244,6 @@ public class Admin : User
         return Successful;
     }
     
-    
-    /*public bool CreateUser(string TempUsername, string TempPassword, int TempEmployeeID, string TempEmail)
-    {
-        //Calls database to create a User, linked to an Employee
-        bool Successful = true;
-        if (LedgrLogic.Password.Validate(TempPassword).Equals("Success"))
-        {
-            //Encrypt the password before storing to database
-            TempPassword = LedgrLogic.Password.Encrypt(TempPassword);
-            string sql = "INSERT INTO User VALUES (@USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
-            try
-            {
-                using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-                connection.Open();
-
-                using var command = new SqliteCommand(sql, connection);
-                command.Parameters.AddWithValue("@USERNAME", TempUsername);
-                command.Parameters.AddWithValue("@PASSWORD", TempPassword);
-                command.Parameters.AddWithValue("@EMAIL", TempEmail);
-                command.Parameters.AddWithValue("@NEWUSER", 1);
-                command.Parameters.AddWithValue("@ISACTIVE", 1);
-                command.Parameters.AddWithValue("@EMPLOYEEID", TempEmployeeID);
-                command.ExecuteNonQuery();
-                
-                connection.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                Successful = false;
-            }
-        }
-
-        return Successful;
-    }*/
-    
-    //Needs access to database, should be bool for user feedback
     public bool ActivateUser(int TempUserID)
     {
         //Changes the IsActive attribute on a user type to true, updates the database
@@ -528,5 +453,541 @@ public class Admin : User
 
         return Successful;
     }
+    public ArrayList UserReport()
+    {
+        ArrayList UserReport = new ArrayList();
+        try
+        {
+            var PotentialUserSQL = "SELECT * FROM User INNER JOIN Employee on User.EmployeeID = Employee.ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var PotentialUserCommand = new SqliteCommand(PotentialUserSQL, connection);
+
+            using var reader = PotentialUserCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < UserReport.Count; i++)
+                    {
+                        UserReport.Add(reader.GetString(i));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        return UserReport;
+    }
     
+    public bool UpdateFirstName(int EmployeeID, string tempFirst)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET FirstName = @NEWFIRST WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWFIRST", tempFirst);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateLastName(int EmployeeID, string tempLast)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET LastName = @NEWLAST WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWLAST", tempLast);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateDoB(int EmployeeID, string tempDoB)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET DoB = @NEWDOB WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWDOB", tempDoB);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    public bool UpdateAddress(int EmployeeID, string tempAddress)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE Employee SET Address = @NEWADDRESS WHERE ID = @EMPLOYEEID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWADDRESS", tempAddress);
+            command.Parameters.AddWithValue("@EMPLOYEEID", EmployeeID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    public bool UpdateUsername(int currentUserID, string tempUsername)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET Username = @USERNAME WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@USERNAME", tempUsername);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateEmail(int currentUserID, string tempEmail)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET Email = @NEWEMAIL WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWEMAIL", tempEmail);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+    
+    public bool UpdateNewUser(int currentUserID, int tempNew)
+    {
+        bool Successful = true;
+        try
+        {
+            var sql = "UPDATE User SET NewUser = @NEWUSER WHERE ID = @USERID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NEWUSER", tempNew);
+            command.Parameters.AddWithValue("@USERID", currentUserID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return Successful;
+    }
+
+    //Admin Edit Account methods
+    public bool EditAccountName(int tempAccountNumber, string tempAccountName)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Name = @NAME WHERE Number = @ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NAME", tempAccountName);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountDescription(int tempAccountNumber, string tempAccountDesc)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Description = @DESC WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@DESC", tempAccountDesc);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    //Because Normal Side has to be either left or right (L or R in the database) ensure the char given is L or R
+    public bool EditAccountNormalSIde(int tempAccountNumber, char tempNormalSide)
+    {
+        if (tempNormalSide != 'L' || tempNormalSide != 'R')
+        {
+            return false;
+        }
+        try
+        {
+            var sql = "UPDATE Account SET NormalSide = @NORMALSIDE WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NORMALSIDE", tempNormalSide);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountCategory(int tempAccountNumber, string tempAccountCategory)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Category = @CATEGORY WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@CATEGORY", tempAccountCategory);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountSubCategory(int tempAccountNumber, string tempAccountSubCategory)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET SubCategory = @SUBCATEGORY WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@CATEGORY", tempAccountSubCategory);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    //Need to call method to turn given double into a value with only two decimal spaces
+    public bool EditAccountInitialBalance(int tempAccountNumber, double tempInitialBalance)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET InitialBalance = @INITIALBALANCE WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@INITIALBALANCE", tempInitialBalance);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountDebit(int tempAccountNumber, double tempDebit)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Debit = @DEBIT WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@DEBIT", tempDebit);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountCredit(int tempAccountNumber, double tempCredit)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Credit = @CREDIT WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@CREDIT", tempCredit);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    public bool EditAccountBalance(int tempAccountNumber, double tempBalance)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Balance = @BALANCE WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@BALANCE", tempBalance);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    public bool EditAccountOrder(int tempAccountNumber, int tempOrder)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Order = @ORDER WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ORDER", tempOrder);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    public bool EditAccountStatement(int tempAccountNumber, string tempStatement)
+    {
+        if (tempStatement != "IS" && tempStatement != "BS" && tempStatement != "RE")
+        {
+            return false;
+        }
+        try
+        {
+            var sql = "UPDATE Account SET Statement = @STATEMENT WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@Statement", tempStatement);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    
+    //Deactivate an account
+    //Needs to check if account balance != 0
+    public bool DeactivateAccount(int tempAccountNumber)
+    {
+        try
+        {
+            var deactivateSql = "UPDATE Account SET Active = 0 WHERE Number = @ID";
+            var getBalanceSql = "SELECT BALANCE FROM  Account WHERE Number = @ID";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            
+            var getBalanceCommand = new SqliteCommand(getBalanceSql, connection);
+            getBalanceCommand.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            var deactivateCommand = new SqliteCommand(deactivateSql, connection);
+            deactivateCommand.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+            
+            //checking that balance != 0
+            using var reader = getBalanceCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    double storedBalance = double.Parse(reader.GetString(0));
+                    if (storedBalance > 0)
+                    {
+                        //Needs to throw error
+                        return false;
+                    }
+                }
+            }
+
+            deactivateCommand.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            //needs to throw error
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+    public bool ActivateAccount(int tempAccountNumber)
+    {
+        try
+        {
+            var sql = "UPDATE Account SET Active = 1 WHERE Number = @ID"; 
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", tempAccountNumber);
+            
+            connection.Open();
+
+            command.ExecuteNonQuery();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
 }

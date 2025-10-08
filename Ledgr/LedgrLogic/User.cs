@@ -457,13 +457,6 @@ public class User
      public static bool ChangePassword(string TempUsername, string TempPassword)
      {
       bool Successful = true;
-      //Validate the password first
-      if (!LedgrLogic.Password.Validate(TempPassword).Equals("Success"))
-      {
-          return false;
-      }
-      
-      //Check that the Password is not equal to current password
       string storedPassword = "";
       int StoredUserID = -1;
       try
@@ -486,11 +479,33 @@ public class User
 
           if (storedPassword.Equals(TempPassword))
           {
-              return false;
+              throw new PasswordUsedBeforeException("Please enter a password that has not been used in the past");
           }
+          
+          var sqlEXP = "SELECT Password FROM ExpiredPassword WHERE UserID = @UserID";
+          List<string> ExpiredPasswords = new List<string>();
+          
+          var expiredCommand = new SqliteCommand(sqlEXP, connection);
+          expiredCommand.Parameters.AddWithValue("@UserID", StoredUserID);
+          
+          using var expiredReader = expiredCommand.ExecuteReader();
+          if (expiredReader.HasRows)
+          {
+              while (expiredReader.Read())
+              {
+                  ExpiredPasswords.Add(expiredReader.GetString(0));
+                  Console.WriteLine(expiredReader.GetString(0));
+              }
+          }
+          
           connection.Close();
+
+          if (ExpiredPasswords.Contains(storedPassword))
+          {
+              throw new PasswordUsedBeforeException("Please enter a password that has not been used in the past");
+          }
       }
-      catch (Exception e)
+      catch (SqliteException e)
       {
           Console.WriteLine(e);
           return false;
@@ -499,16 +514,17 @@ public class User
       //Updating new password, old password now stored in expired password table
       try
       {
+          string encryptedPassword = LedgrLogic.Password.Encrypt(TempPassword);
           var UserSQL = "UPDATE User SET Password = @NEWPASSWORD WHERE Username = @USERNAME";
           using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
           connection.Open();
 
           using var UserCommand = new SqliteCommand(UserSQL, connection);
-          UserCommand.Parameters.AddWithValue("@NEWPASSWORD", TempPassword);
+          UserCommand.Parameters.AddWithValue("@NEWPASSWORD", encryptedPassword);
           UserCommand.Parameters.AddWithValue("@USERNAME", TempUsername);
 
           var ExpiredPasswordSQL = "INSERT INTO ExpiredPassword " +
-                                   "VALUES (2, @STOREDPASSWORD, @USERID)";
+                                   "VALUES (NULL, @STOREDPASSWORD, @USERID)";
           using var PasswordCommand = new SqliteCommand(ExpiredPasswordSQL, connection);
           PasswordCommand.Parameters.AddWithValue("@STOREDPASSWORD", storedPassword);
           PasswordCommand.Parameters.AddWithValue("@USERID", StoredUserID);
@@ -556,10 +572,65 @@ public class User
 
          return tempUserID;
      }
-    
-    /*
-     public bool ChangePassword(string TempPassword)
+
+     public static async Task<bool> IdentifyUser(string Username, string Email)
      {
-      //check if the given password is equal to current password or an older password, as well as if it satisfies the password requirements
-     */
+         var sql = "SELECT EMAIL FROM User WHERE Username = @USERNAME";
+         try
+         {
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             using var command = new SqliteCommand(sql, connection);
+             command.Parameters.AddWithValue("@USERNAME", Username);
+
+             using var reader = command.ExecuteReader();
+             if (reader.HasRows)
+             {
+                 while (reader.Read())
+                 {
+                     if (reader.GetString(0).Equals(Email))
+                     {
+                         return true;
+                     }
+                 }
+             }
+             
+             await connection.CloseAsync();
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+         }
+
+         return false;
+     }
+     
+     public string GetProfilePicturePath()
+     {
+         string path = "";
+         string sql = "SELECT ImagePath FROM ProfilePicture WHERE UserID = @USERID";
+         try
+         {
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             using var command = new SqliteCommand(sql, connection);
+             command.Parameters.AddWithValue("@USERID", UserID);
+             using var reader = command.ExecuteReader();
+             if (reader.HasRows)
+             {
+                 path = reader.GetString(0);
+             }
+             connection.Close();
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             return path;
+         }
+
+         return path;
+     }
+     
 }

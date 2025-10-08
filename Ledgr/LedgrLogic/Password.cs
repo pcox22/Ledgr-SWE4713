@@ -5,7 +5,7 @@ using System.Text;
 
 public class Password
 {
-    public static string Validate(string password)
+    public static async Task<string> Validate(string password)
     {
         bool hasNum = false;
         bool hasSpec = false;
@@ -20,12 +20,12 @@ public class Password
                     if (!Char.IsLetterOrDigit(password[i])) {hasSpec = true;}
                 }
             }
-            else { return "First character must be a letter"; }
+            else { throw new PasswordRequirementsViolationException("First character must be a letter"); }
         }
-        else { return "Password must be at least 8 characters long"; }
-        if (!hasNum) { return "Password must contain a number"; }
-        if (!hasSpec) { return "Password must contain a special character"; }
-        return "Success";
+        else { throw new PasswordRequirementsViolationException("Password must be at least 8 characters long"); }
+        if (!hasNum) { throw new PasswordRequirementsViolationException("Password must contain a number"); }
+        if (!hasSpec) { throw new PasswordRequirementsViolationException("Password must contain a special character"); }
+        return Encrypt(password);
     }
     
     

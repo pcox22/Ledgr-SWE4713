@@ -1,4 +1,5 @@
-@page "/fpwReset"
+@page "/fpwReset/{Username}"
+@using LedgrLogic
 
 <!doctype html> <!-- HTML5 document -->
 <html lang="en">
@@ -24,50 +25,135 @@
   </div>
 </header>
 
-  <!-- Centered page content -->
-  <main class="container container--center">
+<!-- Centered page content -->
+<main class="container container--center">
 
-    <!-- Reset password card -->
-    <section class="card" aria-labelledby="resetTitle">
-      <h1 id="resetTitle" class="h2">Create New Password</h1>
-      <p class="body1 muted">Choose a strong password.</p>
+  <!-- Reset password card -->
+  <section class="card" aria-labelledby="resetTitle">
+    <h1 id="resetTitle" class="h2">Create New Password</h1>
+    <p class="body1 muted">Choose a strong password.</p>
 
-      <!-- Inline alert (hidden by default) -->
-      <div id="fpAlert3" class="alert is-hidden" role="alert" aria-live="polite">
-        <span class="alert__dot"></span>
-        <span id="fpAlert3Text" class="alert__text"></span>
-      </div>
+    @if (Alert != string.Empty)
+    {
+    <div class="alert">
+      <p><strong>@Alert</strong></p>
+    </div>
+    }
 
-      <!-- Reset form (client-side validation only) -->
-      <form id="fpFormReset" class="form" novalidate>
-        <!-- New password with show/hide toggle -->
+    <!-- Reset form (client-side validation only) -->
+    <form id="fpFormReset" class="form" novalidate>
+      <!-- New password with show/hide toggle -->
+      @if (!showNewPW)
+      {
         <label class="field">
           <span class="field__label">New Password</span>
           <div class="input input--with-addon">
-            <input id="newPwd" type="password" class="input__control" required />
-            <!-- JS toggles input type + swaps icon -->
-            <button type="button" class="icon-btn" id="toggleNewPwd" aria-label="Show password">
-              <img src="assets/icons/visible.svg" class="icon" />
+            <InputText @bind-Value="NewPW" id="newPwd" type="password" class="input__control" required/>
+            <button @onclick="ChangeVisibility1" type="button" class="icon-btn" id="toggleNewPwd" aria-label="Show password">
+              <img src="hidden.svg" class="icon" alt="Show"/>
             </button>
           </div>
         </label>
+      }
+      @if (showNewPW)
+      {
+        <label class="field">
+          <span class="field__label">New Password</span>
+          <div class="input input--with-addon">
+            <InputText @bind-Value="NewPW" id="newPwd" class="input__control" required/>
+            <button @onclick="ChangeVisibility1" type="button" class="icon-btn" id="toggleNewPwd" aria-label="Show password">
+              <img src="visible.svg" class="icon" alt="Show"/>
+            </button>
+          </div>
+        </label>
+      }
 
-        <!-- Confirmation must match new password -->
+      <!-- Confirmation must match new password -->
+      @if (!showConPW)
+      {
         <label class="field">
           <span class="field__label">Confirm Password</span>
-          <input id="newPwd2" type="password" class="input" required />
+          <div class="input input--with-addon">
+            <InputText @bind-Value="ConPW" id="newPwd" type="password" class="input__control" required/>
+            <button @onclick="ChangeVisibility2" type="button" class="icon-btn" id="toggleNewPwd" aria-label="Show password">
+              <img src="hidden.svg" class="icon" alt="Show"/>
+            </button>
+          </div>
         </label>
+      }
+      @if (showConPW)
+      {
+        <label class="field">
+          <span class="field__label">Confirm Password</span>
+          <div class="input input--with-addon">
+            <InputText @bind-Value="ConPW" id="newPwd" class="input__control" required/>
+            <button @onclick="ChangeVisibility2" type="button" class="icon-btn" id="toggleNewPwd" aria-label="Show password">
+              <img src="visible.svg" class="icon" alt="Show"/>
+            </button>
+          </div>
+        </label>
+      }
 
-        <!-- Actions: back to verify, save new password -->
-        <div class="actions">
-          <NavLink class="btn btn--secondary" href="/fpwVerify">Back</NavLink>
-          <button type="submit" class="btn btn--primary">Save Password</button>
-        </div>
-      </form>
-    </section>
+      <!-- Actions: back to verify, save new password -->
+      <div class="actions">
+        <NavLink class="btn btn--secondary" href="/fpwVerify">Back</NavLink>
+        <button @onclick="ResetPW" type="button" class="btn btn--primary">Save Password</button>
+      </div>
+    </form>
+  </section>
 
-  </main>
+</main>
 
-  <!-- App scripts (handles show/hide, validation, submit) -->
+<!-- App scripts (handles show/hide, validation, submit) -->
 </body>
 </html>
+
+@code{
+  [Parameter] public string Username { get; set; } = string.Empty;
+  public string NewPW { get; set; } = string.Empty;
+  public string ConPW { get; set; } = string.Empty;
+
+  public bool showNewPW { get; set; } = false;
+  public bool showConPW { get; set; } = false;
+  
+  // Alerts
+  public string Alert { get; set; } = string.Empty;
+
+  public async void ResetPW()
+  {
+    Alert = string.Empty;
+    try
+    {
+      // Note: The following method will break if any of the password requirements are not met
+      string encryptedPassword = await Password.Validate(NewPW);
+      if (NewPW == ConPW)
+      {
+        User.ChangePassword(Username, NewPW);
+      }
+      else
+      {
+        Alert = "Passwords do not match";
+      }
+    }
+    catch (PasswordRequirementsViolationException e)
+    {
+      Alert = e.Message;
+    }
+    catch (PasswordUsedBeforeException e)
+    {
+      Alert = e.Message;
+    }
+    
+  }
+  
+  public void ChangeVisibility1()
+  {
+    showNewPW = !showNewPW;
+  }
+  public void ChangeVisibility2()
+  {
+    showConPW = !showConPW;
+  }
+
+
+}

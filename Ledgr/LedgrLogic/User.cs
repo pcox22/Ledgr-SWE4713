@@ -348,11 +348,11 @@ public class User
         return null;
     }
     public static bool CreatePotentialUser(string tempUsername, string tempPassword, string tempEmail,
-        string tempFirst, string tempLast, string tempDoB, string tempAddress)
+        string tempFirst, string tempLast, string tempDoB, string tempAddress, string Q1, string A1, string Q2, string A2, string Q3, string A3)
     {
         bool Successful = true;
         var sql = "INSERT INTO PotentialUser " +
-                  "VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+                  "VALUES (NULL, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER, @Q1, @A1, @Q2, @A2, @Q3, @A3)";
         try
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -372,6 +372,12 @@ public class User
             command.Parameters.AddWithValue("@ADDRESS", tempAddress);
             command.Parameters.AddWithValue("@ISADMIN", 0);
             command.Parameters.AddWithValue("@ISMANAGER", 0);
+            command.Parameters.AddWithValue("@Q1", Q1);
+            command.Parameters.AddWithValue("@A1", A1);
+            command.Parameters.AddWithValue("@Q2", Q2);
+            command.Parameters.AddWithValue("@A2", A2);
+            command.Parameters.AddWithValue("@Q3", Q3);
+            command.Parameters.AddWithValue("@A3", A3);
 
             using var reader = command.ExecuteReader();
             
@@ -385,7 +391,7 @@ public class User
         return Successful;
     }
 
-    public static async void RejectUser(int ID)
+    public static async Task RejectUser(int ID)
     {
         var sql = "DELETE FROM PotentialUser WHERE ID = @ID";
         try

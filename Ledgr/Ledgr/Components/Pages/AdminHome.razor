@@ -94,8 +94,8 @@
 @code {
     [Parameter] public string? Username { get; set; } = string.Empty;
 
-    List<string> users = Admin.GetAllUsers();
-    List<string> potentialUsers = Admin.GetAllPotentialUsers();
+    List<string> users = Admin.GetAllUsers().Result;
+    List<string> potentialUsers = Admin.GetAllPotentialUsers().Result;
 
     private bool showEmailDialog = false;
     private bool showPWR = false;
@@ -112,16 +112,18 @@
         showPWR = true;
     }
 
-    private async void RejectUserCommand(int id)
+    private async Task RejectUserCommand(int id)
     {
-        User.RejectUser(id);
-        potentialUsers = Admin.GetAllPotentialUsers();
+        await User.RejectUser(id);
+        potentialUsers = await Admin.GetAllPotentialUsers();
+        StateHasChanged();
     }
 
-    private async void AcceptUser(int id)
+    private async Task AcceptUser(int id)
     {
-        Admin.ApproveUser(id);
-        users = Admin.GetAllUsers();
-        potentialUsers = Admin.GetAllPotentialUsers();
+        await Admin.ApproveUser(id);
+        potentialUsers = await Admin.GetAllPotentialUsers();
+        users = await Admin.GetAllUsers();
+        StateHasChanged();
     }
 }

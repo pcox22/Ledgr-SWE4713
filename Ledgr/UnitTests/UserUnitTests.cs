@@ -56,11 +56,17 @@ public class UserUnitTests
         string Address = "123 Main Street, Marietta GA";
         int Admin = 0;
         int Manager = 0;
+        string q1 = "";
+        string a1 = "";
+        string q2 = "";
+        string a2 = "";
+        string q3 = "";
+        string a3 = "";
 
         bool Expected = true;
         
         //act
-        bool Actual = User.CreatePotentialUser(Username, Password, email, FirstName, LastName, DoB, Address);
+        bool Actual = User.CreatePotentialUser(Username, Password, email, FirstName, LastName, DoB, Address, q1, a1, q2, a2, q3, a3);
         
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));

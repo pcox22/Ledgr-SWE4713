@@ -18,7 +18,7 @@ public static class Database
         string DBPath = Path.Combine(ProjectRoot, "LedgrLogic/LedgerDB.db");
         
         
-        Console.WriteLine(Environment.CurrentDirectory);
+        //Console.WriteLine(Environment.CurrentDirectory);
         //Console.WriteLine("P Root: " + ProjectRoot);
 
         return DBPath;

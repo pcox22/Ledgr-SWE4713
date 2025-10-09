@@ -14,7 +14,7 @@ public class Admin : User
     {
     }
 
-    public static List<string> GetAllUsers()
+    public static async Task<List<string>> GetAllUsers()
     {
         List<string> users = new List<string>();
         try
@@ -45,7 +45,7 @@ public class Admin : User
         return null;
     }
 
-    public static List<string> GetAllPotentialUsers()
+    public static async Task<List<string>> GetAllPotentialUsers()
     {
         List<string> users = new List<string>();
         string Username = "";
@@ -89,7 +89,7 @@ public class Admin : User
         return null;
     }
     
-    public static bool ApproveUser(int TempUserID)
+    public static async Task<bool> ApproveUser(int TempUserID)
     {
         bool Successful = true;
 
@@ -147,8 +147,6 @@ public class Admin : User
                     Answer3 = reader.GetString(17);
                 }
             }
-
-            
             
             //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
@@ -165,6 +163,9 @@ public class Admin : User
             // Get that new Employee ID; we need a more viable system; no guarantee first, last name will work
             var getEmployeeIdSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME and LastName = @LASTNAME";
             var getEmployeeIdCommand = new SqliteCommand(getEmployeeIdSQL, connection);
+            
+            getEmployeeIdCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
+            getEmployeeIdCommand.Parameters.AddWithValue("@LASTNAME", LastName);
             
             using var getEmpIDReader = getEmployeeIdCommand.ExecuteReader();
             if (getEmpIDReader.HasRows)
@@ -191,21 +192,21 @@ public class Admin : User
             using var RemoveSQLCommand = new SqliteCommand(RemoveSQL, connection);
 
             RemoveSQLCommand.Parameters.AddWithValue("@ID", PotentialUserID);
-            RemoveSQLCommand.ExecuteNonQuery();
+            await RemoveSQLCommand.ExecuteNonQueryAsync();
 
-            LedgrLogic.Email.SendEmail("ledgrsystems@gmail.com", Email, "Ledgr", (FirstName + " " + LastName), "Login Verified", $"You may log in using {Username} as your username, and {Password} as your password.");
+            LedgrLogic.Email.SendEmail("ledgrsystems@gmail.com", Email, "Ledgr", (FirstName + " " + LastName), "Login Verified", $"You may log in using {Username} as your username, and {LedgrLogic.Password.Decrypt(Password)} as your password.");
 
             var getUserIdSQL = "SELECT ID FROM User WHERE EmployeeID = @EMPID";
             var getUserIdCommand = new SqliteCommand(getUserIdSQL, connection);
             getUserIdCommand.Parameters.AddWithValue("@EMPID", EmployeeID);
 
             int userID = -1;
-            using var getUserIDReader = getEmployeeIdCommand.ExecuteReader();
+            using var getUserIDReader = getUserIdCommand.ExecuteReader();
             if (getUserIDReader.HasRows)
             {
                 while (getUserIDReader.Read())
                 {
-                    userID = Convert.ToInt32(getEmpIDReader.GetInt32(0));
+                    userID = Convert.ToInt32(getEmpIDReader.GetString(0));
                 }
             }
             
@@ -232,7 +233,7 @@ public class Admin : User
             SQ2Command.ExecuteNonQuery();
             SQ3Command.ExecuteNonQuery();
 
-            connection.Close();
+            await connection.CloseAsync();
 
         }
         catch (Exception e)

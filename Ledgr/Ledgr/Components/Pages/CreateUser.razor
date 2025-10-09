@@ -120,12 +120,12 @@
         <!-- Security Questions -->
         <label class="field">
           <span class="field__label">Security Question 1</span>
-          <InputSelect @bind-Value="Q1" id="Q1" name="role">
-            <option value="1" selected>Question 1</option>
-            <option value="2">Question 2</option>
-            <option value="3">Question 3</option>
-            <option value="4">Question 4</option>
-            <option value="5">Question 5</option>
+          <InputSelect @bind-Value="Q1" id="Q1" name="role" class="SecurityQuestion">
+            <option value="What was your first car?" selected>What was your first car?</option>
+            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+            <option value="What year did you graduate High School?">What year did you graduate High School?</option>
+            <option value="What is the name of your first pet?">What is the name of your first pet?</option>
+            <option value="In what city did your parents meet?">In what city did your parents meet?</option>
           </InputSelect>
         </label>
 
@@ -137,11 +137,11 @@
         <label class="field">
           <span class="field__label">Security Question 2</span>
           <InputSelect @bind-Value="Q2" id="Q2" name="role" class="SecurityQuestion">
-            <option value="6" selected>Question 6</option>
-            <option value="7">Question 7</option>
-            <option value="8">Question 8</option>
-            <option value="9">Question 9</option>
-            <option value="10">Question 10</option>
+            <option value="What is your favorite color?" selected>What is your favorite color?</option>
+            <option value="With whom did you go to Senior Prom?">With whom did you go to Senior Prom?</option>
+            <option value="What was your first grade teacher's name?">What was your first grade teacher's name?</option>
+            <option value="When was the last time you expanded your domain?">When was the last time you expanded your domain?</option>
+            <option value="What was your favorite video game system?">What was your favorite video game system?</option>
           </InputSelect>
         </label>
 
@@ -152,18 +152,18 @@
 
         <label class="field">
           <span class="field__label">Security Question 3</span>
-          <InputSelect @bind-Value="Q3" id="Q3" name="role">
-            <option value="11" selected>Question 11</option>
-            <option value="12">Question 12</option>
-            <option value="13">Question 13</option>
-            <option value="14">Question 14</option>
-            <option value="15">Question 15</option>
+          <InputSelect @bind-Value="Q3" id="Q3" name="role" class="SecurityQuestion">
+            <option value="How many siblings do you have?" selected>How many siblings do you have?</option>
+            <option value="Who was your best friend in 12th grade?">Who was your best friend in 12th grade?</option>
+            <option value="What was you dream job as a child?">What was you dream job as a child?</option>
+            <option value="What is the greatest achievement of your life?">What is the greatest achievement of your life?</option>
+            <option value="Who was your first crush?">Who was your first crush?</option>
           </InputSelect>
         </label>
 
         <label class="field">
           <span class="field__label">Answer</span>
-          <InputText @bind-Value="A1" id="Q3 Answer" class="input" placeholder="Answer to Security Question 3" required />
+          <InputText @bind-Value="A3" id="Q3 Answer" class="input" placeholder="Answer to Security Question 3" required />
         </label>
 
         <!-- Actions -->
@@ -199,9 +199,9 @@
   public string Password { get; set; } = string.Empty;
   
   // Security Question IDs & Answers
-  public string Q1 { get; set; } = "1";
-  public string Q2 { get; set; } = "2";
-  public string Q3 { get; set; } = "3";
+  public string Q1 { get; set; } = "";
+  public string Q2 { get; set; } = "";
+  public string Q3 { get; set; } = "";
 
   public string A1 { get; set; } = string.Empty;
   public string A2 { get; set; } = string.Empty;
@@ -252,43 +252,46 @@
     {
       if (A1 != string.Empty && A2 != string.Empty && A3 != string.Empty)
       {
-        string userName = FirstName[0] + LastName + Convert.ToString(Date[5]) + Convert.ToString(Date[6]) + Convert.ToString(Date[8]) + Convert.ToString(Date[9]);
-        userName = userName.ToLower();
-
-        // Create input validation before proceeding
-        try
+        if ((Q1 != string.Empty && A1 != string.Empty) && (Q2 != string.Empty && A2 != string.Empty) && (Q1 != string.Empty && A1 != string.Empty))
         {
-          string encryptedPassword = string.Empty;
-          encryptedPassword = await LedgrLogic.Password.Validate(Password);
-          if (encryptedPassword != string.Empty)
+          string userName = FirstName[0] + LastName + Convert.ToString(Date[5]) + Convert.ToString(Date[6]) + Convert.ToString(Date[8]) + Convert.ToString(Date[9]);
+          userName = userName.ToLower();
+
+          // Create input validation before proceeding
+          try
           {
-            if (User.CreatePotentialUser(userName, encryptedPassword, EmailAddress, FirstName, LastName, DOB, Address))
+            string encryptedPassword = string.Empty;
+            encryptedPassword = await LedgrLogic.Password.Validate(Password);
+            if (encryptedPassword != string.Empty)
             {
-              NavigationManager.NavigateTo($"/");
+              if (User.CreatePotentialUser(userName, encryptedPassword, EmailAddress, FirstName, LastName, DOB, Address, Q1, A1, Q2, A2, Q3, A3))
+              {
+                NavigationManager.NavigateTo($"/");
+              }
             }
           }
+          catch (PasswordRequirementsViolationException e)
+          {
+            await ScrollTop();
+            InvalidPassword = e.Message;
+          }
+          catch (Exception e)
+          {
+            InvalidPassword = "An unknown error occurred. Please try again later";
+            await ScrollTop();
+          }
         }
-        catch (PasswordRequirementsViolationException e)
+        else
         {
-          await ScrollTop();
-          InvalidPassword = e.Message;
-        }
-        catch (Exception e)
-        {
-          InvalidPassword = "An unknown error occurred. Please try again later";
+          EmptyAnswer = "Please select and answer each security question to continue";
           await ScrollTop();
         }
       }
       else
       {
-        EmptyAnswer = "Please select and answer each security question to continue";
+        MissingField = "Please fill out all fields to continue";
         await ScrollTop();
       }
-    }
-    else
-    {
-      MissingField = "Please fill out all fields to continue";
-      await ScrollTop();
     }
   }
 

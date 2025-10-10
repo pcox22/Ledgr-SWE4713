@@ -991,4 +991,52 @@ public class Admin : User
         }
         return true;
     }
+
+    public List<string> GetEventLog(string eventLogTable)
+    {
+        List<string> tempEventLog = new List<string>();
+        using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+        var sql = "";
+        int columns = 0;
+
+        switch (eventLogTable)
+        {
+            case ("Account"):
+                sql = "SELECT * FROM AccountEventLog ORDER BY ID ASC";
+                columns = 18;
+                break;
+            case("Employee"):
+                sql = "SELECT * FROM EmployeeEventLog ORDER BY ID ASC";
+                columns = 10;
+                break;
+            case("User"):
+                sql = "SELECT * FROM UserEventLog ORDER BY ID ASC";
+                columns = 10;
+                break;
+        }
+
+        try
+        {
+            var command = new SqliteCommand(sql, connection);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < columns; i++)
+                    {
+                        tempEventLog.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return tempEventLog;
+    }
 }

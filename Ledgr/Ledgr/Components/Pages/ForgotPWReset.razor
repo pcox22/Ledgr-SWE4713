@@ -1,5 +1,6 @@
 @page "/fpwReset/{Username}"
 @using LedgrLogic
+@inject NavigationManager NavigationManager
 
 <!doctype html> <!-- HTML5 document -->
 <html lang="en">
@@ -96,7 +97,7 @@
 
       <!-- Actions: back to verify, save new password -->
       <div class="actions">
-        <NavLink class="btn btn--secondary" href="/fpwVerify">Back</NavLink>
+        <NavLink class="btn btn--secondary" href=@($"/fpwVerify/{Username}")>Back</NavLink>
         <button @onclick="ResetPW" type="button" class="btn btn--primary">Save Password</button>
       </div>
     </form>
@@ -129,6 +130,7 @@
       if (NewPW == ConPW)
       {
         User.ChangePassword(Username, NewPW);
+        NavigationManager.NavigateTo("/fpwSuccess");
       }
       else
       {

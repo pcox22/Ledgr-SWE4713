@@ -93,7 +93,7 @@ public class UserUnitTests
         bool expected = true;
         
         //act
-        ArrayList temp = User.GetSecurityQuestions(4);
+        List<String> temp = User.GetSecurityQuestions(4).Result;
         bool actual = temp.Contains("What was your first car?");
         
         //assert

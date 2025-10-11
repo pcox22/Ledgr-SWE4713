@@ -1,0 +1,109 @@
+@page "/adminCreateUser"
+@using LedgrLogic
+
+@if (Show)
+{
+    <link rel="stylesheet" href="home.css"/>
+    <div class="modal-backdrop">
+        <div class="dialog-card">
+            <div class="dialog-header">
+                <h2>Create a new User</h2>
+                <button @onclick="Close" aria-label="Close dialog"
+                        style="background:none;border:0;font-size:18px;cursor:pointer">✕
+                </button>
+            </div>
+
+            <div class="dialog-body">
+                <!-- Insert InputText fields for each UserProperty -->
+                <!-- Not that you need to collect the fields for Employee as well -->
+                
+                <div class="upperRowCU">
+                    <label class="field">
+                        <span class="field__label">First Name</span>
+                        <div class="input input--with-addon">
+                            <InputText @bind-Value="FN" class="input__control"></InputText>
+                        </div>
+                    </label>
+                    <label class="field">
+                        <span class="field__label">Last Name</span>
+                        <div class="input input--with-addon">
+                            <InputText @bind-Value="LN" class="input__control"></InputText>
+                        </div>
+                    </label>
+                    <label class="field">
+                        <span class="field__label">Date of Birth (yyyy-MM-dd)</span>
+                        <div class="input input--with-addon">
+                            <InputText @bind-Value="DoB" class="input__control"></InputText>
+                        </div>
+                    </label>
+                </div>
+
+                <label class="field">
+                    <span class="field__label">Password</span>
+                    <div class="input input--with-addon">
+                        <InputText @bind-Value="Password" class="input__control"></InputText>
+                    </div>
+                </label>
+                <label class="field">
+                    <span class="field__label">Address</span>
+                    <div class="input input--with-addon">
+                        <InputText @bind-Value="Address" class="input__control"></InputText>
+                    </div>
+                </label>
+
+                <label class="field">
+                    <span class="field__label">Email</span>
+                    <div class="input input--with-addon">
+                        <InputText @bind-Value="Email" class="input__control"></InputText>
+                    </div>
+                </label>
+            </div>
+            <div>
+                <button type="button" class="btn btn--secondary">Clear</button>
+                <button type="button" class="btn btn-primary">Create User</button>
+            </div>
+        </div>
+    </div>
+    
+}
+
+@code {
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+
+    public string FN { get; set; } = string.Empty;
+    public string LN { get; set; } = string.Empty;
+    public string DoB { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+
+    private async Task CreateNewUser()
+    {
+        // Bunch of code for splitting the data into the two tables
+        // Followed by bunch of code for alerts
+        
+        // Note: Consider creating a new user with the data (awaiting it)
+        // and then calling approve user on the newly created potential user
+        
+        // alt: create a new method that just combines the two processes
+    }
+    
+    private async Task Close()
+    {
+        if (ShowChanged.HasDelegate)
+            await ShowChanged.InvokeAsync(false);
+    }
+
+    private void ClearForm()
+    {
+        FN = string.Empty;
+        LN = string.Empty;
+        DoB = string.Empty;
+        Address = string.Empty;
+        Password = string.Empty;
+        Email = string.Empty;
+    }
+    
+
+}

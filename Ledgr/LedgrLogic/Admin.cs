@@ -206,13 +206,13 @@ public class Admin : User
             {
                 while (getUserIDReader.Read())
                 {
-                    userID = Convert.ToInt32(getEmpIDReader.GetString(0));
+                    userID = Convert.ToInt32(getUserIDReader.GetString(0));
                 }
             }
             
-            var SecQuestionsSQL1 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
-            var SecQuestionsSQL2 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
-            var SecQuestionsSQL3 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL1 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL2 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL3 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
             
             var SQ1Command = new SqliteCommand(SecQuestionsSQL1, connection);
             SQ1Command.Parameters.AddWithValue("@QUESTION", Question1);

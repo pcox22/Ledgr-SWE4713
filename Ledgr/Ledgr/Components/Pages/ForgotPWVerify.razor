@@ -1,4 +1,6 @@
 @page "/fpwVerify/{Username}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
 
 <!doctype html>
 <html lang="en">
@@ -24,38 +26,33 @@
 </p>
 
 <main class="container" style="max-width:980px;">
-
-  <!-- Top alert (toggle via JS) -->
-  @if (Alert)
-  {
-    <div id="fpAlert2" class="alert -error is-hidden" role="alert" aria-live="polite" style="max-width:480px; margin:20px auto 0;">
-      <span class="alert__dot" aria-hidden="true"></span>
-      <span class="alert__text" id="fpAlert2Text">Your answers do not match our records. Please try again.</span>
-    </div>
-  }
-
-
+  
   <!-- Card -->
   <section class="card" aria-labelledby="verifyTitle" style="max-width:480px; margin:24px auto;">
     <h1 id="verifyTitle" class="h2" style="margin-top:8px;">Verify Your Identity</h1>
     <p class="body1 muted" style="margin-top:0;">Answer your security questions to reset your password.</p>
 
-      
-    <!-- These need to be replaced with interactive backend provisions -->
+    @if (Alert != string.Empty)
+    {
+    <div class="alert">
+      <p><strong>@Alert</strong></p>
+    </div>
+    }
+    
     <form id="fpFormVerify" class="form" novalidate>
       <label class="field">
-        <span class="field__label">What is the name of your first pet?</span>
-        <input id="q1" class="input" placeholder="Type your answer." required />
+        <span class="field__label">@Questions[0]</span>
+        <InputText @bind-Value="UserAnswer1" id="a1" class="input" placeholder="Type your answer." required />
       </label>
 
       <label class="field">
-        <span class="field__label">What city were you born in?</span>
-        <input id="q2" class="input" placeholder="Type your answer." required />
+        <span class="field__label">@Questions[2]</span>
+        <InputText @bind-Value="UserAnswer2" id="a2" class="input" placeholder="Type your answer." required />
       </label>
 
       <label class="field">
-        <span class="field__label">What was the model of your first car?</span>
-        <input id="q3" class="input" placeholder="Type your answer." required />
+        <span class="field__label">@Questions[4]</span>
+        <InputText @bind-Value="UserAnswer3" id="a3" class="input" placeholder="Type your answer." required />
       </label>
 
     <!-- Disabled message for now, interpretation is that it should be on the original password page
@@ -63,8 +60,8 @@
     -->
     
       <div class="actions">
-        <button type="button" class="btn btn--secondary" id="btnSecQClear">Clear</button>
-        <button type="submit" class="btn btn--primary">Verify</button>
+        <button @onclick="ClearForm" type="button" class="btn btn--secondary" id="btnSecQClear">Clear</button>
+        <button @onclick="VerifyAnswers" type="button" class="btn btn--primary">Verify</button>
         <NavLink href="@($"/fpwReset/{Username}")">To Reset</NavLink>
       </div>
     </form>
@@ -76,6 +73,50 @@
 
 @code{
   [Parameter] public string Username { get; set; } = string.Empty;
-  public bool Alert { get; set; } = false;
+  
+  public List<string> Questions { get; set; } = new() { "", "", "", "", "", ""};
+  
+  public string UserAnswer1 { get; set; } = string.Empty;
+  public string UserAnswer2 { get; set; } = string.Empty; 
+  public string UserAnswer3 { get; set; } = string.Empty;
+  
+  public string Answer1 { get; set; } = string.Empty;
+  public string Answer2 { get; set; } = string.Empty;
+  public string Answer3 { get; set; } = string.Empty;
+  
+  // Alert Data
+  public string Alert { get; set; } = string.Empty;
+  
+  protected override async Task OnParametersSetAsync()
+  {
+    User user = await User.GetUserFromUserName(Username);
+    Questions = await User.GetSecurityQuestions(user.GetUserID());
+    
+    Answer1 = Questions[1];
+    Answer2 = Questions[3];
+    Answer3 = Questions[5];
+    
+    StateHasChanged();
+  }
 
+  public async Task VerifyAnswers()
+  {
+    if (Answer1 == UserAnswer1 || Answer2 == UserAnswer2 || Answer3 == UserAnswer3)
+    {
+      NavigationManager.NavigateTo($"/fpwReset/{Username}");
+    }
+    else
+    {
+      Alert = "None of the provided answers match those on file";
+    }
+  }
+
+  public void ClearForm()
+  {
+    UserAnswer1 = string.Empty;
+    UserAnswer2 = string.Empty; 
+    UserAnswer3 = string.Empty;
+  }
+  
+  
 }

@@ -309,7 +309,7 @@ public class User
         int StoredActive = -1;
         int StoredEmployeeID = -1;
         
-        var sql = "SELECT FROM USER WHERE USERNAME = @USERNAME";
+        var sql = "SELECT * FROM USER WHERE USERNAME = @USERNAME";
         try
         {
             using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -415,9 +415,9 @@ public class User
         
     }
     
-    public static ArrayList GetSecurityQuestions(int tempUserID)
+    public static async Task<List<string>> GetSecurityQuestions(int tempUserID)
     {
-        ArrayList SecurityQuestions = new ArrayList();
+        List<string> SecurityQuestions = new List<string>();
         var sql = "SELECT Question, Answer FROM SecurityQuestion WHERE UserID = @USERID";
         try
         {
@@ -439,7 +439,7 @@ public class User
                 
             }
             
-            connection.Close();
+            await connection.CloseAsync();
         }
         catch (Exception e)
         {
@@ -506,9 +506,13 @@ public class User
           
           connection.Close();
 
-          if (ExpiredPasswords.Contains(storedPassword))
+          foreach (string expiredPassword in ExpiredPasswords)
           {
-              throw new PasswordUsedBeforeException("Please enter a password that has not been used in the past");
+              if (expiredPassword.Equals(TempPassword))
+              {
+                  Console.WriteLine("Password used before: " + TempPassword);
+                  throw new PasswordUsedBeforeException("Please enter a password that has not been used in the past");
+              }
           }
       }
       catch (SqliteException e)

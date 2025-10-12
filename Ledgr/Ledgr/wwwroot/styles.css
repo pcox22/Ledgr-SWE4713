@@ -442,17 +442,19 @@ body{
 .site-header{
   background: var(--brand-500);
   height: 120px;
-  margin: 0;
+  margin: 0 auto;
+  width:100%;
+  display: flex;
+  
 }
 .header-inner{
-  margin: 0;
+  margin: 0 auto;
   display:flex;
   align-items:center;
-  justify-content: space-between;
 }
 .brand-logo{
   height: 56px; 
-  margin: 0;
+  margin: 0 auto;
   width: auto;
   filter: none;
 }

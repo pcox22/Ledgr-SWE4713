@@ -110,6 +110,7 @@
 </div>
 
 
+
 @code {
     [Parameter] public string? Username { get; set; } = string.Empty;
 
@@ -150,5 +151,15 @@
         potentialUsers = await Admin.GetAllPotentialUsers();
         users = await Admin.GetAllUsers();
         StateHasChanged();
+    }
+
+    private async Task SuspendUser()
+    {
+        
+    }
+
+    private async Task ActivateUser()
+    {
+        
     }
 }

@@ -4,6 +4,7 @@
 @if (Show)
 {
     <link rel="stylesheet" href="home.css"/>
+    <body>
     <div class="modal-backdrop">
         <div class="dialog-card">
             <div class="dialog-header">
@@ -58,13 +59,15 @@
                     </div>
                 </label>
             </div>
-            <div>
-                <button type="button" class="btn btn--secondary">Clear</button>
-                <button type="button" class="btn btn-primary">Create User</button>
+            <div style="display: grid; place-items: center;">
+                <div>
+                    <button type="button" class="btn btn--secondary">Clear</button>
+                    <button type="button" class="btn btn-primary">Create User</button>
+                </div>
             </div>
         </div>
     </div>
-    
+    </body>
 }
 
 @code {
@@ -77,6 +80,12 @@
     public string Address { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string Q1 { get; set; } = string.Empty;
+    public string A1 { get; set; } = string.Empty;
+    public string Q2 { get; set; } = string.Empty;
+    public string A2 { get; set; } = string.Empty;
+    public string Q3 { get; set; } = string.Empty;
+    public string A3 { get; set; } = string.Empty;
 
     private async Task CreateNewUser()
     {

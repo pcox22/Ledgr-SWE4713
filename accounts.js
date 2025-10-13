@@ -2,7 +2,7 @@
 // Accounts module (COA List)
 // ============================
 
-// tiny DOM helpers (guarded so they don't clash if app.js already defines them)
+// tiny DOM helpers
 window.$  = window.$  || (sel => document.querySelector(sel));
 window.$$ = window.$$ || (sel => Array.from(document.querySelectorAll(sel)));
 const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
@@ -36,7 +36,7 @@ window.coa.initListPage = function initListPage(cfg){
     addBtn: $(cfg.addBtn)
   };
 
-  // TODO: use your real signed-in role; this just hides Add for non-admins
+  // TODO: use real signed-in role; this just hides Add for non-admins
   const role = (window.currentUserRole || 'Admin');
   if(role !== 'Admin' && els.addBtn){ els.addBtn.style.display = 'none'; }
 
@@ -47,10 +47,9 @@ window.coa.initListPage = function initListPage(cfg){
   on(els.clearBtn, 'click', () => {
     // reset all form fields
     els.form.reset();
-    // also clear the date pickers (they’re outside the form)
+    // also clear the date pickers
     if (els.dateFrom) els.dateFrom.value = '';
     if (els.dateTo)   els.dateTo.value   = '';
-    // optional: clear search explicitly (some browsers keep it)
     if (els.search)   els.search.value   = '';
     state.page = 1;
     load();
@@ -83,10 +82,10 @@ window.coa.initListPage = function initListPage(cfg){
         to: els.dateTo?.value || ''
       };
 
-      // TODO replace with your API (fetch('/api/accounts?...'))
+      // TODO replace with API
       const all = await fetchAccountsMock();
 
-      // Basic client-side filter (server-side later)
+      // Basic client-side filter
       const filtered = all.filter(r => {
         if(q.category && r.category !== q.category) return false;
         if(q.subcategory && !r.subcategory.toLowerCase().includes(q.subcategory.toLowerCase())) return false;

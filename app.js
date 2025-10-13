@@ -65,7 +65,7 @@ function onSubmit(formId, cb){
 (function(){
   const form = $('#createForm');
   if(!form) return;
-  const first=$('#firstName'), last=$('#lastName'), dob=$('#dob'), user=$('#username'), email=$('#createEmail');
+  const first=$('#firstName'), last=$('#lastName'), dob=$('#dob'), user=$('#username'), email=$('#email');
   const slug = s => (s||'').toLowerCase().replace(/[^a-z]/g,'');
   const mmYy = () => /^\d{2}\/\d{2}\/\d{4}$/.test(dob?.value||'') ? dob.value.slice(0,2)+dob.value.slice(8,10) : '';
 
@@ -230,7 +230,7 @@ function onSubmit(formId, cb){
         </td>
       </tr>
     `).join('');
-    $('#tableCount').textContent = `Showing ${list.length}–${list.length} of ${users.length} users`;
+    $('#tableCount').textContent = `Showing ${list.length} of ${users.length} users`;
   }
   render(users);
 
@@ -346,3 +346,6 @@ function onSubmit(formId, cb){
   });
 
 })();
+
+// Example role: 'Admin' | 'Manager' | 'Accountant'
+window.currentUserRole = window.currentUserRole || 'Admin';

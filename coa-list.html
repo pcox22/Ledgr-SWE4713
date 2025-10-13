@@ -13,6 +13,7 @@
 </head>
 
 <body class="page">
+  
   <!-- Header -->
   <header class="app-header app-header--band">
   <div class="app-header__inner">
@@ -54,22 +55,25 @@
 
   <!-- Main -->
   <main class="container container--xl">
-    
+
     <!-- Top-left calendar -->
     <section class="toolbar" aria-label="Calendar and quick actions">
       <div class="input-group">
         <label class="label" for="coaDateFrom">From</label>
         <input id="coaDateFrom" type="date" class="input" />
       </div>
+
       <div class="input-group">
         <label class="label" for="coaDateTo">To</label>
         <input id="coaDateTo" type="date" class="input" />
       </div>
 
-      <div class="flex-spacer"></div>
+      <button id="btnApplyDates" class="btn btn--primary btn--small" type="button">
+        Apply Dates
+      </button>
 
-      <!-- Admin-only: hidden by JS for non-admin roles -->
-      <a id="btnAddAccount" class="btn btn--primary" href="./coa-form.html">Add Account</a>
+      <div class="flex-spacer"></div>
+      <a href="./coa-form.html" class="btn btn--primary btn--small" role="button">Add Account</a>
     </section>
 
     <section class="card card--fluid" aria-labelledby="coaTitle">      <header class="card__header">
@@ -141,8 +145,11 @@
 
       <div class="card__body">
         <div class="table-actions">
+          <a href="./coa-event-log.html" class="btn btn--secondary" type="button" title="View all account changes">View Event Log</a>
           <button id="btnExportCsv" class="btn btn--secondary" type="button">Export CSV</button>
         </div>
+
+        
 
         <div id="coaAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
           <span class="alert__dot" aria-hidden="true"></span>

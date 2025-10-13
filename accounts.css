@@ -4,9 +4,124 @@
 
 /* Top toolbar (calendar + actions) */
 .toolbar {
-  display:flex; gap:12px; align-items:end; margin:16px 0 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  width: 100%;
 }
-.flex-spacer { flex:1; }
+
+/* Wrap date inputs neatly to the left */
+.toolbar .input-group {
+  display: flex;
+  flex-direction: column;
+  margin-right: 12px;
+}
+
+/* Make the From/To group hug the left edge */
+.toolbar .input-group:first-of-type {
+  margin-left: 4px;
+}
+
+.toolbar .label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #03142e;
+  margin-bottom: 2px;
+}
+
+/* Date fields style */
+.toolbar .input[type="date"] {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #d6dae1;
+  background: #fff;
+  color: #03142e;
+  min-width: 150px;
+}
+
+/* Button stays fixed right */
+.toolbar #btnAddAccount {
+  margin-left: auto;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .toolbar #btnAddAccount {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+}
+
+/* ===== Button consistency fixes ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.1s ease;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+/* Small button variant — matches Apply Filters size */
+.btn--small {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  height: 36px;
+  line-height: 1.1;
+}
+
+/* Primary button (dark blue) */
+.btn--primary {
+  background-color: #03142e;
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  background-color: #04204b;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Secondary (light blue-gray) */
+.btn--secondary {
+  background-color: #e3ecfc;
+  color: #03142e;
+}
+
+.btn--secondary:hover {
+  background-color: #d2e0fb;
+}
+
+/* Disabled state */
+.btn[disabled],
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#btnAddAccount {
+  height: 38px;
+  margin-top: 22px; /* aligns with date inputs */
+}
+
+/* keep date/apply cluster tidy */
+#btnApplyDates { margin-top: 22px; }
+
+/* if your date inputs are taller/shorter, adjust both together */
+.toolbar .input[type="date"] { height: 36px; }
 
 /* Filter grid */
 .grid { display:grid; }
@@ -46,8 +161,8 @@
 .card--fluid { width: 100%; }
 
 /* ensure card sections don't collapse their children */
-.card--fluid .card__body,
-.card--fluid .card__header { width: 100%; }
+.card--fluid .card__body { text-align: left; width: 100%; }
+.card--fluid .card__header { width: 100%; text-align: left; margin-bottom: 12px; }
 
 /* tables should fill and scroll horizontally */
 .card--fluid .table-wrap {
@@ -87,6 +202,20 @@
 .card--fluid .table tbody tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
 .card--fluid .table tbody tr:hover td { background: rgba(0,0,0,0.04); }
 
+/* Keep consistent margins within the card */
+.card.card--fluid {
+  padding: 32px;
+}
+
+/* Slightly larger title spacing */
+.card--fluid .h2 {
+  margin-bottom: 4px;
+}
+
+.card--fluid .body1.muted {
+  margin-bottom: 24px;
+}
+
 /* inline alert from shifting layout */
 #coaAlert { margin: 8px 0; }
 
@@ -95,6 +224,11 @@
    HEADER
    ====== */
 
+/* keep header at the top when scrolling */
+body.page {
+  scroll-padding-top: 90px;
+}
+
 .app-header--band {
   background: var(--brand-500);
   color: #e6eefc;
@@ -102,6 +236,10 @@
   border-bottom-right-radius: 12px;  
   max-width: 100%;  
   padding: 10px 16px;
+  /* keep header at the top when scrolling */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 .app-header--band .app-header__inner {
   display: grid;
@@ -161,11 +299,28 @@
    ==================== */
 
 /* Wider page container just for accounts pages */
-.container--xl{ max-width:90%; margin-inline:auto; }
+.container--xl{ 
+  max-width:90%; 
+  min-width: 80%;
+  margin-inline:auto; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.container.container--xl > .card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto 24px;
+}
 
-.card--fluid { width: 100%; }
-.card--fluid .card__body,
-.card--fluid .card__header { width: 100%; }
+.card--fluid { 
+  width: 100%; 
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background: #ffffff;
+  border-radius: 12px;
+}
+.card--fluid .card__body { text-align: left; width: 100%; }
+.card--fluid .card__header { width: 100%; text-align: left; margin-bottom: 12px; }
 .card--fluid .table-wrap { width:100%; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .card--fluid .table { width:100%; border-collapse:separate; border-spacing:0; table-layout:auto; }
 .card--fluid .table thead th {
@@ -176,12 +331,16 @@
 .card--fluid .table tbody tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
 .card--fluid .table tbody tr:hover td { background: rgba(0,0,0,0.04); }
 
+.card--fluid .form-grid {
+  text-align: left;
+}
+
 /* ==============================
    PAGINATION — centered
    ============================== */
 .pagination {
   display:flex; align-items:center; gap:12px;
-  justify-content:center;          /* centered now */
+  justify-content:center;
   margin-top:12px;
 }
 .pagination__status { font-size:.9rem; color: var(--muted, #8b94a7); }
@@ -196,4 +355,94 @@ body.page { min-height: 100vh; display:flex; flex-direction:column; }
   max-width:1200px; margin: 24px auto; text-align:center;
 }
 .footer-nav { display:flex; gap:18px; justify-content:center; margin-bottom:6px; }
+
+/* ==============================
+            FORM LAYOUT
+   ============================== */
+.form-grid{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.form-col{ display:flex; flex-direction:column; gap:12px; }
+
+.field-error{
+  color:#b42318; font-size:.9rem; margin-top:4px;
+}
+.hint{ color: var(--muted, #8b94a7); font-size:.9rem; }
+
+/* event log JSON preview */
+.mini-json{
+  max-width: 360px;
+  max-height: 120px;
+  overflow:auto;
+  background: rgba(0,0,0,.04);
+  padding:6px 8px;
+  border-radius:8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+/* Buttons row */
+.row-right{ display:flex; gap:16px; justify-content:flex-end; }
+
+/* make readonly fields look consistent */
+.input[readonly]{
+  background: rgba(0,0,0,.04);
+  color:#444;
+  cursor:not-allowed;
+}
+
+.input-group {
+  width: 100%;
+}
+
+.input,
+textarea.input,
+select.input {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== Subtle entry animations for LEDGR cards ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: saturate(90%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: saturate(100%);
+  }
+}
+
+/* Respect accessibility: no motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card--animate { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* Default animation */
+.card--animate {
+  opacity: 0; /* start hidden */
+  animation: fadeInUp .42s ease-out forwards; /* smooth, quick */
+  will-change: transform, opacity;
+}
+
+/* Gentle stagger for the second card (event log) */
+.card--stagger-2 { animation-delay: .08s; }
+
+/* Sticky header shadow reveal as you scroll */
+.app-header--band {
+  transition: box-shadow .2s ease;
+}
+body.scrolled .app-header--band {
+  box-shadow: 0 8px 22px rgba(0,0,0,.14);
+}
+
+/* Hide last column (Actions) for non-admins */
+body.role-readonly th:last-child,
+body.role-readonly td:last-child { display: none; }
 

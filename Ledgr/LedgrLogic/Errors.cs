@@ -14,3 +14,5 @@ public class InactiveUserException(string message) : Exception(message);
 public class PasswordRequirementsViolationException(string message) : Exception(message);
 
 public class PasswordUsedBeforeException(string message) : Exception(message);
+
+public class InvalidDateFormatException(string message) : Exception(message);

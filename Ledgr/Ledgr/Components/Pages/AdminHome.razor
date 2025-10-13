@@ -35,35 +35,32 @@
                 <th>UserID</th>
                 <th>Username</th>
                 <th>Email</th>
-                <th>Active?</th>
+                <!--<th>Active?</th>-->
                 <th>EmployeeID</th>
-                <th></th>
                 <th>Actions</th>
             </tr>
             @for (int i = 0; i < users.Count; i += 7)
             {
                 int index = i;
                 <tr>
-                    <td style="width: 100px;">@users[index]</td>
+                    <td style="width: 100px">@users[index]</td>
                     <td style="width: 300px">@users[index + 1]</td>
                     <td style="width: 400px">
                         <MudButton class="btn-email" OnClick="() => OpenDialog(index)">
                             @users[index + 3]
                         </MudButton>
                     </td>
-                    <td style="width: 100px">@users[index + 5]</td>
+                    <!--<td style="width: 100px">@users[index + 5]</td>-->
                     <td style="width: 150px">@users[index + 6]</td>
                     @if (users[index + 5] == "1")
                     {
-                        <td style="width: 100px"><button class="suspend btn">Suspend</button></td>
+                        <td style="width: 100px"><button @onclick="@(() => SuspendUser(index))" class="suspend btn">Suspend</button></td>
                     }
                     @if (users[index + 5] == "0")
                     {
-                        <td style="width: 100px"><button class="activate btn">Activate</button></td>
+                        <td style="width: 100px"><button @onclick="(() => ActivateUser(index))" class="activate btn">Activate</button></td>
                     }
                     <td style="width: 100px"><button class="edit btn">Edit</button></td>
-
-
                 </tr>
             }
             </thead>
@@ -106,6 +103,8 @@
         <EmailDialog Show="@showEmailDialog" ShowChanged="val => showEmailDialog = val" Recipient="@selectedRecipient"/>
         <PasswordReport ShowReport="@showPWR" ShowChanged="val => showPWR = val"></PasswordReport>
         <CreateUserDialog Show="@showCU" ShowChanged="val => showCU = val"></CreateUserDialog>
+        <SuspendUserDialog Show="@showSU" ShowChanged="val => showSU = val" Username = "@SuspendUsername" OnUserSuspended="@HandleUserSuspended"></SuspendUserDialog>
+        <ActivateUserDialog Show="@showAU" ShowChanged="val => showAU = val" UserID="@activateUserID" OnUserActivated="@HandleUserActivated"></ActivateUserDialog>
     </div>
 </div>
 
@@ -120,7 +119,11 @@
     private bool showEmailDialog = false;
     private bool showPWR = false;
     private bool showCU = false;
+    private bool showSU = false;
+    private bool showAU = false;
+    private string? SuspendUsername;
     private string? selectedRecipient;
+    private int activateUserID;
 
     private void OpenDialog(int index)
     {
@@ -153,13 +156,54 @@
         StateHasChanged();
     }
 
-    private async Task SuspendUser()
+    private async Task SuspendUser(int indexModifier)
     {
+        SuspendUsername = users[indexModifier + 1];
+        showSU = true;
+    }
+    
+    private void HandleUserSuspended(string username)
+    {
+        int index = -1;
+        for (int i = 0; i < users.Count; i++)
+        {
+            if (users[i] == username)
+            {
+                // Set equal to row num
+                index = i - 1;
+                break;
+            }
+        }
         
+        if (index >= 0)
+        {
+            users[index + 5] = "0";
+            StateHasChanged();
+        }
     }
 
-    private async Task ActivateUser()
+    private async Task ActivateUser(int index)
     {
-        
+        activateUserID = Convert.ToInt32(users[index]);
+        showAU = true;
+    }
+
+    private void HandleUserActivated(string userID)
+    {
+        int index = -1;
+        for (int i = 0; i < users.Count; i++)
+        {
+            if (users[i] == userID)
+            {
+                // Set equal to row num
+                index = i;
+                break;
+            }
+        }
+
+        if (index >= 0)
+        {
+            users[index + 5] = "1";
+        }
     }
 }

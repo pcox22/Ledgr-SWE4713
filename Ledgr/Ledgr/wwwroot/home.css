@@ -154,6 +154,13 @@
     margin-right: 5px;
     margin-left: 5px;
 }
+.user-table thead{
+    background-color: var(--brand-500);
+    color: var(--white);
+    text-align: right;
+    margin-right: 5px;
+    margin-left: 5px;
+}
 
 .user-table td{
     text-align: right;

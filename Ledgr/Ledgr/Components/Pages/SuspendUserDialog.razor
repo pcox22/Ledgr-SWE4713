@@ -1,0 +1,122 @@
+@page "/adminSuspendUser"
+@using LedgrLogic
+
+@if (Show)
+{
+    <link rel="stylesheet" href="home.css"/>
+    <body>
+        <div class="modal-backdrop">
+            <div class="dialog-card">
+                <div class="dialog-header">
+                    <h2>Create a new User</h2>
+                    <button @onclick="Close" aria-label="Close dialog"
+                        style="background:none;border:0;font-size:18px;cursor:pointer">✕
+                    </button>
+                </div>
+
+                <div class="dialog-body">
+                <!-- Insert InputText fields for each UserProperty -->
+                <!-- Not that you need to collect the fields for Employee as well -->
+                    
+                <div class="upperRowCU">
+                        <label class="field">
+                            <span class="field__label">Start Date (yyyy-MM-dd)</span>
+                            <div class="input input--with-addon">
+                                <InputText @bind-Value="Start" class="input__control"></InputText>
+                            </div>
+                        </label>
+                        <label class="field">
+                            <span class="field__label">End Date (yyyy-MM-dd)</span>
+                            <div class="input input--with-addon">
+                                <InputText @bind-Value="End" class="input__control"></InputText>
+                            </div>
+                        </label>
+                    </div>
+                    <div style="display: grid; place-items: center;">
+                        <div>
+                            <button @onclick="Close" type="button" class="btn btn--secondary">Cancel</button>
+                            <button @onclick="SuspendUser" type="button" class="btn btn-primary">Suspend User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+}
+
+@code {
+
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    [Parameter] public string? Username { get; set; }
+    
+    // Need to be able to update the data from the Dialog
+    [Parameter] public EventCallback<string> OnUserSuspended { get; set; }
+
+    public string Start { get; set; } = string.Empty;
+    public string End { get; set; } = string.Empty;
+    
+    // Alerts
+    public string Alert { get; set; } = string.Empty;
+    
+    private async Task Close()
+    {
+        Start = string.Empty;
+        End = string.Empty;
+        if (ShowChanged.HasDelegate)
+            await ShowChanged.InvokeAsync(false);
+    }
+
+    private async Task SuspendUser()
+    {
+        try
+        {
+            ValidateDate(Start);
+            ValidateDate(End);
+
+
+            // If the method hasn't stopped, conditions have been met
+            await Admin.DeactivateUser(Username, Start, End);
+            await OnUserSuspended.InvokeAsync(Username);
+            StateHasChanged();
+            await Close();
+        }
+        catch (InvalidDateFormatException e)
+        {
+            Alert = e.Message;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+
+    private void ValidateDate(string date)
+    {
+        if (date.Length != 10)
+        {
+            throw new InvalidDateFormatException("Please enter a valid date using format: yyyy-MM-dd");
+        }
+        else
+        {
+            if (date[4] != '-' && date[7] != '-')
+            {
+                throw new InvalidDateFormatException("Please separate Year, Month, Day using \'-\'");
+            }
+            // Check that each index that should be a number is a number
+            // Divided statements by year, month, date
+            if (!Char.IsDigit(date[0]) || !Char.IsDigit(date[1]) || !Char.IsDigit(date[2]) || !Char.IsDigit(date[3]))
+            {
+                if (!Char.IsDigit(date[5]) || !Char.IsDigit(date[6]))
+                {
+                    if (!Char.IsDigit(date[8]) || !Char.IsDigit(date[9]))
+                    {
+                        throw new InvalidDateFormatException("Please enter a valid date using format: yyyy-MM-dd");
+                    }
+                }
+            }
+            
+        }
+    }
+
+}

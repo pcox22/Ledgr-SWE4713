@@ -245,7 +245,7 @@ public class Admin : User
         return Successful;
     }
     
-    public bool ActivateUser(int TempUserID)
+    public static async Task ActivateUser(int TempUserID)
     {
         //Changes the IsActive attribute on a user type to true, updates the database
         //Deletes entry from SuspendedUser Table
@@ -265,26 +265,22 @@ public class Admin : User
             
             UserTableCommand.ExecuteNonQuery();
             SuspendedTableCommand.ExecuteNonQuery();
-
-            //Successful will only be true if no errors are thrown by the queries
-            Successful = true;
+            
+            await connection.CloseAsync();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-
-        return Successful;
     }
     //Dates given to this method should be formatted as a string (YYYY-MM-DD)
-    public static bool DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate)
+    public static async Task DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate)
     {
         
         //Changes the IsActive attribute on a user type to false
         //Creates a new entry in SuspendedUser Table
         var UserSQL = "UPDATE User SET IsActive = 0 WHERE Username = @USERNAME";
-        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (1, @START, @END, @USERID)";
-        bool Successful = false;
+        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (NULL, @START, @END, @USERID)";
         try
         {
             int targetID = -1;
@@ -321,14 +317,12 @@ public class Admin : User
             SuspendedTableCommand.ExecuteNonQuery();
             
             //Successful will only be true if no errors are thrown by the queries
-            Successful = true;
+            await connection.CloseAsync();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-
-        return Successful;
     }
     
     public static List<string> ExpiredPasswordReport()

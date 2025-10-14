@@ -12,50 +12,188 @@ public class AdminUnitTests
     }
 
     [Test]
-    public void CreateEmployee_ValidUserInput_WritesToDatabase()
+    //TEST ID: Admin-SRS-REQ-001
+    public void ExpiredPasswordReport_ReturnsValidList()
     {
- 
         //arrange
-        Admin TempAdmin = new Admin();
-        string Row = "";
+        List<string> storedPasswords;
+        string expiredPassword = "PassW0rd...";
         
         //act
-        //TempAdmin.CreateEmployee(3, "Michael", "Liu", true, false);
+        storedPasswords = Admin.ExpiredPasswordReport();
         
         //assert
-        var sql = "SELECT ID, FirstName, LastName, IsAdmin, IsMananger FROM Employee WHERE ID = @ID";
-        try
+        if (storedPasswords.Contains(expiredPassword))
         {
-            Console.WriteLine("Hello from Line 28 in Test");
-            using var connection = new SqliteConnection($"Data Source="+Database.GetDatabasePath());
-            Console.WriteLine("Hello from Line 30 in Test");
-            connection.Open();
-
-            using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 1);
-            Console.WriteLine("Hello from Line 33 in Test");
-            using var reader = command.ExecuteReader();
-            Console.WriteLine("Hello from Line 35 in Test");
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    Console.WriteLine("Hello from Line 39 in Test");
-                    Row += reader.GetString(0);
-                    Console.WriteLine("Hello from Line 42 in Test");
-                    Row += reader.GetString(1);
-                    Row += reader.GetString(2);
-                    Row += reader.GetString(3);
-                    Row += reader.GetString(4);
-                }
-            }
-
-            connection.Close();
+            Assert.Pass();
         }
-        catch (Exception e)
+        Assert.Fail();
+    }
+
+    [Test]
+    //TEST ID: Admin-SRS-REQ-002
+    public void UserReport_ReturnsValidList()
+    {
+        //arrange
+        List<string> storedUsers;
+        string knownUsername = "pcox0930";
+        
+        //act
+        storedUsers = Admin.UserReport();
+        
+        //assert
+        if (storedUsers.Contains(knownUsername))
         {
-            Console.WriteLine("Maaaaan wtf going on");
+            Assert.Pass();
         }
-        Assert.That(Row, Is.EqualTo("1 RJ Straiton 1 0"));
+        Assert.Fail();
+    }
+
+    [Test]
+    //TEST ID: Admin-SRS-REQ-003
+    public void UpdateUsername_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newUsername = "ATest1013";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateUsername(4, newUsername, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    //TEST ID: Admin-SRS-REQ-004
+    public void UpdateEmail_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newEmail = "ATest1013@Ledgr.com";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateEmail(4, newEmail, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    //TEST ID: Admin-SRS-REQ-005
+    public void UpdateFirstName_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newFirstName = "Robert";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateFirstName(1005, newFirstName, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    [Test]
+    //TEST ID: Admin-SRS-REQ-006
+    public void UpdateLastName_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newLastName = "Straiton";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateLastName(1005, newLastName, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-007
+    public void UpdateDoB_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newDoB = "2003-06-07";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateDoB(1005, newDoB, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-008
+    public void UpdateAddress_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newAddress = "123 Main Street NE";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.UpdateAddress(1005, newAddress, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-009
+    public void ApproveUser_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        int tempID = 15;
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = Admin.ApproveUser(15, "pcox0930").Result;
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-010
+    public void DeactivateUser_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = Admin.DeactivateUser("MLiu1001", "2025-10-13", "2025-10-15","pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-011
+    public void ActivateUser_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = Admin.ActivateUser(13, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
     }
 }

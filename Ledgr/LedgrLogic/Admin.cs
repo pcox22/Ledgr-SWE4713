@@ -84,13 +84,16 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            throw new UnableToRetrieveException("Unable to get potential users");
         }
-        return null;
     }
     
-    public static async Task<bool> ApproveUser(int TempUserID)
+    public static async Task<bool> ApproveUser(int TempUserID, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
 
         try
@@ -127,16 +130,16 @@ public class Admin : User
             {
                 while (reader.Read())
                 {
-                    PotentialUserID = Convert.ToInt32(reader.GetInt32(0));
-                    Username = reader.GetString(1);
-                    Password = reader.GetString(2);
-                    Email = reader.GetString(3);
+                    PotentialUserID = reader.GetInt32(0);
+                    Username += reader.GetString(1);
+                    Password += reader.GetString(2);
+                    Email += reader.GetString(3);
                     NewUser = int.Parse(reader.GetString(4));
                     IsActive = int.Parse(reader.GetString(5));
-                    FirstName = reader.GetString(6);
-                    LastName = reader.GetString(7);
-                    DoB = reader.GetString(8);
-                    Address = reader.GetString(9);
+                    FirstName += reader.GetString(6);
+                    LastName += reader.GetString(7);
+                    DoB += reader.GetString(8);
+                    Address += reader.GetString(9);
                     IsAdmin = int.Parse(reader.GetString(10));
                     IsManager = int.Parse(reader.GetString(11));
                     Question1 = reader.GetString(12);
@@ -176,6 +179,8 @@ public class Admin : User
                 }
             }
             
+            //updating event log after change
+            EventLog.LogEmployee('a', EmployeeID, adminID);
             
             var UserSQL = "INSERT INTO User " +
                           "VALUES (NULL, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID)";
@@ -210,6 +215,9 @@ public class Admin : User
                 }
             }
             
+            //updating event log after change
+            EventLog.LogEmployee('a', userID, adminID);
+            
             var SecQuestionsSQL1 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
             var SecQuestionsSQL2 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
             var SecQuestionsSQL3 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
@@ -239,21 +247,28 @@ public class Admin : User
         catch (Exception e)
         {
             Console.WriteLine(e);
-            Successful = false;
+            throw new UnableToApproveUserException("Unable to approve the user");
         }
         
         return Successful;
     }
     
-    public bool ActivateUser(int TempUserID)
+    public static bool ActivateUser(int TempUserID, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         //Changes the IsActive attribute on a user type to true, updates the database
         //Deletes entry from SuspendedUser Table
         var UserSQL = "UPDATE User SET IsActive = 1 WHERE ID = @ID";
-        var SuspendedUserSQL = "DELETE FROM SUSPENDEDUSER WHERE UserID = @ID";
+        var SuspendedUserSQL = "DELETE FROM SuspendedUser WHERE UserID = @ID";
         bool Successful = false;
         try
         {
+            //updating event log before change
+            EventLog.LogUser('b', TempUserID, adminID);
+            
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
@@ -265,28 +280,41 @@ public class Admin : User
             
             UserTableCommand.ExecuteNonQuery();
             SuspendedTableCommand.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogUser('a', TempUserID, adminID);
 
             //Successful will only be true if no errors are thrown by the queries
             Successful = true;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new UnableToActivateUserException("Unable to activate user");
         }
 
         return Successful;
     }
     //Dates given to this method should be formatted as a string (YYYY-MM-DD)
-    public static bool DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate)
+    public static bool DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate, string adminUsername)
     {
+        //getting admin ID for event log
+        User admin = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = admin.GetUserID();
         
         //Changes the IsActive attribute on a user type to false
         //Creates a new entry in SuspendedUser Table
         var UserSQL = "UPDATE User SET IsActive = 0 WHERE Username = @USERNAME";
-        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (1, @START, @END, @USERID)";
+        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (NULL, @START, @END, @USERID)";
         bool Successful = false;
+        
+        //getting deactivated user's id
+        User temp = User.GetUserFromUserName(TempUsername).Result;
+        int tempID = temp.GetUserID();
         try
         {
+            //updating event log before change
+            EventLog.LogUser('b', tempID, adminID);
+            
             int targetID = -1;
             
             
@@ -322,10 +350,15 @@ public class Admin : User
             
             //Successful will only be true if no errors are thrown by the queries
             Successful = true;
+            
+            //updating event log after change
+            EventLog.LogUser('a', tempID, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new UnableToDeactivateUserException("Unable to deactivate this user");
         }
 
         return Successful;
@@ -356,18 +389,24 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
-            return null;
+            throw new UnableToRetrieveException("Unable to retrieve expired passwords");
         }
         return ExpiredPasswordReport;
     }
 
-    public bool PromoteToManager(int TempEmployeeID)
+    public bool PromoteToManager(int TempEmployeeID, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = false;
         var sql = "UPDATE Employee SET IsManager = 1 WHERE ID = @ID";
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', TempEmployeeID, adminID);
+            
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
@@ -375,11 +414,15 @@ public class Admin : User
             command.Parameters.AddWithValue("@ID", TempEmployeeID);
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogEmployee('a', TempEmployeeID, adminID);
+            
             Successful = true;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new InvalidChangeException("No such employee exists");
         }
 
         return Successful;
@@ -403,7 +446,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new InvalidChangeException("No such employee exists");
         }
 
         return Successful;
@@ -426,7 +469,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new InvalidChangeException("No such employee exists");
         }
 
         return Successful;
@@ -449,14 +492,14 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new InvalidChangeException("No such employee exists");
         }
 
         return Successful;
     }
-    public ArrayList UserReport()
+    public static List<string> UserReport()
     {
-        ArrayList UserReport = new ArrayList();
+        List<string> UserReport = new List<string>();
         try
         {
             var PotentialUserSQL = "SELECT * FROM User INNER JOIN Employee on User.EmployeeID = Employee.ID";
@@ -470,9 +513,12 @@ public class Admin : User
             {
                 while (reader.Read())
                 {
-                    for (int i = 0; i < UserReport.Count; i++)
+                    for (int i = 0; i < 13; i++)
                     {
-                        UserReport.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            UserReport.Add(reader.GetString(i));
+                        }
                     }
                 }
             }
@@ -480,16 +526,23 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            return null;
+            throw new UnableToRetrieveException("Unable to retrieve User Report");
         }
         return UserReport;
     }
     
-    public bool UpdateFirstName(int EmployeeID, string tempFirst)
+    public bool UpdateFirstName(int EmployeeID, string tempFirst, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', EmployeeID, adminID);
+            
             var sql = "UPDATE Employee SET FirstName = @NEWFIRST WHERE ID = @EMPLOYEEID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
@@ -500,22 +553,31 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             
+            //updating event log after change
+            EventLog.LogEmployee('a', EmployeeID, adminID);
+            
             connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such employee exists");
         }
 
         return Successful;
     }
     
-    public bool UpdateLastName(int EmployeeID, string tempLast)
+    public bool UpdateLastName(int EmployeeID, string tempLast, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', EmployeeID, adminID);
+            
             var sql = "UPDATE Employee SET LastName = @NEWLAST WHERE ID = @EMPLOYEEID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
@@ -526,22 +588,31 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             
+            //updating event log after change
+            EventLog.LogEmployee('a', EmployeeID, adminID);
+            
             connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such user exists");
         }
 
         return Successful;
     }
     
-    public bool UpdateDoB(int EmployeeID, string tempDoB)
+    public bool UpdateDoB(int EmployeeID, string tempDoB, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', EmployeeID, adminID);
+            
             var sql = "UPDATE Employee SET DoB = @NEWDOB WHERE ID = @EMPLOYEEID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
@@ -552,21 +623,31 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             
+            //updating event log after change
+            EventLog.LogEmployee('a', EmployeeID, adminID);
+            
             connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such user exists");
         }
 
         return Successful;
     }
-    public bool UpdateAddress(int EmployeeID, string tempAddress)
+    public bool UpdateAddress(int EmployeeID, string tempAddress,string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
         try
         {
+            
+            //updating event log before change
+            EventLog.LogEmployee('b', EmployeeID, adminID);
+            
             var sql = "UPDATE Employee SET Address = @NEWADDRESS WHERE ID = @EMPLOYEEID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
@@ -577,21 +658,30 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             
+            //updating event log after change
+            EventLog.LogEmployee('a', EmployeeID, adminID);
+            
             connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such user exists");
         }
 
         return Successful;
     }
-    public bool UpdateUsername(int currentUserID, string tempUsername)
+    public bool UpdateUsername(int currentUserID, string tempUsername, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
         try
         {
+            //updating event log before change
+            EventLog.LogUser('b', currentUserID, adminID);
+            
             var sql = "UPDATE User SET Username = @USERNAME WHERE ID = @USERID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
@@ -602,22 +692,31 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             
+            //updating event log before change
+            EventLog.LogUser('a', currentUserID, adminID);
+            
             connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such user exists");
         }
 
         return Successful;
     }
     
-    public bool UpdateEmail(int currentUserID, string tempEmail)
+    public bool UpdateEmail(int currentUserID, string tempEmail, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = true;
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', currentUserID, adminID);
+            
             var sql = "UPDATE User SET Email = @NEWEMAIL WHERE ID = @USERID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
@@ -628,12 +727,14 @@ public class Admin : User
 
             command.ExecuteNonQuery();
             
+            //updating event log after change
+            EventLog.LogEmployee('a', currentUserID, adminID);
+            
             connection.Close();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such user exists");
         }
 
         return Successful;
@@ -658,8 +759,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such user exists");
         }
 
         return Successful;
@@ -706,8 +806,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -734,8 +833,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -757,8 +855,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -780,8 +877,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -804,8 +900,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -827,8 +922,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -850,8 +944,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -872,8 +965,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -894,8 +986,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -921,8 +1012,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -954,8 +1044,7 @@ public class Admin : User
                     double storedBalance = double.Parse(reader.GetString(0));
                     if (storedBalance > 0)
                     {
-                        //Needs to throw error
-                        return false;
+                        throw new InvalidChangeException("Account has a balance greater than $0.00");
                     }
                 }
             }
@@ -964,9 +1053,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            //needs to throw error
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -986,8 +1073,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return false;
+            throw new InvalidChangeException("No such account exists");
         }
         return true;
     }
@@ -1033,10 +1119,52 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            throw new UnableToRetrieveException("Unable to retrieve "+eventLogTable+" Event Log");
         }
 
         return tempEventLog;
+    }
+
+    public static bool CreateAccount(int tempAccountNum, string tempName, string tempDesc, char tempNormalSide,
+        string category, string subCategory, double tempInitBalance, double tempDebit, double tempCredit,
+        double tempBalance, string tempDate, int tempUserID, int tempOrder, string tempStatement, string adminUsername)
+    {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            var sql =
+                "INSERT INTO Account VALUES(NULL, @NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
+            using var command = new SqliteCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@NUMBER", tempAccountNum);
+            command.Parameters.AddWithValue("@DESC", tempDesc);
+            command.Parameters.AddWithValue("@NS", tempNormalSide);
+            command.Parameters.AddWithValue("@CATEGORY", category);
+            command.Parameters.AddWithValue("@SUBCATEGORY", subCategory);
+            command.Parameters.AddWithValue("@INITBALANCE", tempInitBalance);
+            command.Parameters.AddWithValue("@DEBIT", tempDebit);
+            command.Parameters.AddWithValue("@CREDIT", tempCredit);
+            command.Parameters.AddWithValue("@BALANCE", tempBalance);
+            command.Parameters.AddWithValue("@DATE", tempDate);
+            command.Parameters.AddWithValue("@USERID", tempUserID);
+            command.Parameters.AddWithValue("@ORDER", tempOrder);
+            command.Parameters.AddWithValue("@STATEMENT", tempStatement);
+
+            command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogEmployee('a', tempAccountNum, adminID);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return true;
     }
 }

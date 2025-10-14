@@ -31,7 +31,7 @@ public static class EventLog
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var accountSql = "SELECT * FROM Account WHERE Number = @NUMBER";
             var accountCommand = new SqliteCommand(accountSql, connection);
-            accountCommand.Parameters.AddWithValue("@NUMBER", number);
+            accountCommand.Parameters.AddWithValue("@NUMBER", accountNum);
             connection.Open();
             using var reader = accountCommand.ExecuteReader();
             if (reader.HasRows)
@@ -55,10 +55,10 @@ public static class EventLog
                     active = reader.GetInt32(14);
                 }
             }
-            //if the value of number has not been reassigned, throw an error (need to make the error)
+            //if the value of number has not been reassigned
             if (number == -1)
             {
-                return false;
+                throw new InvalidAccountNumberException("No such account exists with this account number");
             }
             
             //Getting current time and date for @TimeOfChange value in the table
@@ -92,8 +92,7 @@ public static class EventLog
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            throw new EventLogException("Unable to update the event log");
         }
         return true;
     }
@@ -138,10 +137,10 @@ public static class EventLog
                     isManager = reader.GetInt32(6);
                 }
             }
-            //if the value of id has not been reassigned, throw an error (need to make the error)
+            //if the value of id has not been reassigned
             if (id == -1)
             {
-                return false;
+                throw new InvalidEmployeeIDException("No such employee exists with this ID");
             }
             
             //Getting current time and date for @TimeOfChange value in the table
@@ -166,8 +165,7 @@ public static class EventLog
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            throw new EventLogException("Unable to update the event log");
         }
         return true;
     }
@@ -204,20 +202,20 @@ public static class EventLog
                     employeeID = reader.GetInt32(6);
                 }
             }
-            //if the value of id has not been reassigned, throw an error (need to make the error)
             if (id == -1)
             {
-                return false;
+                Console.WriteLine("ID did not change");
+                throw new InvalidUserIDException("Invalid User ID");
             }
             
             //Getting current time and date for @TimeOfChange value in the table
             string dateTime = GetDateTime();
 
             var eventLogSql =
-                "INSERT INTO UserEventLog VALUES (NULL, @BEFOREAFTER, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID, @TOC, @RESPONSIBLEUSER)";
+                "INSERT INTO UserEventLog VALUES (NULL, @BEFOREAFTER,@USERID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @EMPLOYEEID, @TOC, @RESPONSIBLEUSER)";
             var command = new SqliteCommand(eventLogSql, connection);
-            command.Parameters.AddWithValue("@ID", id);
             command.Parameters.AddWithValue("@BEFOREAFTER", beforeAfter);
+            command.Parameters.AddWithValue("@USERID", userID);
             command.Parameters.AddWithValue("@USERNAME", username);
             command.Parameters.AddWithValue("@PASSWORD", password);
             command.Parameters.AddWithValue("@EMAIL", email);
@@ -233,7 +231,7 @@ public static class EventLog
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            throw new EventLogException("Unable to update the event log");
         }
         return true;
     }

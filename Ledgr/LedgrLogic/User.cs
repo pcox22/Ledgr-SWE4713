@@ -309,7 +309,7 @@ public class User
         int StoredActive = -1;
         int StoredEmployeeID = -1;
         
-        var sql = "SELECT FROM USER WHERE USERNAME = @USERNAME";
+        var sql = "SELECT * FROM USER WHERE USERNAME = @USERNAME";
         try
         {
             using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -359,8 +359,7 @@ public class User
             connection.Open();
 
             using var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ID", 5);
-
+            command.Parameters.AddWithValue("@ID", null);
             command.Parameters.AddWithValue("@USERNAME", tempUsername);
             command.Parameters.AddWithValue("@PASSWORD", tempPassword);
             command.Parameters.AddWithValue("@EMAIL", tempEmail);
@@ -385,8 +384,7 @@ public class User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            Successful = false;
+            
         }
         return Successful;
     }
@@ -410,7 +408,7 @@ public class User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            throw new UnableToRejectUserException("Unable to reject the potential user");
         }
         
     }
@@ -443,8 +441,7 @@ public class User
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return null;
+            throw new UnableToGetSecurityQuestionException("Unable to retrieve security questions");
         }
 
         return SecurityQuestions;
@@ -572,8 +569,7 @@ public class User
          }
          catch (Exception e)
          {
-             Console.WriteLine(e);
-             return tempUserID;
+             throw new InvalidUsernameException("No user exists with that Username");
          }
 
          return tempUserID;
@@ -606,7 +602,7 @@ public class User
          }
          catch (Exception e)
          {
-             Console.WriteLine(e);
+             throw new UnableToRetrieveException("Unable to get User from this username");
          }
 
          return false;
@@ -632,8 +628,7 @@ public class User
          }
          catch (Exception e)
          {
-             Console.WriteLine(e);
-             return path;
+             throw new InvalidProfilePictureException("A profile picture does not exist for this user");
          }
 
          return path;

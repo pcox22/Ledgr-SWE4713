@@ -2,10 +2,11 @@
 @using LedgrLogic
 @using MudBlazor
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <PageTitle>Home</PageTitle>
 
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="home.css" />
 
 <!-- Header -->
 <header class="site-header">
@@ -14,9 +15,19 @@
     </div>
 </header>
 
+<SideBar>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+
+</SideBar>
+
 <div class="homeDisplay">
-    <div class="homeRow">
-        <button @onclick="OpenReport" type="button" class="btn btn-primary reportButton">PW Report</button>
+    <div class="homeRow" style="display: flex; justify-content: flex-end">
+        <!--<button @onclick="OpenReport" type="button" class="btn btn-primary reportButton">PW Report</button>-->
         <div class="logged-in-data">
             <p><strong>@Username</strong></p>
             <img src="profile.png" alt="PFP" class="pfp"/>
@@ -25,36 +36,50 @@
 
     <div>
         <!-- Existing Users Table -->
-        <h3>User Data</h3>
+        <div class="homeUserContainer">
+            <h3 class="tableHeader">User Data</h3>
+            <!-- <button @onclick="CreateUser" type="button" class="btn btn-primary createUser">Create User +</button> -->    
+        </div>
         <table class="user-table">
             <thead>
             <tr>
                 <th>UserID</th>
                 <th>Username</th>
                 <th>Email</th>
-                <th>Active?</th>
+                <!--<th>Active?</th>-->
                 <th>EmployeeID</th>
+                <th></th>
+                <th>Actions</th>
             </tr>
             @for (int i = 0; i < users.Count; i += 7)
             {
                 int index = i;
                 <tr>
-                    <td style="width: 100px;">@users[index]</td>
+                    <td style="width: 100px">@users[index]</td>
                     <td style="width: 300px">@users[index + 1]</td>
                     <td style="width: 400px">
                         <MudButton class="btn-email" OnClick="() => OpenDialog(index)">
                             @users[index + 3]
                         </MudButton>
                     </td>
-                    <td style="width: 100px">@users[index + 5]</td>
-                    <td style="width: 300px">@users[index + 6]</td>
+                    <!--<td style="width: 100px">@users[index + 5]</td>-->
+                    <td style="width: 150px">@users[index + 6]</td>
+                    @if (users[index + 5] == "1")
+                    {
+                        <td style="width: 100px"><button @onclick="@(() => SuspendUser(index))" class="suspend btn">Suspend</button></td>
+                    }
+                    @if (users[index + 5] == "0")
+                    {
+                        <td style="width: 100px"><button @onclick="(() => ActivateUser(index))" class="activate btn">Activate</button></td>
+                    }
+                    <td style="width: 100px"><button @onclick="(() => EditUser(index))" class="edit btn">Edit</button></td>
                 </tr>
             }
             </thead>
         </table>
 
         <!-- Pending Users Table -->
-        <h3>Pending Users</h3>
+        <h3 class="tableHeader">Pending Users</h3>
         <table class="pendingUsers-table">
             <thead>
             <tr>
@@ -63,7 +88,8 @@
                 <th>Email</th>
                 <th>Date of Birth</th>
                 <th>Address</th>
-                <th>Confirm</th>
+                <th></th>
+                <th>Actions</th>
             </tr>
             @for (int i = 0; i < potentialUsers.Count; i += 12)
             {
@@ -76,30 +102,40 @@
                     <td style="width: 200px">@potentialUsers[index + 8]</td>
                     <td style="width: 200px">@potentialUsers[index + 9]</td>
                     <td style="width: 200px">
-                            <button @onclick="@(() => RejectUserCommand(id))" type="button" class="btn btn-secondary">Reject</button>
-                            <button onclick="@(() => AcceptUser(id))" type="button" class="btn btn-primary">Confirm</button>
+                        <button @onclick="@(() => RejectUserCommand(id))" type="button" class="btn suspend">Reject</button>
+                    </td><td>
+                        <button onclick="@(() => AcceptUser(id))" type="button" class="btn activate">Confirm</button>
                     </td>
                 </tr>
             }
             </thead>
         </table>
 
-        <!-- Email Dialog -->
+        <!-- Dialog -->
         <EmailDialog Show="@showEmailDialog" ShowChanged="val => showEmailDialog = val" Recipient="@selectedRecipient"/>
         <PasswordReport ShowReport="@showPWR" ShowChanged="val => showPWR = val"></PasswordReport>
+        <CreateUserDialog Show="@showCU" ShowChanged="val => showCU = val"></CreateUserDialog>
+        <SuspendUserDialog Show="@showSU" ShowChanged="val => showSU = val" Username = "@SuspendUsername" OnUserSuspended="@HandleUserSuspended"></SuspendUserDialog>
+        <ActivateUserDialog Show="@showAU" ShowChanged="val => showAU = val" UserID="@activateUserID" OnUserActivated="@HandleUserActivated"></ActivateUserDialog>
     </div>
 </div>
+
 
 
 @code {
     [Parameter] public string? Username { get; set; } = string.Empty;
 
-    List<string> users = Admin.GetAllUsers();
-    List<string> potentialUsers = Admin.GetAllPotentialUsers();
+    List<string> users = Admin.GetAllUsers().Result;
+    List<string> potentialUsers = Admin.GetAllPotentialUsers().Result;
 
     private bool showEmailDialog = false;
     private bool showPWR = false;
+    private bool showCU = false;
+    private bool showSU = false;
+    private bool showAU = false;
+    private string? SuspendUsername;
     private string? selectedRecipient;
+    private int activateUserID;
 
     private void OpenDialog(int index)
     {
@@ -112,16 +148,105 @@
         showPWR = true;
     }
 
-    private async void RejectUserCommand(int id)
+    private void CreateUser()
     {
-        User.RejectUser(id);
-        potentialUsers = Admin.GetAllPotentialUsers();
+        showCU = true;
     }
 
-    private async void AcceptUser(int id)
+    private async Task EditUser(int index)
     {
-        Admin.ApproveUser(id);
-        users = Admin.GetAllUsers();
-        potentialUsers = Admin.GetAllPotentialUsers();
+        string targetUsername = users[index + 1];
+        NavigationManager.NavigateTo($"/editUser/{Username}/{targetUsername}");
     }
+
+    private async Task RejectUserCommand(int id)
+    {
+        await User.RejectUser(id);
+        potentialUsers = await Admin.GetAllPotentialUsers();
+        StateHasChanged();
+    }
+
+    private async Task AcceptUser(int id)
+    {
+        await Admin.ApproveUser(id);
+        potentialUsers = await Admin.GetAllPotentialUsers();
+        users = await Admin.GetAllUsers();
+        StateHasChanged();
+    }
+
+    private async Task SuspendUser(int indexModifier)
+    {
+        SuspendUsername = users[indexModifier + 1];
+        showSU = true;
+    }
+    
+    private void HandleUserSuspended(string username)
+    {
+        int index = -1;
+        for (int i = 0; i < users.Count; i++)
+        {
+            if (users[i] == username)
+            {
+                // Set equal to row num
+                index = i - 1;
+                break;
+            }
+        }
+        
+        if (index >= 0)
+        {
+            users[index + 5] = "0";
+            StateHasChanged();
+        }
+    }
+
+    private async Task ActivateUser(int index)
+    {
+        activateUserID = Convert.ToInt32(users[index]);
+        showAU = true;
+    }
+
+    private void HandleUserActivated(string userID)
+    {
+        int index = -1;
+        for (int i = 0; i < users.Count; i++)
+        {
+            if (users[i] == userID)
+            {
+                // Set equal to row num
+                index = i;
+                break;
+            }
+        }
+
+        if (index >= 0)
+        {
+            users[index + 5] = "1";
+        }
+    }
+    
+    // Nav Buttons - Linked to side bar
+    public void Home()
+    {
+        NavigationManager.NavigateTo($"/adminHome/{Username}");
+    }
+
+    public void CoAList()
+    {
+        NavigationManager.NavigateTo($"/CoAList/{Username}");
+    }
+    
+    public void CoAForm()
+    {
+        NavigationManager.NavigateTo($"/CoAForm/{Username}");
+    }
+    public void CoAEventLog()
+    {
+        NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+    }
+    public void PasswordReport()
+    {
+        NavigationManager.NavigateTo($"/pwReport/{Username}");
+    }
+    
 }

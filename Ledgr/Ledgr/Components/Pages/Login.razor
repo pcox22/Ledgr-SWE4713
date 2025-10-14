@@ -80,7 +80,7 @@
                     <label class="field">
                         <span class="field__label">Role</span>
                         <InputSelect @bind-Value="Role" id="role" name="role" class="input">
-                            <option value="Administrator">Administrator</option>
+                            <option value="Administrator" selected>Administrator</option>
                             <option value="Manager">Manager</option>
                             <option value="Accountant" selected>Accountant</option>
                         </InputSelect>
@@ -180,7 +180,7 @@
                     {
                         if (Role == "Administrator")
                         {
-                            NavigationManager.NavigateTo($"/adminHome/{Username}");
+                            NavigationManager.NavigateTo($"/CoAList/{Username}");
                         }
                         else
                         {
@@ -265,7 +265,6 @@
         Console.WriteLine(cur.GetUserName());
         Console.WriteLine(cur.GetUserID());
         SuspendUser(cur);
-
     }
 
     public void SuspendUser(User cur)

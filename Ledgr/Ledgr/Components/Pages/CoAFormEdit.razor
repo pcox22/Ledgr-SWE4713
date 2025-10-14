@@ -1,0 +1,377 @@
+@page "/CoAFormEdit/{Username}/{AccountNum}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add / Edit Account</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="accounts.css" />
+</head>
+<body class="page">
+
+<!-- Header -->
+<header class="app-header app-header--band">
+  <div class="app-header__inner">
+    <!-- Left: Brand -->
+    <a class="app-header__brand" href="/dashboard.html" aria-label="LEDGR Home">
+      <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
+    </a>
+
+    <!-- Center: Primary Nav (inside the dark band) -->
+    <nav class="nav nav--primary">
+      <NavLink class="nav__link is-active" href="/CoAList">Accounts</NavLink>
+      <NavLink class="nav__link" href="../journal/je-create.html">Journal</NavLink>
+      <NavLink class="nav__link" href="../reports/reports.html">Reports</NavLink>
+      <NavLink class="nav__link" href="../dashboard.html">Dashboard</NavLink>
+    </nav>
+
+    <!-- Right: Notifications + User -->
+    <div class="app-header__right">
+      <button class="icon-btn bell" aria-label="Notifications">🔔</button>
+      <div class="user-chip" title="Signed in as">
+        <span class="avatar" aria-hidden="true">A</span>
+        <span class="user-chip__text">
+          <strong id="userName">Admin User</strong>
+          <span class="muted">Admin</span>
+        </span>
+      </div>
+      <button class="icon-btn caret" aria-label="User menu" title="User menu">▾</button>
+    </div>
+  </div>
+</header>
+
+<SideBar>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+  <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+  <button @onclick="CoAFormCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+  <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+</SideBar>
+
+<!-- Main -->
+<main class="container container--xl">
+
+  <!-- Form card -->
+  <section class="card card--fluid card--animate" aria-labelledby="formTitle">
+    <header class="card__header">
+      <h1 id="formTitle" class="h2">Add / Edit Account</h1>
+      <p class="body1 muted">Fields marked * are required. <br>Account number must follow the category’s starting digit rule.</p>
+    </header>
+
+    <div id="formAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
+      <span class="alert__dot" aria-hidden="true"></span>
+      <span class="alert__text" id="formAlertText"></span>
+    </div>
+
+    <div class="card__body">
+      <form id="accountForm" novalidate class="form-grid">
+        <!-- Account Name -->
+        <div class="form-col">
+          <div class="input-group">
+            <label class="label" for="accountName">Account Name *</label>
+            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" required />
+            <p class="field-error" id="accountNameError"></p>
+          </div>
+
+          <!-- Account Nr. -->
+          <div class="input-group">
+            <label class="label" for="accountNo">Account Number *</label>
+            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" required />
+            <small class="hint" id="acctHint">Assets start with <b>1</b>, Liabilities <b>2</b>, Equity <b>3</b>, Revenue <b>4</b>, Expense <b>5</b>.</small>
+            <br>
+            <small class="hint" id="acctHint">Digits only • No decimals, spaces or letters </small>
+            <p class="field-error" id="accountNoError"></p>
+          </div>
+
+          <!-- Account Description -->
+          <div class="input-group">
+            <label class="label" for="description">Description</label>
+            <InputTextArea @bind-Value="Description" id="description" class="input" rows="3" placeholder="Short description"></InputTextArea>
+          </div>
+
+          <!-- Normal Side -->
+          <div class="grid grid--gap grid--cols-2">
+            <div class="input-group">
+              <label class="label" for="normalSide">Normal Side *</label>
+              <InputSelect @bind-Value="NormalSide" id="normalSide" class="input" required>
+                <option value="" selected>Select…</option>
+                <option value="Debit">Debit</option>
+                <option value="Credit">Credit</option>
+              </InputSelect>
+            </div>
+
+            <!-- Account Category -->
+            <div class="grid grid--gap grid--cols-2">
+              <div class="input-group">
+                <label class="label" for="category">Category *</label>
+                <InputSelect @bind-Value="Category" id="category" class="input" required>
+                  <option value="" selected>Select…</option>
+                  <option value="Asset">Asset</option>
+                  <option value="Liability">Liability</option>
+                  <option value="Equity">Equity</option>
+                  <option value="Revenue">Revenue</option>
+                  <option value="Expense">Expense</option>
+                </InputSelect>
+              </div>
+
+              <!-- Account Subcategory -->
+              <div class="input-group">
+                <label class="label" for="subcategory">Subcategory</label>
+                <InputText @bind-Value="SubCategory" id="subcategory" class="input" type="text" placeholder="e.g., Current Assets" />
+              </div>
+            </div>
+            
+            <!-- Balance + tracking fields section -->
+            <div class="grid grid--gap grid--cols-2">
+              <!-- Initial Balance -->
+              <div class="input-group">
+                <label class="label" for="initialBalance">Initial Balance *</label>
+                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" required />
+              </div>
+
+              <!-- Debit -->
+              <div class="input-group">
+                <label class="label" for="debit">Debit</label>
+                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly />
+              </div>
+
+              <!-- Credit -->
+              <div class="input-group">
+                <label class="label" for="credit">Credit</label>
+                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly />
+              </div>
+
+              <!-- Balance -->
+              <div class="input-group">
+                <label class="label" for="balance">Balance</label>
+                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly />
+              </div>
+
+              <!-- Date/Time Account Added -->
+              <div class="input-group">
+                <label class="label" for="created">Date/Time Account Added</label>
+                <InputText @bind-Value="DT" id="created" class="input" type="datetime-local" readonly />
+              </div>
+
+              <!-- User ID -->
+              <div class="input-group">
+                <label class="label" for="addedBy">User ID</label>
+                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly />
+              </div>
+
+              <!-- Order -->
+              <div class="input-group">
+                <label class="label" for="order">Order</label>
+                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0" />
+              </div>
+            </div>
+
+            <!-- Statement -->
+            <div class="input-group">
+              <label class="label" for="statement">Statement *</label>
+              <InputSelect @bind-Value="Statement" id="statement" class="input" required>
+                <option value="" selected>Select…</option>
+                <option value="IS">Income Statement (IS)</option>
+                <option value="BS">Balance Sheet (BS)</option>
+                <option value="RE">Retained Earnings (RE)</option>
+              </InputSelect>
+            </div>
+          </div>
+
+          <!-- Comment -->
+          <div class="input-group">
+            <label class="label" for="comment">Comment (optional)</label>
+            <InputTextArea @bind-Value="Comment" id="comment" class="input" rows="3" placeholder="Reason for change"></InputTextArea>
+          </div>
+
+          <!-- Active Status -->
+          <div class="input-group">
+            <label class="label" for="active">Active</label>
+            <div>
+              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked />
+            </div>
+            <small class="hint" id="activeHint">You cannot deactivate when balance &gt; 0.</small>
+          </div>
+
+          <div class="row-right" style="margin-top:8px;">
+            <button type="button" id="btnCancel" class="btn btn--secondary">Cancel</button>
+            <button @onclick="CreateAccount" type="button" id="btnSave" class="btn btn--primary">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Event log card -->
+  <section class="card card--fluid card--animate card--stagger-2" aria-labelledby="logTitle" style="margin-top:16px;">
+    <header class="card__header">
+      <h2 id="logTitle" class="h3">Recent Changes (This Account)</h2>
+    </header>
+    <div class="card__body">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>Event ID</th>
+            <th>Action</th>
+            <th>User</th>
+            <th>Date/Time</th>
+            <th>Before</th>
+            <th>After</th>
+            <th>Comment</th>
+          </tr>
+          </thead>
+          <tbody id="eventRows">
+          <tr class="muted"><td colspan="7" style="text-align:center; padding:16px;">No events yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="app-footer__inner">
+    <nav class="footer-nav">
+      <a href="help.html" class="link">Help</a>
+      <a href="privacy.html" class="link">Privacy</a>
+      <a href="terms.html" class="link">Terms</a>
+    </nav>
+    <small class="muted">© 2025 LEDGR · Build v0.1</small>
+  </div>
+</footer>
+
+<!-- Global JS + Accounts module -->
+<script src="/app.js"></script>
+<script src="/accounts-form.js"></script>
+<script>
+    // Initialize the form page
+    window.accountsForm?.init?.();
+  </script>
+</body>
+</html>
+
+@code{
+
+  [Parameter] public string? Username { get; set; }
+  [Parameter] public string? AccountNum { get; set; }
+  
+  // Account Parameters
+  private string AccountName { get; set; } = string.Empty;
+  private string AccountNumber { get; set; } = string.Empty;
+  private string Description { get; set; } = string.Empty;
+  private string NormalSide { get; set; } = string.Empty;
+  private string Category { get; set; } = string.Empty;
+  private string SubCategory { get; set; } = string.Empty;
+  private string InitialBalance { get; set; } = "0.00";
+  private string Debit { get; set; } = "0.00";
+  private string Credit { get; set; } = "0.00";
+  private string Balance { get; set; } = "0.00";
+  private string DT { get; set; } = DateTime.Now.ToString();
+  private string DateCreated { get; set; } = string.Empty;
+  private string UserID { get; set; } = string.Empty;
+  private string Order { get; set; } = "0";
+  private string Statement { get; set; } = string.Empty;
+  private string Comment { get; set; } = string.Empty;
+  private bool Active { get; set; }
+  
+  
+  protected override async Task OnParametersSetAsync()
+  {
+    //Set Parameters here
+    List<string> AccountDetails = Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum));
+
+    AccountNumber = AccountDetails[0];
+    AccountName = AccountDetails[1];
+    Description = AccountDetails[2];
+    NormalSide = AccountDetails[3];
+    Category = AccountDetails[4];
+    SubCategory = AccountDetails[5];
+    InitialBalance = AccountDetails[6];
+    Debit = AccountDetails[7];
+    Credit = AccountDetails[8];
+    Balance = AccountDetails[9];
+    DateCreated = AccountDetails[10];
+    UserID = AccountDetails[11];
+    Order = AccountDetails[12];
+    Statement = AccountDetails[13];
+    if (AccountDetails[14] == "1")
+    {
+      Active = true;
+    }
+    else
+    {
+      Active = false;
+    }
+    
+
+    //UserID = user.GetUserID();
+    StateHasChanged();
+  }
+  
+  private async void CreateAccount()
+  {
+    // Convert to proper data
+    char NS = 'L';
+    try
+    {
+      int AN = Convert.ToInt32(AccountNumber);
+      if (NormalSide == "Debit")
+      {
+        NS = 'L';
+      }
+      else
+      {
+        NS = 'R';
+      }
+      double IB = Convert.ToDouble(InitialBalance);
+      double DB = Convert.ToDouble(Debit);
+      double CR = Convert.ToDouble(Credit);
+      double Bal = Convert.ToDouble(Balance);
+
+      int userID = Admin.GetUserFromUserName(Username).Result.GetUserID();
+      int tempOrder = Convert.ToInt32(Order);
+      
+      Admin.CreateAccount(AN, AccountName, Description, NS, Category, SubCategory, IB, DB, CR, Bal, DT, userID, tempOrder, Statement, Username);
+      NavigationManager.NavigateTo($"/CoAList/{Username}");
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine(e.Message);
+    }
+
+  }
+  
+  // Nav Buttons - Linked to side bar
+  public void Home()
+  {
+    NavigationManager.NavigateTo($"/adminHome/{Username}");
+  }
+
+  public void CoAList()
+  {
+    NavigationManager.NavigateTo($"/CoAList/{Username}");
+  }
+    
+  public void CoAFormCall()
+  {
+    NavigationManager.NavigateTo($"/CoAForm/{Username}");
+  }
+  public void CoAEventLog()
+  {
+    NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+  }
+  public void PasswordReport()
+  {
+    NavigationManager.NavigateTo($"/pwReport/{Username}");
+  }
+}

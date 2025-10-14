@@ -378,15 +378,6 @@ body{
 .input__control::placeholder { color: var(--ui-500); transition: color .15s; }
 .input__control:focus::placeholder { color: transparent; }
 
-/* Safari-specific autofill/credentials icons — keep them inside the field 
-input::-webkit-credentials-auto-fill-button,
-input::-webkit-contacts-auto-fill-button{
-  margin-left: 4px;
-}
-*/
- 
-
-
 /* Make select/textarea look like inputs */
 select.input, textarea.input{
   width: 100%;
@@ -442,17 +433,19 @@ body{
 .site-header{
   background: var(--brand-500);
   height: 120px;
-  margin: 0;
+  margin: 0 auto;
+  width:100%;
+  display: flex;
+  
 }
 .header-inner{
-  margin: 0;
+  margin: 0 auto;
   display:flex;
   align-items:center;
-  justify-content: space-between;
 }
 .brand-logo{
   height: 56px; 
-  margin: 0;
+  margin: 0 auto;
   width: auto;
   filter: none;
 }
@@ -795,15 +788,6 @@ textarea{
     /*If not default, write CSS to get buttons side-by-side */
 }
 
-.pendingUsers-table{
-  margin: 20px auto;   /* Centers tables horizontally */
-  border-collapse: collapse;
-  width: 80%;          /* Keep tables at a readable width */
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
-  overflow: hidden;
-}
 
 .pendingUsers-table thead th{
   background-color: var(--brand-500);
@@ -832,4 +816,10 @@ textarea{
 
 .SecurityQuestion{
   height: 40px;
+}
+
+.homeUserContainer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

@@ -1,0 +1,330 @@
+@page "/CoAList/{Username}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chart of Accounts</title>
+
+  <!-- Global theme -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Accounts-only styles -->
+  <link rel="stylesheet" href="accounts.css" />
+</head>
+
+<body class="page">
+  
+<!-- Header -->
+<header class="app-header app-header--band">
+  <div class="app-header__inner">
+    <!-- Left: Brand -->
+    <a class="app-header__brand" href="/dashboard.html" aria-label="LEDGR Home">
+      <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
+    </a>
+
+    <!-- Center: Primary Nav (inside the dark band) -->
+    <nav class="nav nav--primary">
+      <NavLink class="nav__link is-active" href="/CoAList">Accounts</NavLink>
+      <NavLink class="nav__link" href="../journal/je-create.html">Journal</NavLink>
+      <NavLink class="nav__link" href="../reports/reports.html">Reports</NavLink>
+      <NavLink class="nav__link" href="../dashboard.html">Dashboard</NavLink>
+    </nav>
+
+    <!-- Right: Notifications + User -->
+    <div class="app-header__right">
+      <button class="icon-btn bell" aria-label="Notifications">🔔</button>
+      <div class="user-chip" title="Signed in as">
+        <span class="avatar" aria-hidden="true">A</span>
+        <span class="user-chip__text">
+          <strong id="userName">Admin User</strong>
+          <span class="muted">Admin</span>
+        </span>
+      </div>
+      <button class="icon-btn caret" aria-label="User menu" title="User menu">▾</button>
+    </div>
+  </div>
+</header>
+
+<SideBar>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+  <button @onclick="CoAListCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+  <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+  <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+</SideBar>
+
+<!-- Main -->
+<main class="container container--xl">
+
+  <!-- Top-left calendar -->
+  <section class="toolbar" aria-label="Calendar and quick actions">
+    <div class="input-group">
+      <label class="label" for="coaDateFrom">From</label>
+      <input id="coaDateFrom" type="date" class="input" />
+    </div>
+
+    <div class="input-group">
+      <label class="label" for="coaDateTo">To</label>
+      <input id="coaDateTo" type="date" class="input" />
+    </div>
+    <button id="btnApplyDates" class="btn btn--primary btn--small" type="button">Apply Dates</button>
+    <button type="button" @onclick="AddAccount" class="btn btn--primary btn--small" role="button">Add Account</button>
+  </section>
+
+  <section class="card card--fluid" aria-labelledby="coaTitle">      
+    <header class="card__header">
+      <h1 id="coaTitle" class="h2">Chart of Accounts</h1>
+      <p class="body1 muted">Search and filter accounts; click an account to open its ledger.</p>
+    </header>
+
+    <div class="card__body">
+      <form id="coaFilterForm" class="grid grid--cols-6 grid--gap">
+        <div class="input-group">
+          <label class="label" for="fCategory">Category</label>
+          <InputSelect @bind-Value="Category" id="fCategory" class="input">
+            <option value="">All</option>
+            <option value="Asset">Asset</option>
+            <option value="Liability">Liability</option>
+            <option value="Equity">Equity</option>
+            <option value="Revenue">Revenue</option>
+            <option value="Expense">Expense</option>
+          </InputSelect>
+        </div>
+
+        <div class="input-group">
+          <label class="label" for="fSubcategory">Subcategory</label>
+          <InputText @bind-Value="Subcategory" id="fSubcategory" class="input" type="text" placeholder="e.g., Current Assets" />
+        </div>
+
+        <div class="input-group">
+          <label class="label" for="fNormalSide">Normal Side</label>
+          <InputSelect @bind-Value="NormalSide" id="fNormalSide" class="input">
+            <option value="" selected>All</option>
+            <option value="Debit">Debit</option>
+            <option value="Credit">Credit</option>
+          </InputSelect>
+        </div>
+
+        <div class="input-group">
+          <label class="label" for="fAcctFrom">Acct # From</label>
+          <InputText @bind-Value="AcctNumFrom" id="fAcctFrom" class="input" type="number" inputmode="numeric" />
+        </div>
+
+        <div class="input-group">
+          <label class="label" for="fAcctTo">Acct # To</label>
+          <InputText @bind-Value="AcctNumTo" id="fAcctTo" class="input" type="number" inputmode="numeric" />
+        </div>
+
+        <div class="input-group">
+          <label class="label" for="fAmtMin">Amount Min</label>
+          <InputText @bind-Value="AcctMin" id="fAmtMin" class="input" type="number" step="0.01" />
+        </div>
+
+        <div class="input-group">
+          <label class="label" for="fAmtMax">Amount Max</label>
+          <InputText @bind-Value="AcctMax" id="fAmtMax" class="input" type="number" step="0.01" />
+        </div>
+
+        <div class="input-group" style="grid-column: span 2;">
+          <label class="label" for="fSearch">Search</label>
+          <InputText @bind-Value="Search" id="fSearch" class="input" type="search" placeholder="Account number or name" />
+        </div>
+
+        <div class="input-group" style="align-self:end;">
+          <button type="button" id="btnClearFilters" class="btn btn--secondary">Clear Filters</button>
+        </div>
+        <div class="input-group" style="align-self:end;">
+          <button type="submit" class="btn btn--primary">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card__body">
+      <div class="table-actions">
+        <a href="./coa-event-log.html" class="btn btn--secondary" type="button" title="View all account changes">View Event Log</a>
+        <button id="btnExportCsv" class="btn btn--secondary" type="button">Export CSV</button>
+      </div>
+
+        
+
+      <div id="coaAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
+        <span class="alert__dot" aria-hidden="true"></span>
+        <span class="alert__text" id="coaAlertText">There was a problem loading accounts.</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table" aria-describedby="coaCaption">
+          <caption id="coaCaption" class="sr-only">Accounts with monetary values shown to two decimals and thousand separators.</caption>
+          <thead>
+          <tr>
+            <th>Account No.</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Normal Side</th>
+            <th>Category</th>
+            <th>Subcategory</th>
+            <th>Initial Balance</th>
+            <th>Debit</th>
+            <th>Credit</th>
+            <th>Balance</th>
+            <th>Created</th>
+            <th>Added By</th>
+            <th>Order</th>
+            <th>Statement</th>
+            <!-- <th>Updated</th> -->
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+          </thead>
+          <tbody id="coaRows">
+          @if (Accounts.Count > 0)
+          {
+            @for (int i = 0; i < Accounts.Count; i += 15)
+            {
+              int index = i;
+              <tr class="muted">
+
+                <td>@Accounts[index]</td>
+                <td>@Accounts[index + 1]</td>
+                <td>@Accounts[index + 2]</td>
+                <td>@Accounts[index + 3]</td>
+                <td>@Accounts[index + 4]</td>
+                <td>@Accounts[index + 5]</td>
+                <td>@Accounts[index + 6]</td>
+                <td>@Accounts[index + 7]</td>
+                <td>@Accounts[index + 8]</td>
+                <td>@Accounts[index + 9]</td>
+                <td>@Accounts[index + 10]</td>
+                <td>@Accounts[index + 11]</td>
+                <td>@Accounts[index + 12]</td>
+                <td>@Accounts[index + 13]</td>
+                <td>@Accounts[index + 14]</td>
+                <td><button @onclick="(() => EventLogEdit(index))" type="button" class="btn btn-primary">View</button></td>
+              </tr>
+            } 
+          }
+          @if (Accounts.Count <= 0)
+          {
+            <tr>
+              <td colspan="17" style="text-align:center; padding:24px;">Loading…</td>
+            </tr>
+          }
+          </tbody>
+        </table>
+      </div>
+
+      <nav class="pagination" aria-label="Accounts pages">
+        <button class="btn btn--secondary" id="pgPrev" type="button" disabled>Prev</button>
+        <span class="pagination__status" id="pgStatus">Page 1 of 1</span>
+        <button class="btn btn--secondary" id="pgNext" type="button" disabled>Next</button>
+      </nav>
+
+      <p class="body2 muted" style="margin-top:16px;">
+        <strong>Legend:</strong> IS = Income Statement, BS = Balance Sheet, RE = Retained Earnings
+      </p>
+    </div>
+  </section>
+  <AccountActionsAdmin Show="@showActions" Username="@Username" AcctNum="@AcctNum" ShowChanged="val => showActions = val"></AccountActionsAdmin>
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="app-footer__inner">
+    <nav class="footer-nav">
+      <a href="../help.html" class="link">Help</a>
+      <a href="../privacy.html" class="link">Privacy</a>
+      <a href="../terms.html" class="link">Terms</a>
+    </nav>
+    <small class="muted">© 2025 LEDGR · Build v0.1</small>
+  </div>
+</footer>
+
+<!-- Global JS + Accounts module -->
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/accounts.js"></script> 
+<script>
+  window.addEventListener('DOMContentLoaded', function(){
+    window.coa?.initListPage?.({
+      tableSel:'#coaRows',
+      alertSel:'#coaAlert',
+      alertTextSel:'#coaAlertText',
+      exportBtn:'#btnExportCsv',
+      clearBtn:'#btnClearFilters',
+      formSel:'#coaFilterForm',
+      dateFrom:'#coaDateFrom',
+      dateTo:'#coaDateTo',
+      searchSel:'#fSearch',
+      pagination:{prev:'#pgPrev', next:'#pgNext', status:'#pgStatus'},
+      addBtn:'#btnAddAccount'
+    });
+  });
+</script>
+
+</body>
+</html>
+
+@code{
+
+  [Parameter] public string? Username { get; set; }
+
+  private List<string> Accounts = Account.GetAccounts("").Result;
+  private bool showActions { get; set; } = false;
+  private string AcctNum { get; set; } = "-1";
+
+  // Sorting
+  private string Category { get; set; } = string.Empty;
+  private string Subcategory { get; set; } = string.Empty;
+  private string NormalSide { get; set; } = string.Empty;
+  private string AcctNumFrom { get; set; } = string.Empty;
+  private string AcctNumTo { get; set; } = string.Empty;
+  private string AcctMin { get; set; } = string.Empty;
+  private string AcctMax { get; set; } = string.Empty;
+  private string Search { get; set; } = string.Empty;
+  
+  public void showActionsDialog(int index)
+  {
+    AcctNum = (Accounts[index]);
+    showActions = true;
+  }
+  
+  public void AddAccount()
+  {
+    NavigationManager.NavigateTo($"/CoAForm/{Username}");
+  }
+  
+  // Nav Buttons - Linked to side bar
+  public void Home()
+  {
+    NavigationManager.NavigateTo($"/adminHome/{Username}");
+  }
+
+  public void CoAListCall()
+  {
+    NavigationManager.NavigateTo($"/CoAList/{Username}");
+  }
+    
+  public void CoAForm()
+  {
+    NavigationManager.NavigateTo($"/CoAForm/{Username}");
+  }
+  public void CoAEventLog()
+  {
+    NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+  }
+  public void PasswordReport()
+  {
+    NavigationManager.NavigateTo($"/pwReport/{Username}");
+  }
+
+  public void EventLogEdit(int index)
+  {
+    string AccountNum = Accounts[index];
+    NavigationManager.NavigateTo($"/CoAFormEdit/{Username}/{AccountNum}"); 
+  }
+
+}

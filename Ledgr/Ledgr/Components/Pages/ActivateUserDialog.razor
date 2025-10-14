@@ -1,0 +1,63 @@
+@page "/adminActivateUser"
+@using LedgrLogic
+
+@if (Show)
+{
+<link rel="stylesheet" href="home.css"/>
+<body>
+<div class="modal-backdrop">
+    <div class="dialog-card">
+        <div class="dialog-header">
+            <h2>Are you sure you want to end this user's suspension?</h2>
+            <button @onclick="Close" aria-label="Close dialog"
+                    style="background:none;border:0;font-size:18px;cursor:pointer">✕
+            </button>
+        </div>
+
+        <div class="dialog-body">
+            <!-- Insert InputText fields for each UserProperty -->
+            <!-- Not that you need to collect the fields for Employee as well -->
+            
+            <div style="display: grid; place-items: center;">
+                <div>
+                    <button @onclick="Close" type="button" class="btn btn--secondary">Cancel</button>
+                    <button @onclick="ActivateUser" type="button" class="btn btn-primary">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+}
+
+@code{
+
+    [Parameter] public bool Show { get; set; }
+    [Parameter] public EventCallback<bool> ShowChanged { get; set; }
+    [Parameter] public int UserID { get; set; }
+    
+    // Update Home Page
+    [Parameter] public EventCallback<string> OnUserActivated { get; set; }
+
+    private async Task Close()
+    {
+        if (ShowChanged.HasDelegate)
+            await ShowChanged.InvokeAsync(false);
+    }
+
+    private async Task ActivateUser()
+    {
+        try
+        {
+            await Admin.ActivateUser(UserID);
+            await OnUserActivated.InvokeAsync(Convert.ToString(UserID));
+            await Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
+    }
+
+}

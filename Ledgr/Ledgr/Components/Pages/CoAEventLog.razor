@@ -1,0 +1,202 @@
+@page "/CoAEventLog/{Username}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>COA Event Log</title>
+
+    <!-- Global theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Accounts-only styles -->
+    <link rel="stylesheet" href="accounts.css" />
+</head>
+
+<body class="page">
+
+<!-- Header -->
+<header class="app-header app-header--band">
+    <div class="app-header__inner">
+        <!-- Left: Brand -->
+        <a class="app-header__brand" href="/dashboard.html">
+            <img src="logo-slogan.png" class="app-header__logo" alt="LEDGR"/>
+        </a>
+        <!-- Center: Primary Nav (inside the dark band) -->
+        <nav class="nav nav--primary">
+            <a class="nav__link" @onclick="CoAList" href="#">Accounts</a>
+            <a class="nav__link" href="/je-create.html">Journal</a>
+            <a class="nav__link" href="/reports.html">Reports</a>
+            <a class="nav__link" href="/dashboard.html">Dashboard</a>
+        </nav>
+
+        <!-- Right: Notifications + User -->
+        <div class="app-header__right">
+            <button class="icon-btn" aria-label="Notifications">🔔</button>
+            <div class="user-chip">
+                <span class="avatar">A</span>
+                <span class="user-chip__text"><strong>@Username</strong>
+                    <span class="muted">Admin</span>
+                </span>
+            </div>
+            <button class="icon-btn" aria-label="User menu">▾</button>
+        </div>
+    </div>
+</header>
+
+<SideBar>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="CoAEventLogCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+</SideBar>
+
+<!-- Main -->
+<main class="container container--xl">
+
+    <section class="card card--fluid card--animate" aria-labelledby="logH">
+        <header class="card__header">
+            <h1 id="logH" class="h2">Chart of Accounts — Event Log</h1>
+            <p class="body1 muted">Filter and export all account changes.</p>
+        </header>
+
+        <div class="card__body">
+            <form id="logFilters" class="grid grid--gap" style="grid-template-columns: repeat(6, minmax(0, 1fr));">
+                <div class="input-group">
+                    <label class="label" for="lfFrom">From</label>
+                    <input id="lfFrom" type="date" class="input" />
+                </div>
+
+                <div class="input-group">
+                    <label class="label" for="lfTo">To</label>
+                    <input id="lfTo" type="date" class="input" />
+                </div>
+
+                <div class="input-group">
+                    <label class="label" for="lfAction">Action</label>
+                    <select id="lfAction" class="input">
+                        <option value="">All</option>
+                        <option>Add</option>
+                        <option>Edit</option>
+                        <option>Deactivate</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label class="label" for="lfUser">User</label>
+                    <input id="lfUser" class="input" type="text" placeholder="e.g., admin" />
+                </div>
+
+                <div class="input-group" style="grid-column: span 2;">
+                    <label class="label" for="lfSearch">Account</label>
+                    <input id="lfSearch" class="input" type="search" placeholder="Account # or name" />
+                </div>
+
+                <div class="input-group" style="align-self:end;">
+                    <button class="btn btn--secondary btn--small" type="button" id="lfClear">Clear</button>
+                </div>
+
+                <div class="input-group" style="align-self:end;">
+                    <button class="btn btn--primary btn--small" type="submit">Apply</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card__body">
+            <div class="table-actions">
+                <button id="logExport" class="btn btn--secondary btn--small" type="button">Export CSV</button>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Event ID</th>
+                        <th>Account No</th>
+                        <th>Account Name</th>
+                        <th>User</th>
+                        <th>Date/Time</th>
+                        <th>Description</th>
+                        <th class="text-right">Details</th>
+                    </tr>
+                    </thead>
+                    @for (int i = 0; i < EventLog.Count; i += 18)
+                    {
+                        int index = i;
+                        <tr>
+                            <td>@EventLog[index]</td>
+                            <td>@EventLog[index + 2]</td>
+                            <td>@EventLog[index + 3]</td>
+                            <td>@EventLog[index + 17]</td>
+                            <td>@EventLog[index + 16]</td>
+                            <td>@EventLog[index + 4]</td>
+                            <td><button type="button" class = "btn btn--secondary">View</button></td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            <nav class="pagination" aria-label="Log pages">
+                <button class="btn btn--secondary btn--small" id="logPrev" type="button" disabled>Prev</button>
+                <span class="pagination__status" id="logStatus">Page 1 of 1</span>
+                <button class="btn btn--secondary btn--small" id="logNext" type="button" disabled>Next</button>
+            </nav>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+    <div class="app-footer__inner">
+        <nav class="footer-nav">
+            <!-- Will change these to Nav Links once the appropriate files are produced -->
+            <a class="link" href="/help.html">Help</a>
+            <a class="link" href="/privacy.html">Privacy</a>
+            <a class="link" href="/terms.html">Terms</a>
+        </nav>
+        <small class="muted">© 2025 LEDGR · Build v0.1</small>
+    </div>
+</footer>
+
+<!-- Global JS + Accounts module -->
+<script src="app.js"></script>
+<script src="accounts-events.js"></script>
+</body>
+</html>
+@code{
+
+    [Parameter] public string Username { get; set; }
+    [Parameter] public string AcctNum { get; set; }
+
+    private List<string> EventLog = Admin.GetEventLog("Account").Result;
+    
+    // Nav Buttons - Linked to side bar
+    public void Home()
+    {
+        NavigationManager.NavigateTo($"/adminHome/{Username}");
+    }
+
+    public void CoAList()
+    {
+        NavigationManager.NavigateTo($"/CoAList/{Username}");
+    }
+    
+    public void CoAForm()
+    {
+        NavigationManager.NavigateTo($"/CoAForm/{Username}");
+    }
+    public void CoAEventLogCall()
+    {
+        NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+    }
+    public void PasswordReport()
+    {
+        NavigationManager.NavigateTo($"/pwReport/{Username}");
+    }
+
+}

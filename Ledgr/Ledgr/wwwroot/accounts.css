@@ -1,0 +1,452 @@
+/* ===========================
+   Chart of Accounts — styles
+   =========================== */
+
+/* Top toolbar (calendar + actions) */
+.toolbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+/* Wrap date inputs neatly to the left */
+.toolbar .input-group {
+    display: flex;
+    flex-direction: column;
+    margin-right: 12px;
+}
+
+/* Make the From/To group hug the left edge */
+.toolbar .input-group:first-of-type {
+    margin-left: 4px;
+}
+
+.toolbar .label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #03142e;
+    margin-bottom: 2px;
+}
+
+/* Date fields style */
+.toolbar .input[type="date"] {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #d6dae1;
+    background: #fff;
+    color: #03142e;
+    min-width: 150px;
+}
+
+/* Button stays fixed right */
+.toolbar #btnAddAccount {
+    margin-left: auto;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+    .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .toolbar #btnAddAccount {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+}
+
+/* ===== Button consistency fixes ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.1s ease;
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+/* Small button variant — matches Apply Filters size */
+.btn--small {
+    padding: 6px 14px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    height: 36px;
+    line-height: 1.1;
+}
+
+/* Primary button (dark blue) */
+.btn--primary {
+    background-color: #03142e;
+    color: #ffffff;
+}
+
+.btn--primary:hover {
+    background-color: #04204b;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Secondary (light blue-gray) */
+.btn--secondary {
+    background-color: #e3ecfc;
+    color: #03142e;
+}
+
+.btn--secondary:hover {
+    background-color: #d2e0fb;
+}
+
+/* Disabled state */
+.btn[disabled],
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#btnAddAccount {
+    height: 38px;
+    margin-top: 22px; /* aligns with date inputs */
+}
+
+/* keep date/apply cluster tidy */
+#btnApplyDates { margin-top: 22px; }
+
+/* if your date inputs are taller/shorter, adjust both together */
+.toolbar .input[type="date"] { height: 36px; }
+
+/* Filter grid */
+.grid { display:grid; }
+.grid--gap { gap:12px; }
+.grid--cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width:1100px){ .grid--cols-6 { grid-template-columns: repeat(3, 1fr);} }
+@media (max-width:700px){ .grid--cols-6 { grid-template-columns: repeat(2, 1fr);} }
+
+/* Table actions + small utilities */
+.table-actions { display:flex; justify-content:flex-end; margin-bottom:8px; }
+.text-right { text-align:right; }
+
+/* Pagination */
+.pagination { display:flex; align-items:center; gap:12px; justify-content:flex-end; margin-top:12px; }
+/* Removed from following line: var(--muted) before the hex code */
+.pagination__status { font-size:.9rem; color: #8b94a7; }
+
+/* User chip */
+.user-chip { display:flex; align-items:center; gap:8px; }
+.user-chip .avatar {
+    width:28px; height:28px; border-radius:50%;
+    background:#2b3a55; display:inline-grid; place-items:center;
+    color:#cfe0ff; font-weight:600;
+}
+.user-chip__text { display:flex; flex-direction:column; line-height:1.1; }
+
+/* Screen-reader only helper */
+.sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); border:0;
+}
+
+/* ===========================
+   Chart of Accounts — Layout
+   =========================== */
+
+/* make the main card span full container width */
+.card--fluid { width: 100%; }
+
+/* ensure card sections don't collapse their children */
+.card--fluid .card__body { text-align: left; width: 100%; }
+.card--fluid .card__header { width: 100%; text-align: left; margin-bottom: 12px; }
+
+/* tables should fill and scroll horizontally */
+.card--fluid .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* robust table defaults */
+.card--fluid .table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+}
+
+/* header cells */
+.card--fluid .table thead th {
+    text-align: left;
+    font-weight: 600;
+    padding: 12px 10px;
+    white-space: nowrap;
+    /* Removed from following line: var(--panel) before the hex code */
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* body cells */
+.card--fluid .table tbody td {
+    padding: 10px;
+    vertical-align: top;
+}
+
+/* zebra/hover */
+.card--fluid .table tbody tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+.card--fluid .table tbody tr:hover td { background: rgba(0,0,0,0.04); }
+
+/* Keep consistent margins within the card */
+.card.card--fluid {
+    padding: 32px;
+}
+
+/* Slightly larger title spacing */
+.card--fluid .h2 {
+    margin-bottom: 4px;
+}
+
+.card--fluid .body1.muted {
+    margin-bottom: 24px;
+}
+
+/* inline alert from shifting layout */
+#coaAlert { margin: 8px 0; }
+
+
+/* ======
+   HEADER
+   ====== */
+
+/* keep header at the top when scrolling */
+body.page {
+    scroll-padding-top: 90px;
+}
+
+.app-header--band {
+    background: var(--brand-500);
+    color: #e6eefc;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    max-width: 100%;
+    padding: 10px 16px;
+    /* keep header at the top when scrolling */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.app-header--band .app-header__inner {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+}
+.app-header--band .app-header__brand { display:flex; align-items:center; }
+.app-header--band .app-header__logo { height: 56px; object-fit: contain; }
+
+.nav--primary {
+    display:flex; justify-content:center; gap: 24px;
+}
+.app-header--band .nav__link {
+    color:#cfe0ff; text-decoration:none; padding:8px 10px; border-radius:10px;
+    font-weight:600; letter-spacing:.2px;
+}
+.app-header--band .nav__link:hover { background: rgba(255,255,255,.10); }
+.app-header--band .nav__link.is-active { background: rgba(255,255,255,.18); }
+
+.app-header--band .app-header__right {
+    display:flex; align-items:center; justify-content:flex-end; gap:10px;
+}
+.app-header--band .icon-btn {
+    background: transparent; border: 0; color:#e6eefc; font-size: 18px; line-height:1;
+    padding: 8px; border-radius: 10px; cursor:pointer;
+}
+.app-header--band .icon-btn:hover { background: rgba(255,255,255,.10); }
+
+/* ==============================
+   BACK LINK STYLING
+   ============================== */
+
+.back-nav{ margin:12px 0 4px 8px; }
+.back-nav--minimal .back-link{
+    color:#0b1c33; text-decoration:none; font-weight:600;
+}
+.back-nav--minimal .back-link:hover{ text-decoration:underline; }
+
+.back-link:hover {
+    background: rgba(11, 28, 51, 0.15);
+    color: #07172d;
+}
+
+.back-arrow {
+    font-size: 1.1rem;
+    color: inherit;
+}
+
+.back-text {
+    letter-spacing: 0.3px;
+}
+
+
+/* ====================
+   TABLE + CARD LAYOUT
+   ==================== */
+
+/* Wider page container just for accounts pages */
+.container--xl{
+    max-width:90%;
+    min-width: 80%;
+    margin-inline:auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.container.container--xl > .card {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto 24px;
+}
+
+.card--fluid {
+    width: 100%;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    background: #ffffff;
+    border-radius: 12px;
+}
+.card--fluid .card__body { text-align: left; width: 100%; }
+.card--fluid .card__header { width: 100%; text-align: left; margin-bottom: 12px; }
+.card--fluid .table-wrap { width:100%; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.card--fluid .table { width:100%; border-collapse:separate; border-spacing:0; table-layout:auto; }
+.card--fluid .table thead th {
+    text-align:left; font-weight:600; padding:12px 10px; white-space:nowrap;
+    /* Removed from following line: var(--panel) before the hex code */
+    background: #fff; position:sticky; top:0; z-index:1;
+}
+.card--fluid .table tbody td { padding:10px; vertical-align:top; white-space:nowrap; }
+.card--fluid .table tbody tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+.card--fluid .table tbody tr:hover td { background: rgba(0,0,0,0.04); }
+
+.card--fluid .form-grid {
+    text-align: left;
+}
+
+/* ==============================
+   PAGINATION — centered
+   ============================== */
+.pagination {
+    display:flex; align-items:center; gap:12px;
+    justify-content:center;
+    margin-top:12px;
+}
+/* Removed from following line: var(--muted) before the hex code */
+.pagination__status { font-size:.9rem; color: #8b94a7; }
+
+/* ==============================
+   FOOTER — pinned to bottom, centered
+   ============================== */
+body.page { min-height: 100vh; display:flex; flex-direction:column; }
+.container { flex: 1 0 auto; }
+.app-footer { flex-shrink:0; }
+.app-footer .app-footer__inner {
+    max-width:1200px; margin: 24px auto; text-align:center;
+}
+.footer-nav { display:flex; gap:18px; justify-content:center; margin-bottom:6px; }
+
+/* ==============================
+            FORM LAYOUT
+   ============================== */
+.form-grid{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+.form-col{ display:flex; flex-direction:column; gap:12px; }
+
+.field-error{
+    color:#b42318; font-size:.9rem; margin-top:4px;
+}
+/* Removed from following line: var(--muted) before the hex code */
+.hint{ color: #8b94a7; font-size:.9rem; }
+
+/* event log JSON preview */
+.mini-json{
+    max-width: 360px;
+    max-height: 120px;
+    overflow:auto;
+    background: rgba(0,0,0,.04);
+    padding:6px 8px;
+    border-radius:8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+}
+
+/* Buttons row */
+.row-right{ display:flex; gap:16px; justify-content:flex-end; }
+
+/* make readonly fields look consistent */
+.input[readonly]{
+    background: rgba(0,0,0,.04);
+    color:#444;
+    cursor:not-allowed;
+}
+
+.input-group {
+    width: 100%;
+}
+
+.input,
+textarea.input,
+select.input {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ===== Subtle entry animations for LEDGR cards ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+        filter: saturate(90%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: saturate(100%);
+    }
+}
+
+/* Respect accessibility: no motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .card--animate { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* Default animation */
+.card--animate {
+    opacity: 0; /* start hidden */
+    animation: fadeInUp .42s ease-out forwards; /* smooth, quick */
+    will-change: transform, opacity;
+}
+
+/* Gentle stagger for the second card (event log) */
+.card--stagger-2 { animation-delay: .08s; }
+
+/* Sticky header shadow reveal as you scroll */
+.app-header--band {
+    transition: box-shadow .2s ease;
+}
+body.scrolled .app-header--band {
+    box-shadow: 0 8px 22px rgba(0,0,0,.14);
+}
+
+/* Hide last column (Actions) for non-admins */
+body.role-readonly th:last-child,
+body.role-readonly td:last-child { display: none; }

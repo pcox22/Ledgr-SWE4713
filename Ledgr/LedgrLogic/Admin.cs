@@ -14,7 +14,7 @@ public class Admin : User
     {
     }
 
-    public static List<string> GetAllUsers()
+    public static async Task<List<string>> GetAllUsers()
     {
         List<string> users = new List<string>();
         try
@@ -45,7 +45,7 @@ public class Admin : User
         return null;
     }
 
-    public static List<string> GetAllPotentialUsers()
+    public static async Task<List<string>> GetAllPotentialUsers()
     {
         List<string> users = new List<string>();
         string Username = "";
@@ -89,7 +89,7 @@ public class Admin : User
         return null;
     }
     
-    public static bool ApproveUser(int TempUserID)
+    public static async Task<bool> ApproveUser(int TempUserID)
     {
         bool Successful = true;
 
@@ -147,8 +147,6 @@ public class Admin : User
                     Answer3 = reader.GetString(17);
                 }
             }
-
-            
             
             //Inserting new Employee row into Table
             var EmployeeSQL = "INSERT INTO Employee " +
@@ -165,6 +163,9 @@ public class Admin : User
             // Get that new Employee ID; we need a more viable system; no guarantee first, last name will work
             var getEmployeeIdSQL = "SELECT ID FROM Employee WHERE FirstName = @FIRSTNAME and LastName = @LASTNAME";
             var getEmployeeIdCommand = new SqliteCommand(getEmployeeIdSQL, connection);
+            
+            getEmployeeIdCommand.Parameters.AddWithValue("@FIRSTNAME", FirstName);
+            getEmployeeIdCommand.Parameters.AddWithValue("@LASTNAME", LastName);
             
             using var getEmpIDReader = getEmployeeIdCommand.ExecuteReader();
             if (getEmpIDReader.HasRows)
@@ -191,27 +192,27 @@ public class Admin : User
             using var RemoveSQLCommand = new SqliteCommand(RemoveSQL, connection);
 
             RemoveSQLCommand.Parameters.AddWithValue("@ID", PotentialUserID);
-            RemoveSQLCommand.ExecuteNonQuery();
+            await RemoveSQLCommand.ExecuteNonQueryAsync();
 
-            LedgrLogic.Email.SendEmail("ledgrsystems@gmail.com", Email, "Ledgr", (FirstName + " " + LastName), "Login Verified", $"You may log in using {Username} as your username, and {Password} as your password.");
+            LedgrLogic.Email.SendEmail("ledgrsystems@gmail.com", Email, "Ledgr", (FirstName + " " + LastName), "Login Verified", $"You may log in using {Username} as your username, and {LedgrLogic.Password.Decrypt(Password)} as your password.");
 
             var getUserIdSQL = "SELECT ID FROM User WHERE EmployeeID = @EMPID";
             var getUserIdCommand = new SqliteCommand(getUserIdSQL, connection);
             getUserIdCommand.Parameters.AddWithValue("@EMPID", EmployeeID);
 
             int userID = -1;
-            using var getUserIDReader = getEmployeeIdCommand.ExecuteReader();
+            using var getUserIDReader = getUserIdCommand.ExecuteReader();
             if (getUserIDReader.HasRows)
             {
                 while (getUserIDReader.Read())
                 {
-                    userID = Convert.ToInt32(getEmpIDReader.GetInt32(0));
+                    userID = Convert.ToInt32(getUserIDReader.GetString(0));
                 }
             }
             
-            var SecQuestionsSQL1 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
-            var SecQuestionsSQL2 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
-            var SecQuestionsSQL3 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL1 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL2 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL3 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
             
             var SQ1Command = new SqliteCommand(SecQuestionsSQL1, connection);
             SQ1Command.Parameters.AddWithValue("@QUESTION", Question1);
@@ -232,7 +233,7 @@ public class Admin : User
             SQ2Command.ExecuteNonQuery();
             SQ3Command.ExecuteNonQuery();
 
-            connection.Close();
+            await connection.CloseAsync();
 
         }
         catch (Exception e)
@@ -244,7 +245,7 @@ public class Admin : User
         return Successful;
     }
     
-    public bool ActivateUser(int TempUserID)
+    public static async Task ActivateUser(int TempUserID)
     {
         //Changes the IsActive attribute on a user type to true, updates the database
         //Deletes entry from SuspendedUser Table
@@ -264,26 +265,22 @@ public class Admin : User
             
             UserTableCommand.ExecuteNonQuery();
             SuspendedTableCommand.ExecuteNonQuery();
-
-            //Successful will only be true if no errors are thrown by the queries
-            Successful = true;
+            
+            await connection.CloseAsync();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-
-        return Successful;
     }
     //Dates given to this method should be formatted as a string (YYYY-MM-DD)
-    public static bool DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate)
+    public static async Task DeactivateUser(string TempUsername, string TempStartDate, string TempEndDate)
     {
         
         //Changes the IsActive attribute on a user type to false
         //Creates a new entry in SuspendedUser Table
         var UserSQL = "UPDATE User SET IsActive = 0 WHERE Username = @USERNAME";
-        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (1, @START, @END, @USERID)";
-        bool Successful = false;
+        var SuspendedUserSQL = "INSERT INTO SuspendedUser VALUES (NULL, @START, @END, @USERID)";
         try
         {
             int targetID = -1;
@@ -320,14 +317,12 @@ public class Admin : User
             SuspendedTableCommand.ExecuteNonQuery();
             
             //Successful will only be true if no errors are thrown by the queries
-            Successful = true;
+            await connection.CloseAsync();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-
-        return Successful;
     }
     
     public static List<string> ExpiredPasswordReport()
@@ -928,7 +923,7 @@ public class Admin : User
     
     //Deactivate an account
     //Needs to check if account balance != 0
-    public bool DeactivateAccount(int tempAccountNumber)
+    public static async Task DeactivateAccount(int tempAccountNumber)
     {
         try
         {
@@ -954,20 +949,18 @@ public class Admin : User
                     if (storedBalance > 0)
                     {
                         //Needs to throw error
-                        return false;
+                        throw new AccountBalanceGreaterThanZeroException("Cannot deactivate an account with a balance greater than zero");
                     }
                 }
             }
 
             deactivateCommand.ExecuteNonQuery();
         }
-        catch (Exception e)
+        catch (SqliteException e)
         {
             //needs to throw error
             Console.WriteLine(e);
-            return false;
         }
-        return true;
     }
     public bool ActivateAccount(int tempAccountNumber)
     {
@@ -989,5 +982,208 @@ public class Admin : User
             return false;
         }
         return true;
+    }
+    
+    public static async Task<List<string>> GetEventLog(string eventLogTable)
+    {
+        List<string> tempEventLog = new List<string>();
+        using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+        var sql = "";
+        int columns = 0;
+
+        switch (eventLogTable)
+        {
+            case ("Account"):
+                sql = "SELECT * FROM AccountEventLog ORDER BY ID ASC";
+                columns = 18;
+                break;
+            case("Employee"):
+                sql = "SELECT * FROM EmployeeEventLog ORDER BY ID ASC";
+                columns = 10;
+                break;
+            case("User"):
+                sql = "SELECT * FROM UserEventLog ORDER BY ID ASC";
+                columns = 10;
+                break;
+        }
+
+        try
+        {
+            var command = new SqliteCommand(sql, connection);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < columns; i++)
+                    {
+                        tempEventLog.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new UnableToRetrieveException("Unable to retrieve "+eventLogTable+" Event Log");
+        }
+
+        return tempEventLog;
+    }
+
+    public static bool CreateAccount(int tempAccountNum, string tempName, string tempDesc, char tempNormalSide,
+        string category, string subCategory, double tempInitBalance, double tempDebit, double tempCredit,
+        double tempBalance, string tempDate, int tempUserID, int tempOrder, string tempStatement, string adminUsername)
+    {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            var sql =
+                "INSERT INTO Account VALUES(@NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
+            using var command = new SqliteCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@NUMBER", tempAccountNum);
+            command.Parameters.AddWithValue("@NAME", tempName);
+            command.Parameters.AddWithValue("@DESC", tempDesc);
+            command.Parameters.AddWithValue("@NS", tempNormalSide);
+            command.Parameters.AddWithValue("@CATEGORY", category);
+            command.Parameters.AddWithValue("@SUBCATEGORY", subCategory);
+            command.Parameters.AddWithValue("@INITBALANCE", tempInitBalance);
+            command.Parameters.AddWithValue("@DEBIT", tempDebit);
+            command.Parameters.AddWithValue("@CREDIT", tempCredit);
+            command.Parameters.AddWithValue("@BALANCE", tempBalance);
+            command.Parameters.AddWithValue("@DATE", tempDate);
+            command.Parameters.AddWithValue("@USERID", tempUserID);
+            command.Parameters.AddWithValue("@ORDER", tempOrder);
+            command.Parameters.AddWithValue("@STATEMENT", tempStatement);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNum, adminID);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+        return true;
+    }
+
+    public static async Task UpdateUserEmployee(int userID, string email, bool active, string FirstName, string LastName, string DoB, string Address, string Role)
+    {
+        try
+        {
+            var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            await connection.OpenAsync();
+            
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", userID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+            
+            // Update Email
+            var sql = "UPDATE User Set Email = @EMAIL WHERE ID = @ID";
+        
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", userID);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.ExecuteNonQuery();
+            
+            // Update Active / Suspension
+            
+            sql = "UPDATE User SET IsActive = @ACTIVE WHERE ID = @ID";
+            var command1 = new SqliteCommand(sql, connection);
+            command1.Parameters.AddWithValue("@ACTIVE", active);
+            command1.Parameters.AddWithValue("@ID", userID);
+            command1.ExecuteNonQuery();
+            
+            // Update First name
+            sql = "Update Employee Set FirstName = @FIRSTNAME Where ID = @EMPLOYEEID";
+            var command2 = new SqliteCommand(sql, connection);
+            command2.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command2.Parameters.AddWithValue("@FIRSTNAME", FirstName);
+            command2.ExecuteNonQuery();
+            
+            // Update Last Name
+            sql = "Update Employee Set LastName = @LASTNAME Where ID = @EMPLOYEEID";
+            var command3 = new SqliteCommand(sql, connection);
+            command3.Parameters.AddWithValue("@LASTNAME", LastName);
+            command3.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command3.ExecuteNonQuery();
+            
+            // dob address role
+            sql = "Update Employee Set DoB = @DOB WHERE ID = @EMPLOYEEID";
+            var command4 = new SqliteCommand(sql, connection);
+            command4.Parameters.AddWithValue("@DOB", DoB);
+            command4.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command4.ExecuteNonQuery();
+            
+            // Address
+            sql = "Update Employee Set Address = @ADDRESS WHERE ID = @EMPLOYEEID";
+            var command5 = new SqliteCommand(sql, connection);
+            command5.Parameters.AddWithValue("@ADDRESS", Address);
+            command5.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command5.ExecuteNonQuery();
+            
+            // Role
+            int isAdmin = -1;
+            int isManager = -1;
+            
+            if (Role == "Admin")
+            {
+                isAdmin = 1;
+                isManager = 0;
+            }
+            else if (Role == "Employee")
+            {
+                isAdmin = 0;
+                isManager = 1;
+            }
+            else
+            {
+                isAdmin = 0;
+                isManager = 0;
+            }
+            
+            sql = "UPDATE Employee SET IsAdmin = @ISADMIN WHERE ID = @EMPLOYEEID";
+            var sql2 = "UPDATE Employee SET IsManager = @ISMANAGER WHERE ID = @EMPLOYEEID";
+            
+            var command6 = new SqliteCommand(sql, connection);
+            command6.Parameters.AddWithValue("@ISADMIN", isAdmin);
+            command6.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command6.ExecuteNonQuery();
+            
+            var command7 = new SqliteCommand(sql2, connection);
+            command7.Parameters.AddWithValue("@ISMANAGER", isManager);
+            command7.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command7.ExecuteNonQuery();
+
+            await connection.CloseAsync();
+
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e);
+        }
+
+        
+        
+        
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Data;
+using System.Threading.Channels;
 using Microsoft.Data.Sqlite;
 
 namespace LedgrLogic;
@@ -83,6 +84,248 @@ public class User
     public void SetNewUser(bool Temp)
     {
         NewUser = Temp;
+    }
+
+    public string GetEmail()
+    {
+        return Email;
+    }
+
+    public string GetFirstName()
+    {
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", UserID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+
+            var sql = "Select FirstName From Employee Where ID = @EmployeeID";
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@EmployeeID", employeeID);
+
+            using var reader2 = command.ExecuteReader();
+            string firstName = "";
+            if (reader2.HasRows)
+            {
+                while (reader2.Read())
+                {
+                    firstName = reader2.GetString(0);
+                }
+            }
+
+            return firstName;
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e.Message);
+            return "fail";
+        }
+    }
+    public string GetLastName()
+    {
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", UserID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+
+            var sql = "Select LastName From Employee Where ID = @EmployeeID";
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@EmployeeID", employeeID);
+
+            using var reader2 = command.ExecuteReader();
+            string lastName = "";
+            if (reader2.HasRows)
+            {
+                while (reader2.Read())
+                {
+                    lastName = reader2.GetString(0);
+                }
+            }
+
+            Console.WriteLine("Last Name: " + lastName);
+            return lastName;
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e.Message);
+            return "fail";
+        }
+    }
+    public string GetDoB()
+    {
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", UserID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+
+            var sql = "Select DoB From Employee Where ID = @EmployeeID";
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@EmployeeID", employeeID);
+
+            using var reader2 = command.ExecuteReader();
+            string DoB = "";
+            if (reader2.HasRows)
+            {
+                while (reader2.Read())
+                {
+                    DoB = reader2.GetString(0);
+                }
+            }
+
+            return DoB;
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e.Message);
+            return "fail";
+        }
+    }
+    public string GetAddress()
+    {
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+            
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", UserID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+
+            var sql = "Select Address From Employee Where ID = @EmployeeID";
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@EmployeeID", employeeID);
+
+            using var reader2 = command.ExecuteReader();
+            string Address = "";
+            if (reader2.HasRows)
+            {
+                while (reader2.Read())
+                {
+                    Address = reader2.GetString(0);
+                }
+            }
+
+            Console.WriteLine("Address: " + Address);
+            return Address;
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e.Message);
+            return "fail";
+        }
+    }
+    public string GetRole()
+    {
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", UserID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+
+            var sql = "Select IsAdmin, IsManager From Employee Where ID = @EmployeeID";
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@EmployeeID", employeeID);
+
+            using var reader2 = command.ExecuteReader();
+            string isAdmin = "";
+            string isManager = "";
+            if (reader2.HasRows)
+            {
+                while (reader2.Read())
+                {
+                    isAdmin = reader2.GetString(0);
+                    isManager = reader2.GetString(1);
+                }
+            }
+
+            if (isAdmin == "1")
+            {
+                return "Admin";
+            }
+            else if (isManager == "1")
+            {
+                return "Manager";
+            }
+            else
+            {
+                return "Accountant";
+            }
+
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e.Message);
+            return "fail";
+        }
     }
     
     //VerifyLogin takes in a temp username and password, queries the database to find that username and,
@@ -221,7 +464,6 @@ public class User
                 }
             }
 
-            Console.WriteLine("Stored Username: " + StoredUsername);
             if (StoredUsername != TempUsername)
             {
                 throw new InvalidUsernameException("No user exists with that username.");
@@ -271,7 +513,6 @@ public class User
         //If password is verified and the user is not inactive
         if (StoredPassword.Equals(TempPassword) && Active)
         {
-            Console.WriteLine("Login Successful");
             if (TempAdmin == 1)
             {
                 return new Admin(TempUsername, TempPassword, StoredEmail, StoredUserID, StoredEmployeeID, Active, NewUser);
@@ -309,7 +550,7 @@ public class User
         int StoredActive = -1;
         int StoredEmployeeID = -1;
         
-        var sql = "SELECT FROM USER WHERE USERNAME = @USERNAME";
+        var sql = "SELECT * FROM USER WHERE USERNAME = @USERNAME";
         try
         {
             using var Connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -348,11 +589,11 @@ public class User
         return null;
     }
     public static bool CreatePotentialUser(string tempUsername, string tempPassword, string tempEmail,
-        string tempFirst, string tempLast, string tempDoB, string tempAddress)
+        string tempFirst, string tempLast, string tempDoB, string tempAddress, string Q1, string A1, string Q2, string A2, string Q3, string A3)
     {
         bool Successful = true;
         var sql = "INSERT INTO PotentialUser " +
-                  "VALUES (@ID, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER)";
+                  "VALUES (NULL, @USERNAME, @PASSWORD, @EMAIL, @NEWUSER, @ISACTIVE, @FIRSTNAME, @LASTNAME, @DOB, @ADDRESS, @ISADMIN, @ISMANAGER, @Q1, @A1, @Q2, @A2, @Q3, @A3)";
         try
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -372,6 +613,12 @@ public class User
             command.Parameters.AddWithValue("@ADDRESS", tempAddress);
             command.Parameters.AddWithValue("@ISADMIN", 0);
             command.Parameters.AddWithValue("@ISMANAGER", 0);
+            command.Parameters.AddWithValue("@Q1", Q1);
+            command.Parameters.AddWithValue("@A1", A1);
+            command.Parameters.AddWithValue("@Q2", Q2);
+            command.Parameters.AddWithValue("@A2", A2);
+            command.Parameters.AddWithValue("@Q3", Q3);
+            command.Parameters.AddWithValue("@A3", A3);
 
             using var reader = command.ExecuteReader();
             
@@ -385,7 +632,7 @@ public class User
         return Successful;
     }
 
-    public static async void RejectUser(int ID)
+    public static async Task RejectUser(int ID)
     {
         var sql = "DELETE FROM PotentialUser WHERE ID = @ID";
         try
@@ -409,9 +656,9 @@ public class User
         
     }
     
-    public static ArrayList GetSecurityQuestions(int tempUserID)
+    public static async Task<List<string>> GetSecurityQuestions(int tempUserID)
     {
-        ArrayList SecurityQuestions = new ArrayList();
+        List<string> SecurityQuestions = new List<string>();
         var sql = "SELECT Question, Answer FROM SecurityQuestion WHERE UserID = @USERID";
         try
         {
@@ -433,7 +680,7 @@ public class User
                 
             }
             
-            connection.Close();
+            await connection.CloseAsync();
         }
         catch (Exception e)
         {
@@ -500,9 +747,13 @@ public class User
           
           connection.Close();
 
-          if (ExpiredPasswords.Contains(storedPassword))
+          foreach (string expiredPassword in ExpiredPasswords)
           {
-              throw new PasswordUsedBeforeException("Please enter a password that has not been used in the past");
+              if (expiredPassword.Equals(TempPassword))
+              {
+                  Console.WriteLine("Password used before: " + TempPassword);
+                  throw new PasswordUsedBeforeException("Please enter a password that has not been used in the past");
+              }
           }
       }
       catch (SqliteException e)

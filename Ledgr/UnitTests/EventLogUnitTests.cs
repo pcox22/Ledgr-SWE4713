@@ -82,7 +82,7 @@ public class EventLogUnitTests
         
         //act
         before = EventLog.LogAccount('b', 1, 1);
-        temp.EditAccountCategory(1, newCategory);
+        temp.EditAccountCategory(1, newCategory, "pcox0930");
         after = EventLog.LogAccount('a', 1, 1);
 
         if (before && after)

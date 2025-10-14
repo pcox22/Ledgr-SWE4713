@@ -176,7 +176,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = Admin.DeactivateUser("MLiu1001", "2025-10-13", "2025-10-15","pcox0930");
+        actual = Admin.DeactivateUser("ecox1008", "2025-10-13", "2025-10-15","pcox0930");
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -192,6 +192,86 @@ public class AdminUnitTests
         
         //act
         actual = Admin.ActivateUser(13, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-012
+    public void PromoteToManager_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.PromoteToManager(1003, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-013
+    public void PromoteToAdmin_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.PromoteToAdmin(1003, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-014
+    public void DemoteFromManager_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.DemoteFromManager(1003, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-015
+    public void DemoteFromAdmin_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.DemoteFromAdmin(1003, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-016
+    public void EditAccountName_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.DemoteFromAdmin(1003, "pcox0930");
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));

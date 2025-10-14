@@ -428,13 +428,20 @@ public class Admin : User
         return Successful;
     }
     
-    public bool PromoteToAdmin(int TempEmployeeID)
+    public bool PromoteToAdmin(int TempEmployeeID, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = false;
         var sql = "UPDATE Employee SET IsAdmin = 1 WHERE ID = @ID";
                   
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', TempEmployeeID, adminID);
+            
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
@@ -442,6 +449,10 @@ public class Admin : User
             command.Parameters.AddWithValue("@ID", TempEmployeeID);
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogEmployee('a', TempEmployeeID, adminID);
+            
             Successful = true;
         }
         catch (Exception e)
@@ -452,12 +463,19 @@ public class Admin : User
         return Successful;
     }
     
-    public bool DemoteFromAdmin(int TempEmployeeID)
+    public bool DemoteFromAdmin(int TempEmployeeID, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = false;
         var sql = "UPDATE Employee SET IsAdmin = 0 WHERE ID = @ID";
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', TempEmployeeID, adminID);
+            
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
@@ -465,6 +483,10 @@ public class Admin : User
             command.Parameters.AddWithValue("@ID", TempEmployeeID);
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogEmployee('a', TempEmployeeID, adminID);
+            
             Successful = true;
         }
         catch (Exception e)
@@ -475,12 +497,19 @@ public class Admin : User
         return Successful;
     }
     
-    public bool DemoteFromManager(int TempEmployeeID)
+    public bool DemoteFromManager(int TempEmployeeID, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         bool Successful = false;
         var sql = "UPDATE Employee SET IsManager = 0 WHERE ID = @ID";
         try
         {
+            //updating event log before change
+            EventLog.LogEmployee('b', TempEmployeeID, adminID);
+            
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
 
@@ -488,6 +517,10 @@ public class Admin : User
             command.Parameters.AddWithValue("@ID", TempEmployeeID);
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogEmployee('a', TempEmployeeID, adminID);
+            
             Successful = true;
         }
         catch (Exception e)
@@ -766,10 +799,17 @@ public class Admin : User
     }
 
     //Admin Edit Account methods
-    public bool EditAccountName(int tempAccountNumber, string tempAccountName)
+    public bool EditAccountName(int tempAccountNumber, string tempAccountName, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Name = @NAME WHERE Number = @ID";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -780,6 +820,10 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
         }
         catch (Exception e)
         {
@@ -789,10 +833,17 @@ public class Admin : User
         return true;
     }
     
-    public bool EditAccountDescription(int tempAccountNumber, string tempAccountDesc)
+    public bool EditAccountDescription(int tempAccountNumber, string tempAccountDesc, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Description = @DESC WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -803,6 +854,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -812,14 +868,22 @@ public class Admin : User
     }
     
     //Because Normal Side has to be either left or right (L or R in the database) ensure the char given is L or R
-    public bool EditAccountNormalSIde(int tempAccountNumber, char tempNormalSide)
+    public bool EditAccountNormalSIde(int tempAccountNumber, char tempNormalSide, string adminUsername)
     {
         if (tempNormalSide != 'L' || tempNormalSide != 'R')
         {
             return false;
         }
+        
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET NormalSide = @NORMALSIDE WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -830,6 +894,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -838,10 +907,17 @@ public class Admin : User
         return true;
     }
     
-    public bool EditAccountCategory(int tempAccountNumber, string tempAccountCategory)
+    public bool EditAccountCategory(int tempAccountNumber, string tempAccountCategory, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Category = @CATEGORY WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -852,6 +928,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -860,10 +941,17 @@ public class Admin : User
         return true;
     }
     
-    public bool EditAccountSubCategory(int tempAccountNumber, string tempAccountSubCategory)
+    public bool EditAccountSubCategory(int tempAccountNumber, string tempAccountSubCategory, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET SubCategory = @SUBCATEGORY WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -874,6 +962,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -883,10 +976,17 @@ public class Admin : User
     }
     
     //Need to call method to turn given double into a value with only two decimal spaces
-    public bool EditAccountInitialBalance(int tempAccountNumber, double tempInitialBalance)
+    public bool EditAccountInitialBalance(int tempAccountNumber, double tempInitialBalance, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET InitialBalance = @INITIALBALANCE WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -897,6 +997,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -905,10 +1010,17 @@ public class Admin : User
         return true;
     }
     
-    public bool EditAccountDebit(int tempAccountNumber, double tempDebit)
+    public bool EditAccountDebit(int tempAccountNumber, double tempDebit, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Debit = @DEBIT WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -919,6 +1031,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -927,10 +1044,17 @@ public class Admin : User
         return true;
     }
     
-    public bool EditAccountCredit(int tempAccountNumber, double tempCredit)
+    public bool EditAccountCredit(int tempAccountNumber, double tempCredit, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Credit = @CREDIT WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -941,6 +1065,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -948,10 +1077,17 @@ public class Admin : User
         }
         return true;
     }
-    public bool EditAccountBalance(int tempAccountNumber, double tempBalance)
+    public bool EditAccountBalance(int tempAccountNumber, double tempBalance, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Balance = @BALANCE WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -962,6 +1098,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -969,10 +1110,17 @@ public class Admin : User
         }
         return true;
     }
-    public bool EditAccountOrder(int tempAccountNumber, int tempOrder)
+    public bool EditAccountOrder(int tempAccountNumber, int tempOrder, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Order = @ORDER WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -983,6 +1131,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -991,14 +1144,21 @@ public class Admin : User
         return true;
     }
     
-    public bool EditAccountStatement(int tempAccountNumber, string tempStatement)
+    public bool EditAccountStatement(int tempAccountNumber, string tempStatement, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         if (tempStatement != "IS" && tempStatement != "BS" && tempStatement != "RE")
         {
             return false;
         }
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Statement = @STATEMENT WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -1009,6 +1169,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -1018,9 +1183,12 @@ public class Admin : User
     }
     
     //Deactivate an account
-    //Needs to check if account balance != 0
-    public bool DeactivateAccount(int tempAccountNumber)
+    public bool DeactivateAccount(int tempAccountNumber, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
             var deactivateSql = "UPDATE Account SET Active = 0 WHERE Number = @ID";
@@ -1048,8 +1216,15 @@ public class Admin : User
                     }
                 }
             }
-
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             deactivateCommand.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -1057,10 +1232,17 @@ public class Admin : User
         }
         return true;
     }
-    public bool ActivateAccount(int tempAccountNumber)
+    public bool ActivateAccount(int tempAccountNumber, string adminUsername)
     {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+        
         try
         {
+            //updating event log before change
+            EventLog.LogAccount('b', tempAccountNumber, adminID);
+            
             var sql = "UPDATE Account SET Active = 1 WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
@@ -1070,6 +1252,11 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogAccount('a', tempAccountNumber, adminID);
+            
+            connection.Close();
         }
         catch (Exception e)
         {

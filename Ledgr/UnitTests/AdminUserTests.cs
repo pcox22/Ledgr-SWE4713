@@ -560,4 +560,20 @@ public class AdminUnitTests
             Assert.Fail();
         }
     }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-033
+    public void CreateAccount_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = Admin.CreateAccount(4567, "Owners equity", "How much has the owner invested", 'R', "equity",
+            "owners equity", 20000.00, 0, 20000.00, 20000.00, "2025-10-14", 1, 7, "BS", "pcox0930");
+        
+        //assert
+       Assert.That(actual, Is.EqualTo(expected));
+    }
 }

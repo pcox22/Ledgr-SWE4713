@@ -1327,10 +1327,11 @@ public class Admin : User
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var sql =
-                "INSERT INTO Account VALUES(NULL, @NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
+                "INSERT INTO Account VALUES(@NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
             using var command = new SqliteCommand(sql, connection);
 
             command.Parameters.AddWithValue("@NUMBER", tempAccountNum);
+            command.Parameters.AddWithValue("@NAME", tempName);
             command.Parameters.AddWithValue("@DESC", tempDesc);
             command.Parameters.AddWithValue("@NS", tempNormalSide);
             command.Parameters.AddWithValue("@CATEGORY", category);
@@ -1344,10 +1345,11 @@ public class Admin : User
             command.Parameters.AddWithValue("@ORDER", tempOrder);
             command.Parameters.AddWithValue("@STATEMENT", tempStatement);
 
+            connection.Open();
             command.ExecuteNonQuery();
             
             //updating event log after change
-            EventLog.LogEmployee('a', tempAccountNum, adminID);
+            EventLog.LogAccount('a', tempAccountNum, adminID);
         }
         catch (Exception e)
         {

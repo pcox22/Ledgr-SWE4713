@@ -45,10 +45,10 @@ public class UserUnitTests
     public void CreatePotentialUser_ValidInputs_ReturnsTrue()
     {
         //arrange
-        string FirstName = "Michael";
-        string LastName = "Liu";
+        string FirstName = "Please";
+        string LastName = "Work";
         string Username = User.GenerateUsername(FirstName, LastName);
-        string Password = "PassW0rd...";
+        string Password = LedgrLogic.Password.Encrypt("PassW0rd...");
         string email = "email@email.com";
         int NewUser = 0;
         int IsActive = 1;

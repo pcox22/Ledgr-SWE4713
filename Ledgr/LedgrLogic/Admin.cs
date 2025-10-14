@@ -211,16 +211,16 @@ public class Admin : User
             {
                 while (getUserIDReader.Read())
                 {
-                    userID = Convert.ToInt32(getEmpIDReader.GetString(0));
+                    userID = Convert.ToInt32(getUserIDReader.GetString(0));
                 }
             }
             
             //updating event log after change
-            EventLog.LogEmployee('a', userID, adminID);
+            EventLog.LogUser('a', userID, adminID);
             
-            var SecQuestionsSQL1 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
-            var SecQuestionsSQL2 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
-            var SecQuestionsSQL3 = "Insert INTO PotentialUser Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL1 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL2 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
+            var SecQuestionsSQL3 = "Insert INTO SecurityQuestion Values(Null, @QUESTION, @ANSWER, @USERID)";
             
             var SQ1Command = new SqliteCommand(SecQuestionsSQL1, connection);
             SQ1Command.Parameters.AddWithValue("@QUESTION", Question1);
@@ -870,7 +870,7 @@ public class Admin : User
     //Because Normal Side has to be either left or right (L or R in the database) ensure the char given is L or R
     public bool EditAccountNormalSIde(int tempAccountNumber, char tempNormalSide, string adminUsername)
     {
-        if (tempNormalSide != 'L' || tempNormalSide != 'R')
+        if (tempNormalSide != 'L' && tempNormalSide != 'R')
         {
             return false;
         }
@@ -956,7 +956,7 @@ public class Admin : User
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
             var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@CATEGORY", tempAccountSubCategory);
+            command.Parameters.AddWithValue("@SUBCATEGORY", tempAccountSubCategory);
             command.Parameters.AddWithValue("@ID", tempAccountNumber);
             
             connection.Open();
@@ -1121,7 +1121,7 @@ public class Admin : User
             //updating event log before change
             EventLog.LogAccount('b', tempAccountNumber, adminID);
             
-            var sql = "UPDATE Account SET Order = @ORDER WHERE Number = @ID"; 
+            var sql = "UPDATE Account SET \"Order\" = @ORDER WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
             var command = new SqliteCommand(sql, connection);
@@ -1139,6 +1139,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             throw new InvalidChangeException("No such account exists");
         }
         return true;
@@ -1163,7 +1164,7 @@ public class Admin : User
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
             var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@Statement", tempStatement);
+            command.Parameters.AddWithValue("@STATEMENT", tempStatement);
             command.Parameters.AddWithValue("@ID", tempAccountNumber);
             
             connection.Open();
@@ -1177,6 +1178,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             throw new InvalidChangeException("No such account exists");
         }
         return true;
@@ -1228,6 +1230,7 @@ public class Admin : User
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             throw new InvalidChangeException("No such account exists");
         }
         return true;

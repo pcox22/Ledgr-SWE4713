@@ -156,12 +156,12 @@ public class AdminUnitTests
     public void ApproveUser_ValidInput_ReturnsTrue()
     {
         //arrange
-        int tempID = 15;
+        int tempID = 19;
         bool expected = true;
         bool actual;
         
         //act
-        actual = Admin.ApproveUser(15, "pcox0930").Result;
+        actual = Admin.ApproveUser(tempID, "pcox0930").Result;
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -267,11 +267,226 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
+        string newAccountName = "Inventory Merchandising";
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.DemoteFromAdmin(1003, "pcox0930");
+        actual = temp.EditAccountName(12345, newAccountName, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-017
+    public void EditAccountDescription_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newAccountDesc = "The account for all costs related to merchandise";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountDescription(12345, newAccountDesc, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-018
+    public void EditAccountNormalSide_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        char newNormalSide = 'R';
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountNormalSIde(12345, newNormalSide, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-019
+    public void EditAccountCategory_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newCategory = "Asset";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountCategory(12345, newCategory, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-020
+    public void EditAccountSubCategory_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newSubCategory = "Current Asset";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountSubCategory(12345, newSubCategory, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-021
+    public void EditAccountInitialBalance_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        double newInitBalance = 1234.56;
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountInitialBalance(12345, newInitBalance, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-022
+    public void EditAccountDebit_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        double newDebit = 500.56;
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountDebit(12345, newDebit, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-023
+    public void EditAccountCredit_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        double newCredit = 850.00;
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountCredit(12345, newCredit, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-024
+    public void EditAccountBalance_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        double newBalance = 500.56;
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountBalance(12345, newBalance, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-025
+    public void EditAccountOrder_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        int newOrder = 6;
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountOrder(12345, newOrder, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-026
+    public void EditAccountStatement_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        string newStatement = "BS";
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.EditAccountStatement(12345, newStatement, "pcox0930");
+        
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-027
+    public void DeactivateAccount_AccountBalanceGreaterThanZero_ThrowsInvalidChangeException()
+    {
+        //arrange
+        Admin temp = new Admin();
+        
+        //assert
+        Assert.Throws<InvalidChangeException>(() => temp.DeactivateAccount(12345, "pcox0930"));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-028
+    public void DeactivateAccount_AccountBalanceEqualToZero_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        temp.EditAccountBalance(12345, 0, "pcox0930");
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.DeactivateAccount(12345, "pcox0930");
+            
+        //assert
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-029
+    public void ActivateAccount_ValidInput_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        bool expected = true;
+        bool actual;
+        
+        //act
+        actual = temp.ActivateAccount(12345, "pcox0930");
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));

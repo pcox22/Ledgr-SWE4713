@@ -1356,7 +1356,6 @@ public class Admin : User
             Console.WriteLine(e);
             return false;
         }
-
         return true;
     }
 }

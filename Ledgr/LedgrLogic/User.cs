@@ -221,7 +221,6 @@ public class User
                 }
             }
 
-            Console.WriteLine("Stored Username: " + StoredUsername);
             if (StoredUsername != TempUsername)
             {
                 throw new InvalidUsernameException("No user exists with that username.");
@@ -271,7 +270,6 @@ public class User
         //If password is verified and the user is not inactive
         if (StoredPassword.Equals(TempPassword) && Active)
         {
-            Console.WriteLine("Login Successful");
             if (TempAdmin == 1)
             {
                 return new Admin(TempUsername, TempPassword, StoredEmail, StoredUserID, StoredEmployeeID, Active, NewUser);

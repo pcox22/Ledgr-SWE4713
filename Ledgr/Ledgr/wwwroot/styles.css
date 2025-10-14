@@ -378,15 +378,6 @@ body{
 .input__control::placeholder { color: var(--ui-500); transition: color .15s; }
 .input__control:focus::placeholder { color: transparent; }
 
-/* Safari-specific autofill/credentials icons — keep them inside the field 
-input::-webkit-credentials-auto-fill-button,
-input::-webkit-contacts-auto-fill-button{
-  margin-left: 4px;
-}
-*/
- 
-
-
 /* Make select/textarea look like inputs */
 select.input, textarea.input{
   width: 100%;

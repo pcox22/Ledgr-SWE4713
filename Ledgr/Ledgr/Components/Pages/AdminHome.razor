@@ -2,6 +2,7 @@
 @using LedgrLogic
 @using MudBlazor
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <PageTitle>Home</PageTitle>
 
@@ -14,9 +15,19 @@
     </div>
 </header>
 
+<SideBar>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+
+</SideBar>
+
 <div class="homeDisplay">
-    <div class="homeRow">
-        <button @onclick="OpenReport" type="button" class="btn btn-primary reportButton">PW Report</button>
+    <div class="homeRow" style="display: flex; justify-content: flex-end">
+        <!--<button @onclick="OpenReport" type="button" class="btn btn-primary reportButton">PW Report</button>-->
         <div class="logged-in-data">
             <p><strong>@Username</strong></p>
             <img src="profile.png" alt="PFP" class="pfp"/>
@@ -27,7 +38,7 @@
         <!-- Existing Users Table -->
         <div class="homeUserContainer">
             <h3 class="tableHeader">User Data</h3>
-            <button @onclick="CreateUser" type="button" class="btn btn-primary createUser">Create User +</button>    
+            <!-- <button @onclick="CreateUser" type="button" class="btn btn-primary createUser">Create User +</button> -->    
         </div>
         <table class="user-table">
             <thead>
@@ -37,6 +48,7 @@
                 <th>Email</th>
                 <!--<th>Active?</th>-->
                 <th>EmployeeID</th>
+                <th></th>
                 <th>Actions</th>
             </tr>
             @for (int i = 0; i < users.Count; i += 7)
@@ -206,4 +218,29 @@
             users[index + 5] = "1";
         }
     }
+    
+    // Nav Buttons - Linked to side bar
+    public void Home()
+    {
+        NavigationManager.NavigateTo($"/adminHome/{Username}");
+    }
+
+    public void CoAList()
+    {
+        NavigationManager.NavigateTo($"/CoAList/{Username}");
+    }
+    
+    public void CoAForm()
+    {
+        NavigationManager.NavigateTo($"/CoAForm/{Username}");
+    }
+    public void CoAEventLog()
+    {
+        NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+    }
+    public void PasswordReport()
+    {
+        NavigationManager.NavigateTo($"/pwReport/{Username}");
+    }
+    
 }

@@ -89,4 +89,34 @@ public static class Account
         return tempAccounts;
     }
     
+    public static List<string> GetAccountFromAccountNumber(int accountNum)
+    {
+        List<string> Account = new List<string>();
+        try
+        {
+            string sql = "SELECT * FROM Account where Number = @ACCOUNTNUM";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
+
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i <= 14; i++)
+                    {
+                        Account.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        return Account;
+    }
 }

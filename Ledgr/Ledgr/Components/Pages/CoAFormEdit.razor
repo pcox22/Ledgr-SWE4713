@@ -263,6 +263,7 @@
 @code{
 
   [Parameter] public string? Username { get; set; }
+  [Parameter] public string? AccountNum { get; set; }
   
   // Account Parameters
   private string AccountName { get; set; } = string.Empty;
@@ -276,6 +277,7 @@
   private string Credit { get; set; } = "0.00";
   private string Balance { get; set; } = "0.00";
   private string DT { get; set; } = DateTime.Now.ToString();
+  private string DateCreated { get; set; } = string.Empty;
   private string UserID { get; set; } = string.Empty;
   private string Order { get; set; } = "0";
   private string Statement { get; set; } = string.Empty;
@@ -286,6 +288,31 @@
   protected override async Task OnParametersSetAsync()
   {
     //Set Parameters here
+    List<string> AccountDetails = Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum));
+
+    AccountNumber = AccountDetails[0];
+    AccountName = AccountDetails[1];
+    Description = AccountDetails[2];
+    NormalSide = AccountDetails[3];
+    Category = AccountDetails[4];
+    SubCategory = AccountDetails[5];
+    InitialBalance = AccountDetails[6];
+    Debit = AccountDetails[7];
+    Credit = AccountDetails[8];
+    Balance = AccountDetails[9];
+    DateCreated = AccountDetails[10];
+    UserID = AccountDetails[11];
+    Order = AccountDetails[12];
+    Statement = AccountDetails[13];
+    if (AccountDetails[14] == "1")
+    {
+      Active = true;
+    }
+    else
+    {
+      Active = false;
+    }
+    
 
     //UserID = user.GetUserID();
     StateHasChanged();

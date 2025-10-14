@@ -78,7 +78,7 @@
     </button>
 
     <div class="flex-spacer"></div>
-    <a href="./coa-form.html" class="btn btn--primary btn--small" role="button">Add Account</a>
+    <button type="button" @onclick="AddAccount" class="btn btn--primary btn--small" role="button">Add Account</button>
   </section>
 
   <section class="card card--fluid" aria-labelledby="coaTitle">      <header class="card__header">
@@ -186,12 +186,12 @@
           </tr>
           </thead>
           <tbody id="coaRows">
-            @if (Accounts.Count > 0)
+          @if (Accounts.Count > 0)
+          {
+            @for (int i = 0; i < Accounts.Count; i += 15)
             {
-              @for (int i = 0; i < Accounts.Count; i += 15)
-              {
-                int index = i;
-                <tr class="muted">
+              int index = i;
+              <tr class="muted">
 
                 <td>@Accounts[index]</td>
                 <td>@Accounts[index + 1]</td>
@@ -208,15 +208,16 @@
                 <td>@Accounts[index + 12]</td>
                 <td>@Accounts[index + 13]</td>
                 <td>@Accounts[index + 14]</td>
-                </tr>
-              } 
-            }
-            @if (Accounts.Count <= 0)
-            {
-              <tr>
-              <td colspan="17" style="text-align:center; padding:24px;">Loading…</td>
+                <td><button @onclick="(() => showActionsDialog(index))" type="button" class="btn btn-primary">Actions</button></td>
               </tr>
-            }
+            } 
+          }
+          @if (Accounts.Count <= 0)
+          {
+            <tr>
+              <td colspan="17" style="text-align:center; padding:24px;">Loading…</td>
+            </tr>
+          }
           </tbody>
         </table>
       </div>
@@ -232,6 +233,7 @@
       </p>
     </div>
   </section>
+  <AccountActionsAdmin Show="@showActions" Username="@Username" AcctNum="@AcctNum" ShowChanged="val => showActions = val"></AccountActionsAdmin>
 </main>
 
 <!-- Footer -->
@@ -275,6 +277,19 @@
   [Parameter] public string? Username { get; set; }
 
   private List<string> Accounts = Account.GetAccounts("").Result;
+  private bool showActions { get; set; } = false;
+  private string AcctNum { get; set; } = "-1";
+
+  public void showActionsDialog(int index)
+  {
+    AcctNum = (Accounts[index]);
+    showActions = true;
+  }
+  
+  public void AddAccount()
+  {
+    NavigationManager.NavigateTo($"/CoAForm/{Username}");
+  }
   
   // Nav Buttons - Linked to side bar
   public void Home()

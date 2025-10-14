@@ -1,4 +1,4 @@
-@page "/CoAEventLog/{Username}"
+@page "/CoAEventLog/{Username}/{AcctNum}"
 @inject NavigationManager NavigationManager
 
 <!doctype html>
@@ -161,6 +161,7 @@
 @code{
 
     [Parameter] public string Username { get; set; }
+    [Parameter] public string AcctNum { get; set; }
     
     // Nav Buttons - Linked to side bar
     // Nav Buttons - Linked to side bar

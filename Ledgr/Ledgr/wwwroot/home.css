@@ -177,10 +177,25 @@
     border-color: #ff0f0f;
     background-color: #FF8DA1;
 }
+.view{
+    border: 5px;
+    border-color: #555555;
+    background-color: #7777FF;
+}
+.add{
+    border: 5px;
+    border-color: #008800;
+    background-color: #98fb98;
+}
 .edit{
     border: 5px;
-    border-color: #0a1f3f;
-    background-color: #0dcaf0;
+    background: var(--brand-500);
+    color: var(--white);
+}
+.deactivate{
+    border: 5px;
+    border-color: #ff0f0f;
+    background-color: #FF8DA1;
 }
 
 

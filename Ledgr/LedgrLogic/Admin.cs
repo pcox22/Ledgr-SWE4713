@@ -923,7 +923,7 @@ public class Admin : User
     
     //Deactivate an account
     //Needs to check if account balance != 0
-    public bool DeactivateAccount(int tempAccountNumber)
+    public static async Task DeactivateAccount(int tempAccountNumber)
     {
         try
         {
@@ -949,20 +949,18 @@ public class Admin : User
                     if (storedBalance > 0)
                     {
                         //Needs to throw error
-                        return false;
+                        throw new AccountBalanceGreaterThanZeroException("Cannot deactivate an account with a balance greater than zero");
                     }
                 }
             }
 
             deactivateCommand.ExecuteNonQuery();
         }
-        catch (Exception e)
+        catch (SqliteException e)
         {
             //needs to throw error
             Console.WriteLine(e);
-            return false;
         }
-        return true;
     }
     public bool ActivateAccount(int tempAccountNumber)
     {
@@ -1047,8 +1045,19 @@ public class Admin : User
             var sql =
                 "INSERT INTO Account VALUES(NULL, @NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
             using var command = new SqliteCommand(sql, connection);
+            
+            var verifySQL = "Select * From Account Where Number = @NUMBER";
+            using var verifyCommand = new SqliteCommand(verifySQL, connection);
+            connection.Open();
+            
+            using var reader = verifyCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                throw new AccountAlreadyExistsException("An account with this number or name already exists");
+            }
 
             command.Parameters.AddWithValue("@NUMBER", tempAccountNum);
+            command.Parameters.AddWithValue("@Name", tempName);
             command.Parameters.AddWithValue("@DESC", tempDesc);
             command.Parameters.AddWithValue("@NS", tempNormalSide);
             command.Parameters.AddWithValue("@CATEGORY", category);
@@ -1067,7 +1076,7 @@ public class Admin : User
             //updating event log after change
             EventLog.LogEmployee('a', tempAccountNum, adminID);
         }
-        catch (Exception e)
+        catch (SqliteException e)
         {
             Console.WriteLine(e);
             return false;

@@ -40,3 +40,7 @@ public class EventLogException(string message) : Exception(message);
 public class InvalidAccountNumberException(string message) : Exception(message);
 
 public class InvalidEmployeeIDException(string message) : Exception(message);
+
+public class AccountAlreadyExistsException(string message) : Exception(message);
+
+public class AccountBalanceGreaterThanZeroException(string message) : Exception(message);

@@ -491,4 +491,73 @@ public class AdminUnitTests
         //assert
         Assert.That(actual, Is.EqualTo(expected));
     }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-030
+    public void GetEventLog_Account_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        List<string> accountEventLog;
+        string knownAccountName = "Inventory Merchandising";
+        
+        //act
+        accountEventLog = temp.GetEventLog("Account");
+        
+        //assert
+        if (accountEventLog.Contains(knownAccountName))
+        {
+            Assert.Pass();
+        }
+        else
+        {
+            Assert.Fail();
+        }
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-031
+    public void GetEventLog_User_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        List<string> userEventLog;
+        string knownUsername = "MLiu1001";
+        
+        //act
+        userEventLog = temp.GetEventLog("User");
+        
+        //assert
+        if (userEventLog.Contains(knownUsername))
+        {
+            Assert.Pass();
+        }
+        else
+        {
+            Assert.Fail();
+        }
+    }
+    
+    [Test]
+    //TEST ID: Admin-SRS-REQ-032
+    public void GetEventLog_Employee_ReturnsTrue()
+    {
+        //arrange
+        Admin temp = new Admin();
+        List<string> employeeEventLog;
+        string knownAddress = "1100 South Marietta Parkway";
+        
+        //act
+        employeeEventLog = temp.GetEventLog("Employee");
+        
+        //assert
+        if (employeeEventLog.Contains(knownAddress))
+        {
+            Assert.Pass();
+        }
+        else
+        {
+            Assert.Fail();
+        }
+    }
 }

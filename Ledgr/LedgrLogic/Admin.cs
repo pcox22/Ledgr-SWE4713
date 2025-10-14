@@ -985,4 +985,94 @@ public class Admin : User
         }
         return true;
     }
+    
+    public List<string> GetEventLog(string eventLogTable)
+    {
+        List<string> tempEventLog = new List<string>();
+        using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+        var sql = "";
+        int columns = 0;
+
+        switch (eventLogTable)
+        {
+            case ("Account"):
+                sql = "SELECT * FROM AccountEventLog ORDER BY ID ASC";
+                columns = 18;
+                break;
+            case("Employee"):
+                sql = "SELECT * FROM EmployeeEventLog ORDER BY ID ASC";
+                columns = 10;
+                break;
+            case("User"):
+                sql = "SELECT * FROM UserEventLog ORDER BY ID ASC";
+                columns = 10;
+                break;
+        }
+
+        try
+        {
+            var command = new SqliteCommand(sql, connection);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < columns; i++)
+                    {
+                        tempEventLog.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new UnableToRetrieveException("Unable to retrieve "+eventLogTable+" Event Log");
+        }
+
+        return tempEventLog;
+    }
+
+    public static bool CreateAccount(int tempAccountNum, string tempName, string tempDesc, char tempNormalSide,
+        string category, string subCategory, double tempInitBalance, double tempDebit, double tempCredit,
+        double tempBalance, string tempDate, int tempUserID, int tempOrder, string tempStatement, string adminUsername)
+    {
+        //getting admin ID for event log
+        User temp = User.GetUserFromUserName(adminUsername).Result;
+        int adminID = temp.GetUserID();
+
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            var sql =
+                "INSERT INTO Account VALUES(NULL, @NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
+            using var command = new SqliteCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@NUMBER", tempAccountNum);
+            command.Parameters.AddWithValue("@DESC", tempDesc);
+            command.Parameters.AddWithValue("@NS", tempNormalSide);
+            command.Parameters.AddWithValue("@CATEGORY", category);
+            command.Parameters.AddWithValue("@SUBCATEGORY", subCategory);
+            command.Parameters.AddWithValue("@INITBALANCE", tempInitBalance);
+            command.Parameters.AddWithValue("@DEBIT", tempDebit);
+            command.Parameters.AddWithValue("@CREDIT", tempCredit);
+            command.Parameters.AddWithValue("@BALANCE", tempBalance);
+            command.Parameters.AddWithValue("@DATE", tempDate);
+            command.Parameters.AddWithValue("@USERID", tempUserID);
+            command.Parameters.AddWithValue("@ORDER", tempOrder);
+            command.Parameters.AddWithValue("@STATEMENT", tempStatement);
+
+            command.ExecuteNonQuery();
+            
+            //updating event log after change
+            EventLog.LogEmployee('a', tempAccountNum, adminID);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -186,7 +186,37 @@
           </tr>
           </thead>
           <tbody id="coaRows">
-          <tr class="muted"><td colspan="17" style="text-align:center; padding:24px;">Loading…</td></tr>
+            @if (Accounts.Count > 0)
+            {
+              @for (int i = 0; i < Accounts.Count; i += 15)
+              {
+                int index = i;
+                <tr class="muted">
+
+                <td>@Accounts[index]</td>
+                <td>@Accounts[index + 1]</td>
+                <td>@Accounts[index + 2]</td>
+                <td>@Accounts[index + 3]</td>
+                <td>@Accounts[index + 4]</td>
+                <td>@Accounts[index + 5]</td>
+                <td>@Accounts[index + 6]</td>
+                <td>@Accounts[index + 7]</td>
+                <td>@Accounts[index + 8]</td>
+                <td>@Accounts[index + 9]</td>
+                <td>@Accounts[index + 10]</td>
+                <td>@Accounts[index + 11]</td>
+                <td>@Accounts[index + 12]</td>
+                <td>@Accounts[index + 13]</td>
+                <td>@Accounts[index + 14]</td>
+                </tr>
+              } 
+            }
+            @if (Accounts.Count <= 0)
+            {
+              <tr>
+              <td colspan="17" style="text-align:center; padding:24px;">Loading…</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
@@ -243,6 +273,8 @@
 @code{
 
   [Parameter] public string? Username { get; set; }
+
+  private List<string> Accounts = Account.GetAccounts("").Result;
   
   // Nav Buttons - Linked to side bar
   public void Home()

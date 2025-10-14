@@ -72,16 +72,12 @@
       <label class="label" for="coaDateTo">To</label>
       <input id="coaDateTo" type="date" class="input" />
     </div>
-
-    <button id="btnApplyDates" class="btn btn--primary btn--small" type="button">
-      Apply Dates
-    </button>
-
-    <div class="flex-spacer"></div>
+    <button id="btnApplyDates" class="btn btn--primary btn--small" type="button">Apply Dates</button>
     <button type="button" @onclick="AddAccount" class="btn btn--primary btn--small" role="button">Add Account</button>
   </section>
 
-  <section class="card card--fluid" aria-labelledby="coaTitle">      <header class="card__header">
+  <section class="card card--fluid" aria-labelledby="coaTitle">      
+    <header class="card__header">
       <h1 id="coaTitle" class="h2">Chart of Accounts</h1>
       <p class="body1 muted">Search and filter accounts; click an account to open its ledger.</p>
     </header>
@@ -90,53 +86,53 @@
       <form id="coaFilterForm" class="grid grid--cols-6 grid--gap">
         <div class="input-group">
           <label class="label" for="fCategory">Category</label>
-          <select id="fCategory" class="input">
+          <InputSelect @bind-Value="Category" id="fCategory" class="input">
             <option value="">All</option>
-            <option>Asset</option>
-            <option>Liability</option>
-            <option>Equity</option>
-            <option>Revenue</option>
-            <option>Expense</option>
-          </select>
+            <option value="Asset">Asset</option>
+            <option value="Liability">Liability</option>
+            <option value="Equity">Equity</option>
+            <option value="Revenue">Revenue</option>
+            <option value="Expense">Expense</option>
+          </InputSelect>
         </div>
 
         <div class="input-group">
           <label class="label" for="fSubcategory">Subcategory</label>
-          <input id="fSubcategory" class="input" type="text" placeholder="e.g., Current Assets" />
+          <InputText @bind-Value="Subcategory" id="fSubcategory" class="input" type="text" placeholder="e.g., Current Assets" />
         </div>
 
         <div class="input-group">
           <label class="label" for="fNormalSide">Normal Side</label>
-          <select id="fNormalSide" class="input">
-            <option value="">All</option>
-            <option>Debit</option>
-            <option>Credit</option>
-          </select>
+          <InputSelect @bind-Value="NormalSide" id="fNormalSide" class="input">
+            <option value="" selected>All</option>
+            <option value="Debit">Debit</option>
+            <option value="Credit">Credit</option>
+          </InputSelect>
         </div>
 
         <div class="input-group">
           <label class="label" for="fAcctFrom">Acct # From</label>
-          <input id="fAcctFrom" class="input" type="number" inputmode="numeric" />
+          <InputText @bind-Value="AcctNumFrom" id="fAcctFrom" class="input" type="number" inputmode="numeric" />
         </div>
 
         <div class="input-group">
           <label class="label" for="fAcctTo">Acct # To</label>
-          <input id="fAcctTo" class="input" type="number" inputmode="numeric" />
+          <InputText @bind-Value="AcctNumTo" id="fAcctTo" class="input" type="number" inputmode="numeric" />
         </div>
 
         <div class="input-group">
           <label class="label" for="fAmtMin">Amount Min</label>
-          <input id="fAmtMin" class="input" type="number" step="0.01" />
+          <InputText @bind-Value="AcctMin" id="fAmtMin" class="input" type="number" step="0.01" />
         </div>
 
         <div class="input-group">
           <label class="label" for="fAmtMax">Amount Max</label>
-          <input id="fAmtMax" class="input" type="number" step="0.01" />
+          <InputText @bind-Value="AcctMax" id="fAmtMax" class="input" type="number" step="0.01" />
         </div>
 
         <div class="input-group" style="grid-column: span 2;">
           <label class="label" for="fSearch">Search</label>
-          <input id="fSearch" class="input" type="search" placeholder="Account number or name" />
+          <InputText @bind-Value="Search" id="fSearch" class="input" type="search" placeholder="Account number or name" />
         </div>
 
         <div class="input-group" style="align-self:end;">
@@ -208,7 +204,7 @@
                 <td>@Accounts[index + 12]</td>
                 <td>@Accounts[index + 13]</td>
                 <td>@Accounts[index + 14]</td>
-                <td><button @onclick="(() => showActionsDialog(index))" type="button" class="btn btn-primary">Actions</button></td>
+                <td><button @onclick="(() => EventLogEdit(index))" type="button" class="btn btn-primary">View</button></td>
               </tr>
             } 
           }
@@ -280,6 +276,16 @@
   private bool showActions { get; set; } = false;
   private string AcctNum { get; set; } = "-1";
 
+  // Sorting
+  private string Category { get; set; } = string.Empty;
+  private string Subcategory { get; set; } = string.Empty;
+  private string NormalSide { get; set; } = string.Empty;
+  private string AcctNumFrom { get; set; } = string.Empty;
+  private string AcctNumTo { get; set; } = string.Empty;
+  private string AcctMin { get; set; } = string.Empty;
+  private string AcctMax { get; set; } = string.Empty;
+  private string Search { get; set; } = string.Empty;
+  
   public void showActionsDialog(int index)
   {
     AcctNum = (Accounts[index]);
@@ -313,6 +319,12 @@
   public void PasswordReport()
   {
     NavigationManager.NavigateTo($"/pwReport/{Username}");
+  }
+
+  public void EventLogEdit(int index)
+  {
+    string AccountNum = Accounts[index];
+    NavigationManager.NavigateTo($"/CoAFormEdit/{Username}/{AccountNum}"); 
   }
 
 }

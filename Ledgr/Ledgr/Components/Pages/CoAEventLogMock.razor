@@ -1,5 +1,4 @@
-@page "/CoAEventLog/{Username}"
-@using LedgrLogic
+@page "/CoAEventLogMock/{Username}"
 @inject NavigationManager NavigationManager
 
 <!doctype html>
@@ -38,7 +37,7 @@
             <button class="icon-btn" aria-label="Notifications">🔔</button>
             <div class="user-chip">
                 <span class="avatar">A</span>
-                <span class="user-chip__text"><strong>@Username</strong>
+                <span class="user-chip__text"><strong>Admin User</strong>
                     <span class="muted">Admin</span>
                 </span>
             </div>
@@ -119,25 +118,16 @@
                         <th>Event ID</th>
                         <th>Account No</th>
                         <th>Account Name</th>
+                        <th>Action</th>
                         <th>User</th>
                         <th>Date/Time</th>
-                        <th>Description</th>
+                        <th>Comment</th>
                         <th class="text-right">Details</th>
                     </tr>
                     </thead>
-                    @for (int i = 0; i < EventLog.Count; i += 18)
-                    {
-                        int index = i;
-                        <tr>
-                            <td>@EventLog[index]</td>
-                            <td>@EventLog[index + 2]</td>
-                            <td>@EventLog[index + 3]</td>
-                            <td>@EventLog[index + 17]</td>
-                            <td>@EventLog[index + 16]</td>
-                            <td>@EventLog[index + 4]</td>
-                            <td><button type="button" class = "btn btn--secondary">View</button></td>
-                        </tr>
-                    }
+                    <tbody id="logRows">
+                    <tr class="muted"><td colspan="8" style="text-align:center; padding:16px;">Loading…</td></tr>
+                    </tbody>
                 </table>
             </div>
 
@@ -172,9 +162,8 @@
 
     [Parameter] public string Username { get; set; }
     [Parameter] public string AcctNum { get; set; }
-
-    private List<string> EventLog = Admin.GetEventLog("Account").Result;
     
+    // Nav Buttons - Linked to side bar
     // Nav Buttons - Linked to side bar
     public void Home()
     {

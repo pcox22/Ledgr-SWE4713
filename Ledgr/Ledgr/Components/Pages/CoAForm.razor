@@ -304,10 +304,9 @@
 
       int userID = Admin.GetUserFromUserName(Username).Result.GetUserID();
       int tempOrder = Convert.ToInt32(Order);
-
-
-
+      
       Admin.CreateAccount(AN, AccountName, Description, NS, Category, SubCategory, IB, DB, CR, Bal, DT, userID, tempOrder, Statement, Username);
+      NavigationManager.NavigateTo($"/CoAList/{Username}");
     }
     catch (Exception e)
     {

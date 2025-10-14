@@ -984,7 +984,7 @@ public class Admin : User
         return true;
     }
     
-    public List<string> GetEventLog(string eventLogTable)
+    public static async Task<List<string>> GetEventLog(string eventLogTable)
     {
         List<string> tempEventLog = new List<string>();
         using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -1043,21 +1043,11 @@ public class Admin : User
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var sql =
-                "INSERT INTO Account VALUES(NULL, @NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
+                "INSERT INTO Account VALUES(@NUMBER, @NAME, @DESC, @NS, @CATEGORY, @SUBCATEGORY, @INITBALANCE, @DEBIT, @CREDIT, @BALANCE, @DATE, @USERID, @ORDER, @STATEMENT, 1)";
             using var command = new SqliteCommand(sql, connection);
-            
-            var verifySQL = "Select * From Account Where Number = @NUMBER";
-            using var verifyCommand = new SqliteCommand(verifySQL, connection);
-            connection.Open();
-            
-            using var reader = verifyCommand.ExecuteReader();
-            if (reader.HasRows)
-            {
-                throw new AccountAlreadyExistsException("An account with this number or name already exists");
-            }
 
             command.Parameters.AddWithValue("@NUMBER", tempAccountNum);
-            command.Parameters.AddWithValue("@Name", tempName);
+            command.Parameters.AddWithValue("@NAME", tempName);
             command.Parameters.AddWithValue("@DESC", tempDesc);
             command.Parameters.AddWithValue("@NS", tempNormalSide);
             command.Parameters.AddWithValue("@CATEGORY", category);
@@ -1071,17 +1061,129 @@ public class Admin : User
             command.Parameters.AddWithValue("@ORDER", tempOrder);
             command.Parameters.AddWithValue("@STATEMENT", tempStatement);
 
+            connection.Open();
             command.ExecuteNonQuery();
             
             //updating event log after change
-            EventLog.LogEmployee('a', tempAccountNum, adminID);
+            EventLog.LogAccount('a', tempAccountNum, adminID);
         }
-        catch (SqliteException e)
+        catch (Exception e)
         {
             Console.WriteLine(e);
             return false;
         }
-
         return true;
+    }
+
+    public static async Task UpdateUserEmployee(int userID, string email, bool active, string FirstName, string LastName, string DoB, string Address, string Role)
+    {
+        try
+        {
+            var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            await connection.OpenAsync();
+            
+            // Get employee ID for later
+            var empIDsql = "SELECT EmployeeID From User WHERE ID = @ID";
+            var empIDcommand = new SqliteCommand(empIDsql, connection);
+            empIDcommand.Parameters.AddWithValue("@ID", userID);
+
+            int employeeID = -1;
+            using var reader = empIDcommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    employeeID = reader.GetInt32(0);
+                }
+            }
+            
+            // Update Email
+            var sql = "UPDATE User Set Email = @EMAIL WHERE ID = @ID";
+        
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ID", userID);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.ExecuteNonQuery();
+            
+            // Update Active / Suspension
+            
+            sql = "UPDATE User SET IsActive = @ACTIVE WHERE ID = @ID";
+            var command1 = new SqliteCommand(sql, connection);
+            command1.Parameters.AddWithValue("@ACTIVE", active);
+            command1.Parameters.AddWithValue("@ID", userID);
+            command1.ExecuteNonQuery();
+            
+            // Update First name
+            sql = "Update Employee Set FirstName = @FIRSTNAME Where ID = @EMPLOYEEID";
+            var command2 = new SqliteCommand(sql, connection);
+            command2.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command2.Parameters.AddWithValue("@FIRSTNAME", FirstName);
+            command2.ExecuteNonQuery();
+            
+            // Update Last Name
+            sql = "Update Employee Set LastName = @LASTNAME Where ID = @EMPLOYEEID";
+            var command3 = new SqliteCommand(sql, connection);
+            command3.Parameters.AddWithValue("@LASTNAME", LastName);
+            command3.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command3.ExecuteNonQuery();
+            
+            // dob address role
+            sql = "Update Employee Set DoB = @DOB WHERE ID = @EMPLOYEEID";
+            var command4 = new SqliteCommand(sql, connection);
+            command4.Parameters.AddWithValue("@DOB", DoB);
+            command4.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command4.ExecuteNonQuery();
+            
+            // Address
+            sql = "Update Employee Set Address = @ADDRESS WHERE ID = @EMPLOYEEID";
+            var command5 = new SqliteCommand(sql, connection);
+            command5.Parameters.AddWithValue("@ADDRESS", Address);
+            command5.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command5.ExecuteNonQuery();
+            
+            // Role
+            int isAdmin = -1;
+            int isManager = -1;
+            
+            if (Role == "Admin")
+            {
+                isAdmin = 1;
+                isManager = 0;
+            }
+            else if (Role == "Employee")
+            {
+                isAdmin = 0;
+                isManager = 1;
+            }
+            else
+            {
+                isAdmin = 0;
+                isManager = 0;
+            }
+            
+            sql = "UPDATE Employee SET IsAdmin = @ISADMIN WHERE ID = @EMPLOYEEID";
+            var sql2 = "UPDATE Employee SET IsManager = @ISMANAGER WHERE ID = @EMPLOYEEID";
+            
+            var command6 = new SqliteCommand(sql, connection);
+            command6.Parameters.AddWithValue("@ISADMIN", isAdmin);
+            command6.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command6.ExecuteNonQuery();
+            
+            var command7 = new SqliteCommand(sql2, connection);
+            command7.Parameters.AddWithValue("@ISMANAGER", isManager);
+            command7.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
+            command7.ExecuteNonQuery();
+
+            await connection.CloseAsync();
+
+        }
+        catch (SqliteException e)
+        {
+            Console.WriteLine(e);
+        }
+
+        
+        
+        
     }
 }

@@ -72,7 +72,7 @@
                     {
                         <td style="width: 100px"><button @onclick="(() => ActivateUser(index))" class="activate btn">Activate</button></td>
                     }
-                    <td style="width: 100px"><button class="edit btn">Edit</button></td>
+                    <td style="width: 100px"><button @onclick="(() => EditUser(index))" class="edit btn">Edit</button></td>
                 </tr>
             }
             </thead>
@@ -151,6 +151,12 @@
     private void CreateUser()
     {
         showCU = true;
+    }
+
+    private async Task EditUser(int index)
+    {
+        string targetUsername = users[index + 1];
+        NavigationManager.NavigateTo($"/editUser/{Username}/{targetUsername}");
     }
 
     private async Task RejectUserCommand(int id)

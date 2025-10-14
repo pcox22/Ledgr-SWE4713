@@ -1,0 +1,245 @@
+@page "/editUser/{Username}/{TargetUser}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit User</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="accounts.css" />
+</head>
+<body class="page">
+
+<!-- Header -->
+<header class="app-header app-header--band">
+  <div class="app-header__inner">
+    <!-- Left: Brand -->
+    <a class="app-header__brand" href="/dashboard.html" aria-label="LEDGR Home">
+      <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
+    </a>
+
+    <!-- Center: Primary Nav (inside the dark band) -->
+    <nav class="nav nav--primary">
+      <NavLink class="nav__link is-active" href="/CoAList">Accounts</NavLink>
+      <NavLink class="nav__link" href="../journal/je-create.html">Journal</NavLink>
+      <NavLink class="nav__link" href="../reports/reports.html">Reports</NavLink>
+      <NavLink class="nav__link" href="../dashboard.html">Dashboard</NavLink>
+    </nav>
+
+    <!-- Right: Notifications + User -->
+    <div class="app-header__right">
+      <button class="icon-btn bell" aria-label="Notifications">🔔</button>
+      <div class="user-chip" title="Signed in as">
+        <span class="avatar" aria-hidden="true">A</span>
+        <span class="user-chip__text">
+          <strong id="userName">@Username</strong>
+          <span class="muted">Admin</span>
+        </span>
+      </div>
+      <button class="icon-btn caret" aria-label="User menu" title="User menu">▾</button>
+    </div>
+  </div>
+</header>
+
+<SideBar>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+  <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+  <button @onclick="CoAFormCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+  <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+</SideBar>
+
+<!-- Main -->
+<main class="container container--xl">
+
+  <!-- Form card -->
+  <section class="card card--fluid card--animate" aria-labelledby="formTitle">
+    <header class="card__header">
+      <h1 id="formTitle" class="h2">Add / Edit Account</h1>
+    </header>
+
+    <div id="formAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
+      <span class="alert__dot" aria-hidden="true"></span>
+      <span class="alert__text" id="formAlertText"></span>
+    </div>
+
+    <div class="card__body">
+      <form id="accountForm" novalidate class="form-grid">
+        <!-- Account Name -->
+        <div class="form-col">
+          <div class="input-group">
+            <label class="label" >Username</label>
+            <InputText @bind-Value="Username" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" readonly />
+            <p class="field-error" id="accountNameError"></p>
+          </div>
+
+          <!-- Email -->
+          <div class="input-group">
+            <label class="label" for="accountNo">Email</label>
+            <InputText @bind-Value="Email" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" required />
+          </div>
+
+          <!-- First Name -->
+          <div class="input-group">
+            <label class="label" for="subcategory">First Name</label>
+            <InputText @bind-Value="FN" id="subcategory" class="input" type="text"/>
+          </div>
+        </div>
+
+        <!-- Last Name -->
+        <div class="grid grid--gap grid--cols-2">
+          <!-- Initial Balance -->
+          <div class="input-group">
+            <label class="label" for="initialBalance">Last Name</label>
+            <InputText @bind-Value="LN" id="initialBalance" type="text" class="input" required />
+          </div>
+        </div> 
+
+          <!-- Date of Birth -->
+          <div class="grid grid--gap grid--cols-2">
+            <!-- Initial Balance -->
+            <div class="input-group">
+              <label class="label">Date of Birth (yyyy-MM-dd)</label>
+              <InputText @bind-Value="DoB" class="input" type="text" required />
+            </div>
+          </div>
+
+            <!-- Address -->
+            <div class="grid grid--gap grid--cols-2">
+              <!-- Initial Balance -->
+              <div class="input-group">
+                <label class="label">Address</label>
+                <InputText @bind-Value="Address" class="input" required />
+              </div>
+            </div>
+
+            <!-- Normal Side -->
+          <div class="grid grid--gap grid--cols-2">
+            <div class="input-group">
+              <label class="label" for="normalSide">Role</label>
+              <InputSelect @bind-Value="Role" id="normalSide" class="input" required>
+                <option value="" selected>...Select</option>
+                <option value="Admin">Admin</option>
+                <option value="Manager">Manager</option>
+                <option value="Accountant">Accountant</option>
+              </InputSelect>
+            </div>
+          
+
+          <!-- Active Status -->
+          <div class="input-group">
+            <label class="label" for="active">Active</label>
+            <div>
+              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked />
+            </div>
+          </div>
+
+          <div class="row-right" style="margin-top:8px;">
+            <button type="button" id="btnCancel" class="btn btn--secondary">Cancel</button>
+            <button @onclick="SaveChanges" type="button" id="btnSave" class="btn btn--primary">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="app-footer">
+  <div class="app-footer__inner">
+    <nav class="footer-nav">
+      <a href="help.html" class="link">Help</a>
+      <a href="privacy.html" class="link">Privacy</a>
+      <a href="terms.html" class="link">Terms</a>
+    </nav>
+    <small class="muted">© 2025 LEDGR · Build v0.1</small>
+  </div>
+</footer>
+
+<!-- Global JS + Accounts module -->
+<script src="/app.js"></script>
+<script src="/accounts-form.js"></script>
+<script>
+    // Initialize the form page
+    window.accountsForm?.init?.();
+  </script>
+</body>
+</html>
+
+@code{
+
+  [Parameter] public string Username { get; set; }
+  [Parameter] public string TargetUser { get; set; }
+
+  private int UserID { get; set; } = -1;
+  private string Email { get; set; } = string.Empty;
+  private string FN { get; set; } = string.Empty;
+  private string LN { get; set; } = string.Empty;
+  private string DoB { get; set; } = string.Empty;
+  private string Address { get; set; } = string.Empty;
+  private string Role { get; set; } = string.Empty;
+  private bool Active { get; set; } = false;
+  
+
+  
+  protected override async Task OnParametersSetAsync()
+  {
+    User user = await User.GetUserFromUserName(TargetUser);
+
+    UserID = user.GetUserID();
+    Email = user.GetEmail();
+    Active = user.GetIsActive();
+    FN = user.GetFirstName();
+    LN = user.GetLastName();
+    DoB = user.GetDoB();
+    Address = user.GetAddress();
+    Role = user.GetRole();
+    StateHasChanged();
+  }
+
+  public async void SaveChanges()
+  {
+    try
+    {
+      await Admin.UpdateUserEmployee(UserID, Email, Active, FN, LN, DoB, Address, Role);
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine(e);
+    }
+    
+  }
+  
+  
+  // Nav Buttons - Linked to side bar
+  public void Home()
+  {
+    NavigationManager.NavigateTo($"/adminHome/{Username}");
+  }
+
+  public void CoAList()
+  {
+    NavigationManager.NavigateTo($"/CoAList/{Username}");
+  }
+    
+  public void CoAFormCall()
+  {
+    NavigationManager.NavigateTo($"/CoAForm/{Username}");
+  }
+  public void CoAEventLog()
+  {
+    NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+  }
+  public void PasswordReport()
+  {
+    NavigationManager.NavigateTo($"/pwReport/{Username}");
+  }
+
+}

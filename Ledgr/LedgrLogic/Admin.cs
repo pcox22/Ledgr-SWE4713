@@ -1358,4 +1358,36 @@ public class Admin : User
         }
         return true;
     }
+
+    public static List<string> GetAccountEventLog(int accountNumber)
+    {
+        List<string> accountEventLog = new List<string>();
+        try
+        {
+            var sql = "SELECT * FROM AccountEventLog WHERE Number = @ACCOUNTNUM";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ACCOUNTNUM", accountNumber);
+
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 19; i++)
+                    {
+                        accountEventLog.Add(reader.GetString(i));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new UnableToRetrieveException("Unable to retrieve this account's event log");
+        }
+
+        return accountEventLog;
+    }
 }

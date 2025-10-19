@@ -50,6 +50,7 @@ public class Accountant : User
                     journalEntryID = reader.GetInt32(0);
                 }
             }
+            connection.Close();
         }
         catch(Exception e)
         {
@@ -97,6 +98,7 @@ public class Accountant : User
                     journalEntryID = reader.GetInt32(0);
                 }
             }
+            connection.Close();
         }
         catch(Exception e)
         {
@@ -144,6 +146,7 @@ public class Accountant : User
                     journalEntryID = reader.GetInt32(0);
                 }
             }
+            connection.Close();
         }
         catch(Exception e)
         {
@@ -190,6 +193,7 @@ public class Accountant : User
                         journalEntryID = reader.GetInt32(0);
                     }
                 }
+                connection.Close();
             }
             catch(Exception e)
             {
@@ -207,6 +211,7 @@ public class Accountant : User
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var sql = "INSERT INTO JournalEntryDebit VALUES(NULL, @ACCOUNTNUM, @AMOUNT, @JE)";
+            connection.Open();
             
             var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
@@ -214,6 +219,7 @@ public class Accountant : User
             command.Parameters.AddWithValue("@JE", journalEntryID);
 
             command.ExecuteNonQuery();
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -229,6 +235,7 @@ public class Accountant : User
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var sql = "INSERT INTO JournalEntryCredit VALUES(NULL, @ACCOUNTNUM, @AMOUNT, @JE)";
+            connection.Open();
             
             var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
@@ -236,6 +243,7 @@ public class Accountant : User
             command.Parameters.AddWithValue("@JE", journalEntryID);
 
             command.ExecuteNonQuery();
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -308,7 +316,7 @@ public class Accountant : User
             }
             else if (input.Equals("Date"))
             {
-                sql = 
+                sql = "";
             }
         }
 
@@ -323,7 +331,7 @@ public class Accountant : User
         {
             var sql = "SELECT * FROM AccountEventLog WHERE Number = @ACCOUNTNUM";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-
+            connection.Open();
             var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ACCOUNTNUM", accountNumber);
 
@@ -338,6 +346,7 @@ public class Accountant : User
                     }
                 }
             }
+            connection.Close();
         }
         catch (Exception e)
         {

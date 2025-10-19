@@ -50,6 +50,7 @@ public class Manager : User
                     journalEntryID = reader.GetInt32(0);
                 }
             }
+            connection.Close();
         }
         catch(Exception e)
         {
@@ -97,6 +98,7 @@ public class Manager : User
                     journalEntryID = reader.GetInt32(0);
                 }
             }
+            connection.Close();
         }
         catch(Exception e)
         {
@@ -144,6 +146,7 @@ public class Manager : User
                     journalEntryID = reader.GetInt32(0);
                 }
             }
+            connection.Close();
         }
         catch(Exception e)
         {
@@ -190,6 +193,7 @@ public class Manager : User
                         journalEntryID = reader.GetInt32(0);
                     }
                 }
+                connection.Close();
             }
             catch(Exception e)
             {
@@ -206,6 +210,7 @@ public class Manager : User
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var sql = "INSERT INTO JournalEntryDebit VALUES(NULL, @ACCOUNTNUM, @AMOUNT, @JE)";
+            connection.Open();
             
             var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
@@ -213,6 +218,8 @@ public class Manager : User
             command.Parameters.AddWithValue("@JE", journalEntryID);
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -228,6 +235,7 @@ public class Manager : User
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             var sql = "INSERT INTO JournalEntryCredit VALUES(NULL, @ACCOUNTNUM, @AMOUNT, @JE)";
+            connection.Open();
             
             var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
@@ -235,6 +243,7 @@ public class Manager : User
             command.Parameters.AddWithValue("@JE", journalEntryID);
 
             command.ExecuteNonQuery();
+            connection.Close();
         }
         catch (Exception e)
         {
@@ -246,7 +255,54 @@ public class Manager : User
     }
     
     //can approve or reject journal entries made by an accountant, if a journal entry is rejected the manager must explain why
-    
+    //(DONE) (NOT TESTED)
+    public static bool ApproveJournalEntry(int journalEntryID)
+    {
+        var sql = "UPDATE JournalEntry SET Status = 'A' WHERE ID = @JOURNALENTRYID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@JOURNALENTRYID", journalEntryID);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return true;
+    }
+    public static bool RejectJournalEntry(int journalEntryID, string comment)
+    {
+        var sql = "UPDATE JournalEntry SET Status = 'R', Comment = @COMMENT WHERE ID = @JOURNALENTRYID";
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@JOURNALENTRYID", journalEntryID);
+            command.Parameters.AddWithValue("@COMMENT", comment);
+
+            command.ExecuteNonQuery();
+            
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return true;
+    }
     //view all journal entries by status (DONE) (NOT TESTED)
     public static List<string> ViewEntriesByStatus(char status)
     {
@@ -301,7 +357,8 @@ public class Manager : User
         {
             var sql = "SELECT * FROM AccountEventLog WHERE Number = @ACCOUNTNUM";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-
+            connection.Open();
+            
             var command = new SqliteCommand(sql, connection);
             command.Parameters.AddWithValue("@ACCOUNTNUM", accountNumber);
 
@@ -316,6 +373,7 @@ public class Manager : User
                     }
                 }
             }
+            connection.Close();
         }
         catch (Exception e)
         {

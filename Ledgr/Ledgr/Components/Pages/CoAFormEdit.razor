@@ -156,8 +156,8 @@
 
               <!-- Date/Time Account Added -->
               <div class="input-group">
-                <label class="label" for="created">Date/Time Account Added</label>
-                <InputText @bind-Value="DT" id="created" class="input" type="datetime-local" readonly />
+                <label class="label" for="created">Date Created</label>
+                <InputText @bind-Value="DateCreated" id="created" class="input" readonly />
               </div>
 
               <!-- User ID -->
@@ -193,12 +193,12 @@
 
           <!-- Active Status -->
           <div class="input-group">
-            <label class="label" for="active">Active</label>
+            <label class="label" for="active">Active   </label>
             <div>
               <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked />
             </div>
-            <small class="hint" id="activeHint">You cannot deactivate when balance &gt; 0.</small>
           </div>
+
 
           <div class="row-right" style="margin-top:8px;">
             <button type="button" id="btnCancel" class="btn btn--secondary">Cancel</button>
@@ -284,6 +284,9 @@
   private string Comment { get; set; } = string.Empty;
   private bool Active { get; set; }
   
+  // Alerts
+  public string Alert { get; set; } = string.Empty;
+  
   
   protected override async Task OnParametersSetAsync()
   {
@@ -304,14 +307,7 @@
     UserID = AccountDetails[11];
     Order = AccountDetails[12];
     Statement = AccountDetails[13];
-    if (AccountDetails[14] == "1")
-    {
-      Active = true;
-    }
-    else
-    {
-      Active = false;
-    }
+    Active = AccountDetails[14] == "1";
     
 
     //UserID = user.GetUserID();
@@ -329,9 +325,13 @@
       {
         NS = 'L';
       }
-      else
+      else if(NormalSide == "Credit")
       {
         NS = 'R';
+      }
+      else
+      {
+        Alert = "Please select a normal side";
       }
       double IB = Convert.ToDouble(InitialBalance);
       double DB = Convert.ToDouble(Debit);

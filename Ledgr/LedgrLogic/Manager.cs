@@ -354,6 +354,64 @@ public class Manager : User
 
         return entries;
     }
+    
+    //filter journal entries displayed by status and by date (DONE) (NOT TESTED)
+    //returns journal entries ordered by status (P || A || R) and date (asc||desc)
+    public static List<string> FilterJournalStatusDate(char status, string dateOrderBy)
+    {
+        List<string> results = new List<string>();
+        var sql = "";
+        if (status == 'A' && dateOrderBy.Equals("asc"))
+        {
+            sql = "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE Status = 'A' ORDER BY DATE ASC";
+        }
+        else if (status == 'A' && dateOrderBy.Equals("desc"))
+        {
+            sql = "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE Status = 'A' ORDER BY DATE DESC";
+        }
+        else if (status == 'P' && dateOrderBy.Equals("asc"))
+        {
+            sql = "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE Status = 'P' ORDER BY DATE ASC";
+        }
+        else if (status == 'P' && dateOrderBy.Equals("desc"))
+        {
+            sql = "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE Status = 'P' ORDER BY DATE DESC";
+        }
+        else if (status == 'R' && dateOrderBy.Equals("asc"))
+        {
+            sql = "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE Status = 'P' ORDER BY DATE ASC";
+        }
+        else if (status == 'R' && dateOrderBy.Equals("desc"))
+        {
+            sql = "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE Status = 'P' ORDER BY DATE DESC";
+        }
+        try
+        {
+            using var connection = new SqliteConnection();
+            var command = new SqliteCommand(sql, connection);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        results.Add(reader.GetString(i));
+                    }
+                }
+            }
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return results;
+    }
+    
     //search a journal by account name, amount, or date (DONE) (NOT TESTED)
     public static List<string> SearchJournal(string searchBy, Object input)
     {

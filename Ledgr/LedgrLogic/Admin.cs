@@ -1315,6 +1315,33 @@ public class Admin : User
         return tempEventLog;
     }
 
+    public static bool UniqueAccountName(string tempName)
+    {
+        try
+        {
+            var sql = "SELECT Name FROM Account WHERE Name = @NAME";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NAME", tempName);
+
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                return false;
+            } 
+            
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
+    }
+
     public static bool CreateAccount(int tempAccountNum, string tempName, string tempDesc, char tempNormalSide,
         string category, string subCategory, double tempInitBalance, double tempDebit, double tempCredit,
         double tempBalance, string tempDate, int tempUserID, int tempOrder, string tempStatement, string adminUsername)
@@ -1322,6 +1349,11 @@ public class Admin : User
         //getting admin ID for event log
         User temp = User.GetUserFromUserName(adminUsername).Result;
         int adminID = temp.GetUserID();
+
+        if (!UniqueAccountName(tempName))
+        {
+            return false;
+        }
 
         try
         {

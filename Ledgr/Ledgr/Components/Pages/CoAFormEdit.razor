@@ -12,38 +12,50 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="accounts.css" />
+<!-- Base + Page Styles -->
+<link rel="stylesheet" href="/dashboard.css">
 </head>
-<body class="page">
+<body class="page page--dashboard">
 
-<!-- Header -->
-<header class="app-header app-header--band">
-  <div class="app-header__inner">
-    <!-- Left: Brand -->
-    <a class="app-header__brand" href="/dashboard.html" aria-label="LEDGR Home">
-      <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
-    </a>
 
-    <!-- Center: Primary Nav (inside the dark band) -->
-    <nav class="nav nav--primary">
-      <NavLink class="nav__link is-active" href="/CoAList">Accounts</NavLink>
-      <NavLink class="nav__link" href="../journal/je-create.html">Journal</NavLink>
-      <NavLink class="nav__link" href="../reports/reports.html">Reports</NavLink>
-      <NavLink class="nav__link" href="../dashboard.html">Dashboard</NavLink>
-    </nav>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-header__top">
+    <div class="brand">
+      <img src="/logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
+    </div>
 
-    <!-- Right: Notifications + User -->
-    <div class="app-header__right">
-      <button class="icon-btn bell" aria-label="Notifications">🔔</button>
-      <div class="user-chip" title="Signed in as">
-        <span class="avatar" aria-hidden="true">A</span>
-        <span class="user-chip__text">
-          <strong id="userName">Admin User</strong>
-          <span class="muted">Admin</span>
-        </span>
+    <div class="user">
+      <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+        <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+        </svg>
+        <span class="user__name">Admin</span>
+        <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
+      </button>
+
+      <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+        <button @onclick="LogOut" class="menu__item" role="menuitem">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
+          </svg>
+          Log out
+        </button>
       </div>
-      <button class="icon-btn caret" aria-label="User menu" title="User menu">▾</button>
     </div>
   </div>
+
+  <nav class="app-nav" aria-label="Primary">
+    <div class="app-nav__inner">
+      <ul class="app-nav__list">
+        <li><a class="app-nav__link is-active" href="dashboard.html">Dashboard</a></li>
+        <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
+        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+        <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
+        <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
 <SideBar>
@@ -51,19 +63,50 @@
   <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
   <button @onclick="CoAFormCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
   <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
-  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
-  <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+  @if (Role == "Admin")
+  {
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+  }
 </SideBar>
+
+<!-- DATE DROPDOWN BOX -->
+<div class="toolbar">
+  <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+    <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+    </svg>
+    <span id="dateText">October 16th, 2025</span>
+  </button>
+  <input id="dateInput" type="date" class="visually-hidden">
+</div>
+
+<!-- CALENDAR -->
+<div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
+  <div class="cal__inner">
+    <div class="cal__header">
+      <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+      <div id="calLabel" class="cal__label">October 2025</div>
+      <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+    </div>
+    <div class="cal__grid cal__dow">
+      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+    </div>
+    <div id="calGrid" class="cal__grid"></div>
+  </div>
+</div>
 
 <!-- Main -->
 <main class="container container--xl">
 
   <!-- Form card -->
   <section class="card card--fluid card--animate" aria-labelledby="formTitle">
-    <header class="card__header">
-      <h1 id="formTitle" class="h2">Add / Edit Account</h1>
-      <p class="body1 muted">Fields marked * are required. <br>Account number must follow the category’s starting digit rule.</p>
-    </header>
+    <div>
+      <header class="card__header">
+        <h1 id="formTitle" class="h2">Add / Edit Account</h1>
+        <p class="body1 muted">Fields marked * are required. <br>Account number must follow the category’s starting digit rule.</p>
+      </header>
+    </div>
 
     <div id="formAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
       <span class="alert__dot" aria-hidden="true"></span>
@@ -76,14 +119,14 @@
         <div class="form-col">
           <div class="input-group">
             <label class="label" for="accountName">Account Name *</label>
-            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" required />
+            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" required/>
             <p class="field-error" id="accountNameError"></p>
           </div>
 
           <!-- Account Nr. -->
           <div class="input-group">
             <label class="label" for="accountNo">Account Number *</label>
-            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" required />
+            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" required/>
             <small class="hint" id="acctHint">Assets start with <b>1</b>, Liabilities <b>2</b>, Equity <b>3</b>, Revenue <b>4</b>, Expense <b>5</b>.</small>
             <br>
             <small class="hint" id="acctHint">Digits only • No decimals, spaces or letters </small>
@@ -124,52 +167,52 @@
               <!-- Account Subcategory -->
               <div class="input-group">
                 <label class="label" for="subcategory">Subcategory</label>
-                <InputText @bind-Value="SubCategory" id="subcategory" class="input" type="text" placeholder="e.g., Current Assets" />
+                <InputText @bind-Value="SubCategory" id="subcategory" class="input" type="text" placeholder="e.g., Current Assets"/>
               </div>
             </div>
-            
+
             <!-- Balance + tracking fields section -->
             <div class="grid grid--gap grid--cols-2">
               <!-- Initial Balance -->
               <div class="input-group">
                 <label class="label" for="initialBalance">Initial Balance *</label>
-                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" required />
+                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" required/>
               </div>
 
               <!-- Debit -->
               <div class="input-group">
                 <label class="label" for="debit">Debit</label>
-                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly />
+                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly/>
               </div>
 
               <!-- Credit -->
               <div class="input-group">
                 <label class="label" for="credit">Credit</label>
-                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly />
+                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly/>
               </div>
 
               <!-- Balance -->
               <div class="input-group">
                 <label class="label" for="balance">Balance</label>
-                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly />
+                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly/>
               </div>
 
               <!-- Date/Time Account Added -->
               <div class="input-group">
                 <label class="label" for="created">Date Created</label>
-                <InputText @bind-Value="DateCreated" id="created" class="input" readonly />
+                <InputText @bind-Value="DateCreated" id="created" class="input" readonly/>
               </div>
 
               <!-- User ID -->
               <div class="input-group">
                 <label class="label" for="addedBy">User ID</label>
-                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly />
+                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly/>
               </div>
 
               <!-- Order -->
               <div class="input-group">
                 <label class="label" for="order">Order</label>
-                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0" />
+                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0"/>
               </div>
             </div>
 
@@ -193,9 +236,9 @@
 
           <!-- Active Status -->
           <div class="input-group">
-            <label class="label" for="active">Active   </label>
+            <label class="label" for="active">Active </label>
             <div>
-              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked />
+              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked/>
             </div>
           </div>
 
@@ -258,12 +301,14 @@
     window.accountsForm?.init?.();
   </script>
 </body>
+<script src="/dashboard.js"></script>
 </html>
 
 @code{
 
   [Parameter] public string? Username { get; set; }
   [Parameter] public string? AccountNum { get; set; }
+  public string Role { get; set; } = string.Empty;
   
   // Account Parameters
   private string AccountName { get; set; } = string.Empty;
@@ -308,6 +353,8 @@
     Order = AccountDetails[12];
     Statement = AccountDetails[13];
     Active = AccountDetails[14] == "1";
+
+    Role = (await Admin.GetUserFromUserName(Username)).GetRole();
     
 
     //UserID = user.GetUserID();
@@ -354,7 +401,7 @@
   // Nav Buttons - Linked to side bar
   public void Home()
   {
-    NavigationManager.NavigateTo($"/adminHome/{Username}");
+    NavigationManager.NavigateTo($"/dashboard/{Username}");
   }
 
   public void CoAList()
@@ -370,8 +417,17 @@
   {
     NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
   }
+  public void ManageUser()
+  {
+    NavigationManager.NavigateTo($"/manageUsers/{Username}");
+  }
   public void PasswordReport()
   {
     NavigationManager.NavigateTo($"/pwReport/{Username}");
+  }
+
+  public void LogOut()
+  {
+    NavigationManager.NavigateTo("/");
   }
 }

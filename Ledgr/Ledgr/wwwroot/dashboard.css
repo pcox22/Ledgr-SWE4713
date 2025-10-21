@@ -118,6 +118,7 @@
     padding:28px 30px; background:var(--neutral-100); border:1px solid var(--ui-400); border-radius: 16px;
     box-shadow: var(--shadow-card); transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .card:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 18px rgba(20, 30, 50, 0.1);

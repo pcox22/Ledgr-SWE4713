@@ -51,7 +51,7 @@
     <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
     <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
     <button @onclick="CoAEventLogCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
-    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
     <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
 </SideBar>
 
@@ -182,6 +182,10 @@
     public void CoAEventLogCall()
     {
         NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+    }
+    public void ManageUser()
+    {
+        NavigationManager.NavigateTo($"/manageUsers/{Username}");
     }
     public void PasswordReport()
     {

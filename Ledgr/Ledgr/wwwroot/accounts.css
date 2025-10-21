@@ -205,7 +205,10 @@
 .card--fluid .table tbody tr:hover td { background: rgba(0,0,0,0.04); }
 
 /* Keep consistent margins within the card */
-.card.card--fluid {
+.card {
+    padding: 32px;
+}
+.card--fluid {
     padding: 32px;
 }
 

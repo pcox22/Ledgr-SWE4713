@@ -1,4 +1,4 @@
-@page "/CoAForm/{Username}"
+@page "/CoAFormView/{Username}/{AccountNum}"
 @using LedgrLogic
 @inject NavigationManager NavigationManager
 
@@ -7,14 +7,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Add / Edit Account</title>
+  <title>View Account</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="accounts.css" />
-
-<!-- Base + Page Styles -->
-<link rel="stylesheet" href="/dashboard.css">
+  <!-- Base + Page Styles -->
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body class="page page--dashboard">
 
@@ -66,8 +66,8 @@
   <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
   @if (Role == "Admin")
   {
-  <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
-  <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
   }
 </SideBar>
 
@@ -103,8 +103,7 @@
   <!-- Form card -->
   <section class="card card--fluid card--animate" aria-labelledby="formTitle">
     <header class="card__header">
-      <h1 id="formTitle" class="h2">Add / Edit Account</h1>
-      <p class="body1 muted">Fields marked * are required. <br>Account number must follow the category’s starting digit rule.</p>
+      <h1 id="formTitle" class="h2">View Account</h1>
     </header>
 
     <div id="formAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
@@ -118,14 +117,14 @@
         <div class="form-col">
           <div class="input-group">
             <label class="label" for="accountName">Account Name *</label>
-            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" required />
+            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" readonly />
             <p class="field-error" id="accountNameError"></p>
           </div>
 
           <!-- Account Nr. -->
           <div class="input-group">
             <label class="label" for="accountNo">Account Number *</label>
-            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" required />
+            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" readonly />
             <small class="hint" id="acctHint">Assets start with <b>1</b>, Liabilities <b>2</b>, Equity <b>3</b>, Revenue <b>4</b>, Expense <b>5</b>.</small>
             <br>
             <small class="hint" id="acctHint">Digits only • No decimals, spaces or letters </small>
@@ -135,28 +134,25 @@
           <!-- Account Description -->
           <div class="input-group">
             <label class="label" for="description">Description</label>
-            <InputTextArea @bind-Value="Description" id="description" class="input" rows="3" placeholder="Short description"></InputTextArea>
+            <InputTextArea @bind-Value="Description" id="description" class="input" rows="3" placeholder="Short description" readonly></InputTextArea>
           </div>
 
+          <!-- Normal Side -->
           <div class="grid grid--gap grid--cols-2">
-
-            <!-- Normal Side 
             <div class="input-group">
-              <label class="label" for="normalSide">Normal Side *</label>
-              <InputSelect @bind-Value="NormalSide" id="normalSide" class="input" required>
+              <label class="label" for="normalSide">Normal Side</label>
+              <InputSelect @bind-Value="NormalSide" id="normalSide" class="input" readonly>
                 <option value="" selected>Select…</option>
                 <option value="Debit">Debit</option>
                 <option value="Credit">Credit</option>
               </InputSelect>
             </div>
-            -->
-
 
             <!-- Account Category -->
             <div class="grid grid--gap grid--cols-2">
               <div class="input-group">
-                <label class="label" for="category">Category *</label>
-                <InputSelect @bind-Value="Category" id="category" class="input" required>
+                <label class="label" for="category">Category</label>
+                <InputSelect @bind-Value="Category" id="category" class="input" readonly>
                   <option value="" selected>Select…</option>
                   <option value="Asset">Asset</option>
                   <option value="Liability">Liability</option>
@@ -169,91 +165,59 @@
               <!-- Account Subcategory -->
               <div class="input-group">
                 <label class="label" for="subcategory">Subcategory</label>
-                @if (Category == "Asset")
-                {
-                  <InputSelect @bind-Value="SubCategory" id="subcategory" class="input" required>
-                    <option value="" selected>Select…</option>
-                    <option value="Current Asset">Current Asset</option>
-                    <option value="Non-Current Asset">Non-Current Asset</option>
-                    <option value="Contra Asset">Contra Asset</option>
-                  </InputSelect>
-                }
-                @if (Category == "Liability")
-                {
-                  <InputSelect @bind-Value="SubCategory" id="subcategory" class="input" required>
-                    <option value="" selected>Select…</option>
-                    <option value="Current Asset">Current Liability</option>
-                    <option value="Non-Current Asset">Non-Current Liability</option>
-                  </InputSelect>
-                }
-                @if (Category == "Capital")
-                {
-                  <InputSelect @bind-Value="SubCategory" id="subcategory" class="input" required>
-                    <option value="" selected>Select…</option>
-                    <option value="Tangible">Tangible</option>
-                    <option value="Intangible">Intangible</option>
-                  </InputSelect>
-                }
-                @if (Category == "Revenue")
-                {
-                  <InputSelect @bind-Value="SubCategory" id="subcategory" class="input" required>
-                    <option value="" selected>Select…</option>
-                    <option value="Operating">Operating</option>
-                    <option value="Non-Operating">Non-Operating</option>
-                  </InputSelect>
-                }
-                </div>
+                <InputText @bind-Value="SubCategory" id="subcategory" class="input" type="text" placeholder="e.g., Current Assets" readonly/>
+              </div>
             </div>
-
+            
             <!-- Balance + tracking fields section -->
             <div class="grid grid--gap grid--cols-2">
               <!-- Initial Balance -->
               <div class="input-group">
-                <label class="label" for="initialBalance">Initial Balance *</label>
-                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" required/>
+                <label class="label" for="initialBalance">Initial Balance</label>
+                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Debit -->
               <div class="input-group">
                 <label class="label" for="debit">Debit</label>
-                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly/>
+                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Credit -->
               <div class="input-group">
                 <label class="label" for="credit">Credit</label>
-                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly/>
+                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Balance -->
               <div class="input-group">
                 <label class="label" for="balance">Balance</label>
-                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly/>
+                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Date/Time Account Added -->
               <div class="input-group">
-                <label class="label" for="created">Date/Time Account Added</label>
-                <InputText @bind-Value="DT" id="created" class="input" type="datetime-local" readonly/>
+                <label class="label" for="created">Date Created</label>
+                <InputText @bind-Value="DateCreated" id="created" class="input" readonly />
               </div>
 
               <!-- User ID -->
               <div class="input-group">
                 <label class="label" for="addedBy">User ID</label>
-                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly/>
+                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly />
               </div>
 
               <!-- Order -->
               <div class="input-group">
                 <label class="label" for="order">Order</label>
-                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0"/>
+                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0" readonly/>
               </div>
             </div>
 
             <!-- Statement -->
             <div class="input-group">
-              <label class="label" for="statement">Statement *</label>
-              <InputSelect @bind-Value="Statement" id="statement" class="input" required>
+              <label class="label" for="statement">Statement</label>
+              <InputSelect @bind-Value="Statement" id="statement" class="input" readonly>
                 <option value="" selected>Select…</option>
                 <option value="IS">Income Statement (IS)</option>
                 <option value="BS">Balance Sheet (BS)</option>
@@ -262,25 +226,20 @@
             </div>
           </div>
 
-          <!-- Comment -->
-          <div class="input-group">
-            <label class="label" for="comment">Comment (optional)</label>
-            <InputTextArea @bind-Value="Comment" id="comment" class="input" rows="3" placeholder="Reason for change"></InputTextArea>
-          </div>
-
           <!-- Active Status -->
           <div class="input-group">
             <label class="label" for="active">Active</label>
             <div>
-              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked />
+              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" readonly/>
             </div>
-            <small class="hint" id="activeHint">You cannot deactivate when balance &gt; 0.</small>
           </div>
 
+          <!--
           <div class="row-right" style="margin-top:8px;">
             <button type="button" id="btnCancel" class="btn btn--secondary">Cancel</button>
             <button @onclick="CreateAccount" type="button" id="btnSave" class="btn btn--primary">Save</button>
           </div>
+          -->
         </div>
       </form>
     </div>
@@ -330,24 +289,25 @@
 <!-- Global JS + Accounts module -->
 <script src="/app.js"></script>
 <script src="/accounts-form.js"></script>
-<script src="/dashboard.js"></script>
-
 <script>
     // Initialize the form page
     window.accountsForm?.init?.();
   </script>
+<script src="/dashboard.js"></script>
 </body>
 </html>
 
 @code{
 
   [Parameter] public string? Username { get; set; }
+  [Parameter] public string? AccountNum { get; set; }
   public string Role { get; set; } = string.Empty;
   
   // Account Parameters
   private string AccountName { get; set; } = string.Empty;
   private string AccountNumber { get; set; } = string.Empty;
   private string Description { get; set; } = string.Empty;
+  private string NormalSide { get; set; } = string.Empty;
   private string Category { get; set; } = string.Empty;
   private string SubCategory { get; set; } = string.Empty;
   private string InitialBalance { get; set; } = "0.00";
@@ -355,51 +315,64 @@
   private string Credit { get; set; } = "0.00";
   private string Balance { get; set; } = "0.00";
   private string DT { get; set; } = DateTime.Now.ToString();
+  private string DateCreated { get; set; } = string.Empty;
   private string UserID { get; set; } = string.Empty;
   private string Order { get; set; } = "0";
   private string Statement { get; set; } = string.Empty;
   private string Comment { get; set; } = string.Empty;
   private bool Active { get; set; }
-
+  
+  // Alerts
+  public string Alert { get; set; } = string.Empty;
+  
+  
   protected override async Task OnParametersSetAsync()
   {
+    //Set Parameters here
+    List<string> AccountDetails = Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum));
+
+    AccountNumber = AccountDetails[0];
+    AccountName = AccountDetails[1];
+    Description = AccountDetails[2];
+    NormalSide = AccountDetails[3];
+    Category = AccountDetails[4];
+    SubCategory = AccountDetails[5];
+    InitialBalance = AccountDetails[6];
+    Debit = AccountDetails[7];
+    Credit = AccountDetails[8];
+    Balance = AccountDetails[9];
+    DateCreated = AccountDetails[10];
+    UserID = AccountDetails[11];
+    Order = AccountDetails[12];
+    Statement = AccountDetails[13];
+    Active = AccountDetails[14] == "1";
+
     Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+    
+
+    //UserID = user.GetUserID();
+    StateHasChanged();
   }
   
   private async void CreateAccount()
   {
-    char NS = 'L';
-
-    switch (Category)
-    {
-      case "Asset":
-        NS = 'L';
-        break;
-      case "Liability":
-        NS = 'R';
-        break;
-      case "Revenue":
-        NS = 'R';
-        break;
-      case "Expense":
-        NS = 'L';
-        break;
-      case "Capital":
-        NS = 'R';
-        break;
-      default:
-        NS = 'X';
-        break;
-    }
     // Convert to proper data
+    char NS = 'L';
     try
     {
-      if (NS == 'X')
-      {
-        // Make a custom error later
-        throw new Exception("Please select a valid category");
-      }
       int AN = Convert.ToInt32(AccountNumber);
+      if (NormalSide == "Debit")
+      {
+        NS = 'L';
+      }
+      else if(NormalSide == "Credit")
+      {
+        NS = 'R';
+      }
+      else
+      {
+        Alert = "Please select a normal side";
+      }
       double IB = Convert.ToDouble(InitialBalance);
       double DB = Convert.ToDouble(Debit);
       double CR = Convert.ToDouble(Credit);
@@ -437,7 +410,6 @@
   {
     NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
   }
-
   public void ManageUser()
   {
     NavigationManager.NavigateTo($"/manageUsers/{Username}");
@@ -446,6 +418,7 @@
   {
     NavigationManager.NavigateTo($"/pwReport/{Username}");
   }
+
   public void LogOut()
   {
     NavigationManager.NavigateTo("/");

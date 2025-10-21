@@ -22,16 +22,21 @@
 <header class="app-header app-header--band">
   <div class="app-header__inner">
     <!-- Left: Brand -->
-    <a class="app-header__brand" href="/dashboard.html" aria-label="LEDGR Home">
+    <a @onclick="Home" class="app-header__brand" href="#" aria-label="LEDGR Home">
       <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
     </a>
 
     <!-- Center: Primary Nav (inside the dark band) -->
-    <nav class="nav nav--primary">
-      <NavLink class="nav__link is-active" href="/CoAList">Accounts</NavLink>
-      <NavLink class="nav__link" href="../journal/je-create.html">Journal</NavLink>
-      <NavLink class="nav__link" href="../reports/reports.html">Reports</NavLink>
-      <NavLink class="nav__link" href="../dashboard.html">Dashboard</NavLink>
+    <nav class="app-nav" aria-label="Primary">
+      <div class="app-nav__inner">
+        <ul class="app-nav__list">
+          <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
+          <li><a @onclick="CoAListCall" class="app-nav__link" href="#">Chart of Accounts</a></li>
+          <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+          <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
+          <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+        </ul>
+      </div>
     </nav>
 
     <!-- Right: Notifications + User -->
@@ -54,8 +59,11 @@
   <button @onclick="CoAListCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
   <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
   <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
-  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  @if (Role == "Admin")
+  {
+  <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
   <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+  }
 </SideBar>
 
 <!-- Main -->
@@ -146,7 +154,7 @@
 
     <div class="card__body">
       <div class="table-actions">
-        <a href="./coa-event-log.html" class="btn btn--secondary" type="button" title="View all account changes">View Event Log</a>
+        <a @onclick="CoAEventLog" href="#" class="btn btn--secondary" type="button" title="View all account changes">View Event Log</a>
         <button id="btnExportCsv" class="btn btn--secondary" type="button">Export CSV</button>
       </div>
 
@@ -165,7 +173,7 @@
             <th>Account No.</th>
             <th>Name</th>
             <th>Description</th>
-            <th>Normal Side</th>
+            <!-- <th>Normal Side</th> -->
             <th>Category</th>
             <th>Subcategory</th>
             <th>Initial Balance</th>
@@ -192,7 +200,7 @@
                 <td>@Accounts[index]</td>
                 <td>@Accounts[index + 1]</td>
                 <td>@Accounts[index + 2]</td>
-                <td>@Accounts[index + 3]</td>
+                <!-- <td>@Accounts[index + 3]</td> -->
                 <td>@Accounts[index + 4]</td>
                 <td>@Accounts[index + 5]</td>
                 <td>@Accounts[index + 6]</td>
@@ -204,7 +212,18 @@
                 <td>@Accounts[index + 12]</td>
                 <td>@Accounts[index + 13]</td>
                 <td>@Accounts[index + 14]</td>
-                <td><button @onclick="(() => EventLogEdit(index))" type="button" class="btn btn-primary">View</button></td>
+                @if (Role == "Admin")
+                {
+                  <td><button @onclick="(() => AccountEdit(index))" type="button" class="btn btn-primary">View</button></td>
+                }
+                @if (Role == "Manager")
+                {
+                  <td><button @onclick="(() => AccountView(index))" type="button" class="btn btn-primary">View</button></td>
+                }
+                @if (Role == "Accountant")
+                {
+                <td><button @onclick="(() => AccountView(index))" type="button" class="btn btn-primary">View</button></td>
+                }
               </tr>
             } 
           }
@@ -271,6 +290,7 @@
 @code{
 
   [Parameter] public string? Username { get; set; }
+  public string Role { get; set; } = string.Empty;
 
   private List<string> Accounts = Account.GetAccounts("").Result;
   private bool showActions { get; set; } = false;
@@ -285,6 +305,11 @@
   private string AcctMin { get; set; } = string.Empty;
   private string AcctMax { get; set; } = string.Empty;
   private string Search { get; set; } = string.Empty;
+
+  protected override async Task OnParametersSetAsync()
+  {
+    Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+  }
   
   public void showActionsDialog(int index)
   {
@@ -321,10 +346,21 @@
     NavigationManager.NavigateTo($"/pwReport/{Username}");
   }
 
-  public void EventLogEdit(int index)
+  public void AccountEdit(int index)
   {
     string AccountNum = Accounts[index];
     NavigationManager.NavigateTo($"/CoAFormEdit/{Username}/{AccountNum}"); 
+  }
+
+  public void AccountView(int index)
+  {
+    string AccountNum = Accounts[index];
+    NavigationManager.NavigateTo($"/CoAFormView/{Username}/{AccountNum}"); 
+  }
+
+  public void ManageUser()
+  {
+    NavigationManager.NavigateTo($"/manageUsers/{Username}"); 
   }
 
 }

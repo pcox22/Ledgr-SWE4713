@@ -4,7 +4,6 @@ const $ = (sel, root=document) => root.querySelector(sel);
 (() => {
     const btn = $('#userMenuBtn');
     const menu = $('#userMenu');
-    const logout = $('#logoutBtn');
     if (!btn || !menu) return;
 
     const toggle = (open) => {
@@ -20,10 +19,7 @@ const $ = (sel, root=document) => root.querySelector(sel);
     document.addEventListener('click', (e) => {
         if (!menu.contains(e.target) && e.target !== btn) toggle(false);
     });
-
-    logout?.addEventListener('click', () => {
-        window.location.href = 'login.html';
-    });
+    
 })();
 
 /* === Calendar === */

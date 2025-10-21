@@ -15,7 +15,7 @@ public class PasswordUnitTests
     public void Encrypt_ValidInput_ReturnsDifferentString()
     {
         //arrange
-        string UserInput = "AppD0m4!N";
+        string UserInput = "AppD0m4!N2";
         
         //act
         string Actual = Password.Encrypt(UserInput);

@@ -1,4 +1,6 @@
 @page "/dashboard/{Username}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
 
 <!doctype html>
 <html lang="en">
@@ -15,6 +17,7 @@
   <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body class="page page--dashboard">
+
 
 <!-- HEADER -->
 <header class="app-header">
@@ -33,7 +36,7 @@
       </button>
 
       <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
-        <button class="menu__item" role="menuitem" id="logoutBtn">
+        <button @onclick="LogOut" class="menu__item" role="menuitem">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
           </svg>
@@ -46,15 +49,27 @@
   <nav class="app-nav" aria-label="Primary">
     <div class="app-nav__inner">
       <ul class="app-nav__list">
-        <li><a class="app-nav__link is-active" href="dashboard.html">Dashboard</a></li>
-        <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
-        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li> 
-        <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
+        <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
+        <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
+        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+        <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
         <li><a class="app-nav__link" href="journal.html">Journal</a></li>
       </ul>
     </div>
   </nav>
 </header>
+
+<SideBar>
+  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+  <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+  <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+  <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+  @if (Role == "Admin")
+  {
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button> 
+  }
+</SideBar>
 
 <!-- DATE DROPDOWN BOX -->
 <div class="toolbar">
@@ -62,7 +77,7 @@
     <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
     </svg>
-    <span id="dateText">October 16th, 2025</span>
+    <span id="dateText">October 21st, 2025</span>
   </button>
   <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -93,11 +108,11 @@
         <img src="AccountManage.svg" alt="" />
       </div>
       <div class="card__body">
-        <h2 class="card__title">Account Management</h2>
-        <p class="card__desc">Manage and organize all your business accounts in one place. View balances, track transactions, and maintain accurate records.</p>
+        <h2 class="card__title">User Management</h2>
+        <p class="card__desc">Manage and organize all your user accounts in one place. View employees, approve requests, and maintain accurate records.</p>
       </div>
       <div class="card__cta">
-        <a class="btn btn--primary" href="admin-user-management.html">Select</a>
+        <a @onclick="ManageUser" class="btn btn--primary" href="#">Select</a>
       </div>
     </article>
 
@@ -111,7 +126,7 @@
         <p class="card__desc">Access and modify your chart of accounts. Organize your financial data with a structured hierarchy of account categories.</p>
       </div>
       <div class="card__cta">
-        <a class="btn btn--primary" href="accounts/coa-list.html">Select</a>
+        <a @onclick="CoAList" class="btn btn--primary" href="#">Select</a>
       </div>
     </article>
 
@@ -125,7 +140,7 @@
         <p class="card__desc">Review all system activities and transactions. Track changes, monitor user actions, and maintain a complete audit trail.</p>
       </div>
       <div class="card__cta">
-        <a class="btn btn--primary" href="accounts/coa-event-log.html">Select</a>
+        <a @onclick="CoAEventLog" class="btn btn--primary" href="#">Select</a>
       </div>
     </article>
   </section>
@@ -150,5 +165,51 @@
 @code {
 
   [Parameter] public string? Username { get; set; }
+  public string Role { get; set; } = string.Empty;
+
+  protected override async Task OnParametersSetAsync()
+  {
+    try
+    {
+      Role = Admin.GetUserFromUserName(Username).Result.GetRole();
+    }
+    catch (Exception e)
+    {
+      Console.WriteLine(e.Message);
+    }
+    StateHasChanged();
+  }
+  
+  public void Home()
+  {
+    NavigationManager.NavigateTo($"/dashboard/{Username}");
+  }
+
+  public void CoAList()
+  {
+    NavigationManager.NavigateTo($"/CoAList/{Username}");
+  }
+    
+  public void CoAForm()
+  {
+    NavigationManager.NavigateTo($"/CoAForm/{Username}");
+  }
+  public void CoAEventLog()
+  {
+    NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+  }
+  public void ManageUser()
+  {
+    NavigationManager.NavigateTo($"/manageUsers/{Username}");
+  }
+  public void PasswordReport()
+  {
+    NavigationManager.NavigateTo($"/pwReport/{Username}");
+  }
+
+  public void LogOut()
+  {
+    NavigationManager.NavigateTo("/");
+  }
 
 }

@@ -191,7 +191,7 @@
                     {
                         if (Role == "Manager")
                         {
-                            // Navigate to Manager Home
+                            NavigationManager.NavigateTo($"/dashboard/{Username}");
                         }
                         else
                         {
@@ -202,7 +202,7 @@
                     {
                         if (Role == "Accountant")
                         {
-                            // Nav to acct home
+                            NavigationManager.NavigateTo($"/dashboard/{Username}");
                         }
                         else
                         {

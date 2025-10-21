@@ -284,12 +284,12 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
-        string newAccountDesc = "The account for all costs related to merchandise";
+        string newAccountDesc = "";
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.EditAccountDescription(12345, newAccountDesc, "pcox0930");
+        actual = temp.EditAccountDescription(4001, newAccountDesc, "pcox0930");
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -318,12 +318,12 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
-        string newCategory = "Asset";
+        string newCategory = "Liability";
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.EditAccountCategory(12345, newCategory, "pcox0930");
+        actual = temp.EditAccountCategory(2001, newCategory, "pcox0930");
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -420,12 +420,12 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
-        int newOrder = 6;
+        int newOrder = 8;
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.EditAccountOrder(12345, newOrder, "pcox0930");
+        actual = temp.EditAccountOrder(5001, newOrder, "pcox0930");
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -570,8 +570,8 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = Admin.CreateAccount(4567, "Owners equity", "How much has the owner invested", 'R', "equity",
-            "owners equity", 20000.00, 0, 20000.00, 20000.00, "2025-10-14", 1, 7, "BS", "pcox0930");
+        actual = Admin.CreateAccount(2003, "Salaries Payable", "", 'R', "Liability",
+            "Current Liability", 0.00, 0.00,0.00, 0.00, "2025-10-14", 1, 2, "BS", "pcox0930");
         
         //assert
        Assert.That(actual, Is.EqualTo(expected));

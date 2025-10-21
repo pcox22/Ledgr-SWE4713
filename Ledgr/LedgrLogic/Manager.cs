@@ -24,7 +24,7 @@ public class Manager : User
             
             var insertCommand = new SqliteCommand(insertSql, connection);
             insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
+            insertCommand.Parameters.AddWithValue("@STATUS", 'A');
             insertCommand.Parameters.AddWithValue("@COMMENT", comment);
             insertCommand.Parameters.AddWithValue("@REFERENCE", reference);
             insertCommand.Parameters.AddWithValue("@USERID", userID);
@@ -73,7 +73,7 @@ public class Manager : User
             
             var insertCommand = new SqliteCommand(insertSql, connection);
             insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
+            insertCommand.Parameters.AddWithValue("@STATUS", 'A');
             insertCommand.Parameters.AddWithValue("@COMMENT", comment);
             insertCommand.Parameters.AddWithValue("@USERID", userID);
             
@@ -121,7 +121,7 @@ public class Manager : User
             
             var insertCommand = new SqliteCommand(insertSql, connection);
             insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
+            insertCommand.Parameters.AddWithValue("@STATUS", 'A');
             insertCommand.Parameters.AddWithValue("@REFERENCE", reference);
             insertCommand.Parameters.AddWithValue("@USERID", userID);
 
@@ -169,7 +169,7 @@ public class Manager : User
             
                 var insertCommand = new SqliteCommand(insertSql, connection);
                 insertCommand.Parameters.AddWithValue("@DATE", date);
-                insertCommand.Parameters.AddWithValue("@STATUS", 'P');
+                insertCommand.Parameters.AddWithValue("@STATUS", 'A');
                 insertCommand.Parameters.AddWithValue("@USERID", userID);
 
                 insertCommand.ExecuteNonQuery();

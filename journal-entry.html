@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Journal Entry • LEDGR</title>
+
+    <!-- Base + Page Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/journal.css" />
+</head>
+
+<body class="page page--journal" data-page="entry">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-header__top">
+      <div class="brand">
+        <img src="assets/img/logo.png" alt="LEDGR" class="brand__logo" />
+      </div>
+
+      <div class="user">
+        <button id="userMenuBtn" class="user__btn">
+          <span class="user__name" id="activeUserName">Admin</span>
+          <svg class="icon icon--caret" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </button>
+
+        <ul id="userMenu" class="menu" hidden>
+          <li><button class="menu__item" id="logoutBtn">Log out</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <nav class="app-nav">
+      <div class="app-nav__inner">
+        <ul class="app-nav__list">
+          <li><a class="app-nav__link" href="dashboard.html">Dashboard</a></li>
+          <li><a class="app-nav__link" href="chart-of-accounts.html">Chart of Accounts</a></li>
+          <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+          <li><a class="app-nav__link" href="event-log.html">Event Log</a></li>
+          <li><a class="app-nav__link is-active" href="journal.html">Journal</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Breadcrumbs -->
+<div class="breadcrumbs">
+  <a href="journal.html" class="crumb">
+    <svg viewBox="0 0 24 24" class="icon"><path d="M15 6l-6 6 6 6"/></svg>
+    <span>Return</span>
+  </a>
+  <span class="sep">/</span>
+  <a href="journal.html" class="crumb">Journal</a>
+  <span class="sep">/</span>
+  <span class="crumb current">New Journal Entry</span>
+</div>
+
+  <!-- DATE DROPDOWN BOX -->
+  <div class="toolbar">
+    <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+      <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+      </svg>
+      <span id="dateText">October 16th, 2025</span>
+    </button>
+    <input id="dateInput" type="date" class="visually-hidden">
+  </div>
+
+  <!-- CALENDAR -->
+  <div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
+    <div class="cal__inner">
+      <div class="cal__header">
+        <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+        <div id="calLabel" class="cal__label">October 2025</div>
+        <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+      </div>
+      <div class="cal__grid cal__dow">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div id="calGrid" class="cal__grid"></div>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- List card -->
+    <section class="cards">
+      <article id="journalEntryCard" class="card card--page" aria-labelledby="jeTitle">
+        <div class="page-head page-head--stack">
+          <div>
+            <h1 id="jeTitle" class="h2">Journal Entry</h1>
+            <h2 class="muted">Create / Edit your journal entry</h2>
+          </div>
+        </div>
+
+        <!-- Journal Form -->
+        <form id="journalForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <span class="label">Reference</span>
+              <output id="jeRef" class="output output--center">—</output>
+            </div>
+            <label class="field"> 
+              <span class="label">Date</span> 
+              <div class="date-field">
+                <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+                </svg>
+                <input type="date" id="jeDate" required />
+              </div>
+            </label>
+          </div>
+
+          <fieldset class="lines">
+            <legend class="legend">Journal Entries</legend>
+
+            <div class="line-head">
+              <span>Account</span>
+              <span class="num">Debit</span>
+              <span class="num">Credit</span>
+              <span class="center visually-hidden">Remove</span>
+            </div>
+
+            <div id="lineItems" class="line-items"></div>
+
+            <div class="totals">
+              <div class="totals__row">
+                <span>Totals</span>
+                <output id="totalDebit" class="num">$0.00</output>
+                <output id="totalCredit" class="num">$0.00</output>
+                <span></span>
+              </div>
+
+            <div class="line-actions">
+              <button type="button" id="addLine" class="btn btn--secondary">+ Add Entry Line</button>
+            </div>
+
+              <div id="balanceState" class="balance balance--notok" aria-live="polite">
+                <span class="badge badge--error" id="balanceBadge">Not Balanced</span>
+                <span class="muted" id="balanceDiff">(Difference: $0.00)</span>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Description/Comment Field -->
+          <label class="field">
+            <span class="label">Description / Comment <span class="muted">(optional)</span></span>
+            <textarea id="jeDesc" rows="3" placeholder="Enter details about this journal entry…"></textarea>
+          </label>
+
+          <!-- Attatchments -->
+          <fieldset class="attachments">
+            <legend class="legend">Attach Documents <span class="muted">(optional)</span></legend>
+            <div class="attachments-inner">
+              <p class="muted small">Allowed: pdf, docx, xlsx, csv, jpg, png</p>
+              <input id="jeFiles" type="file" multiple accept=".pdf,.doc,.docx,.xlsx,.csv,.jpg,.jpeg,.png" />
+            </div>
+          </fieldset>
+
+
+          <div class="form-actions">
+            <button type="button" id="saveDraft" class="btn btn--secondary">Save Draft</button>
+            <button type="reset" id="resetForm" class="btn btn--secondary">Reset Form</button>
+            <button type="submit" id="submitForApproval" class="btn btn--primary">Submit for Approval</button>
+          </div>
+
+          <!-- Activity Log
+          <section aria-labelledby="activityTitle" class="activity">
+            <h1 id="activityTitle" class="h2">Activity Log</h1>
+            <div id="activityLog" class="activity__items"></div>
+          </section>
+        </form>
+      </article>
+    </section> -->
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="app-footer__inner">
+      <nav class="footer-nav">
+        <a class="link" href="help.html">Help</a>
+        <a class="link" href="privacy.html">Privacy</a>
+        <a class="link" href="terms.html">Terms</a>
+      </nav>
+      <small class="muted">© 2025 LEDGR · Build v0.1</small>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/journal.js"></script>
+
+</body>
+</html>

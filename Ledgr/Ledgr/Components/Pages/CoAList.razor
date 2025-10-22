@@ -34,7 +34,7 @@
           <li><a @onclick="CoAListCall" class="app-nav__link" href="#">Chart of Accounts</a></li>
           <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
           <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
-          <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+          <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
         </ul>
       </div>
     </nav>
@@ -255,17 +255,17 @@
 <footer class="app-footer">
   <div class="app-footer__inner">
     <nav class="footer-nav">
-      <a href="../help.html" class="link">Help</a>
-      <a href="../privacy.html" class="link">Privacy</a>
-      <a href="../terms.html" class="link">Terms</a>
+      <a href="/help.html" class="link">Help</a>
+      <a href="/privacy.html" class="link">Privacy</a>
+      <a href="/terms.html" class="link">Terms</a>
     </nav>
     <small class="muted">© 2025 LEDGR · Build v0.1</small>
   </div>
 </footer>
 
 <!-- Global JS + Accounts module -->
-<script src="../assets/js/app.js"></script>
-<script src="../assets/js/accounts.js"></script> 
+<script src="app.js"></script>
+<script src="accounts.js"></script> 
 <script>
   window.addEventListener('DOMContentLoaded', function(){
     window.coa?.initListPage?.({
@@ -358,6 +358,10 @@
     NavigationManager.NavigateTo($"/CoAFormView/{Username}/{AccountNum}"); 
   }
 
+  public void Journal()
+  {
+    NavigationManager.NavigateTo($"/journal/{Username}"); 
+  }
   public void ManageUser()
   {
     NavigationManager.NavigateTo($"/manageUsers/{Username}"); 

@@ -31,7 +31,7 @@
         <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
         </svg>
-        <span class="user__name">Admin</span>
+        <span class="user__name">@Username</span>
         <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
       </button>
 
@@ -49,11 +49,11 @@
   <nav class="app-nav" aria-label="Primary">
     <div class="app-nav__inner">
       <ul class="app-nav__list">
-        <li><a class="app-nav__link is-active" href="dashboard.html">Dashboard</a></li>
-        <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
+        <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
+        <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
         <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
-        <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
-        <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+        <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
+        <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
       </ul>
     </div>
   </nav>
@@ -419,6 +419,10 @@
     NavigationManager.NavigateTo($"/pwReport/{Username}");
   }
 
+  public void Journal()
+  {
+    NavigationManager.NavigateTo($"/journal/{Username}");
+  }
   public void LogOut()
   {
     NavigationManager.NavigateTo("/");

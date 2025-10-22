@@ -120,7 +120,7 @@ Please check all the other pages to ensure consistancy:
 .btn--primary:hover{ background: var(--brand-100); color: var(--brand-500); }
 
 /* ---------- Footer ---------- */
-.app-footer{ background: var(--neutral-100); padding: 24px 0; text-align: center;
+.app-footer{ position: fixed; bottom: 0; left: 0; background: var(--neutral-100); padding: 24px 0; text-align: center;
     border-top: 1px solid var(--ui-300); margin-top: auto; }
 .app-footer__inner{
     max-width: 1200px; margin: 0 auto; text-align: center;

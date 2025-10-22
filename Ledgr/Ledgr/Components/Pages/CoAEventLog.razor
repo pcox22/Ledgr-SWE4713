@@ -17,9 +17,6 @@
     <link rel="stylesheet" href="accounts.css" />
 </head>
 
-<!-- Base + Page Styles -->
-<link rel="stylesheet" href="/styles.css">
-
 <body class="page page--dashboard">
 
 
@@ -57,7 +54,7 @@
                 <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
                 <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
                 <li><a @onclick="CoAEventLogCall" class="app-nav__link" href="#">Event Log</a></li>
-                <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+                <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
             </ul>
         </div>
     </nav>
@@ -269,6 +266,11 @@
     public void LogOut()
     {
         NavigationManager.NavigateTo("/");
+    }
+    
+    public void Journal()
+    {
+        NavigationManager.NavigateTo($"/journal/{Username}");
     }
     
     public void AccountEdit(int index)

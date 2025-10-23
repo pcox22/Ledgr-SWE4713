@@ -336,7 +336,7 @@
   protected override async Task OnParametersSetAsync()
   {
     //Set Parameters here
-    List<string> AccountDetails = Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum));
+    List<string> AccountDetails = Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum)).Result;
 
     AccountNumber = AccountDetails[0];
     AccountName = AccountDetails[1];

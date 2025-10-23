@@ -16,6 +16,7 @@ public class Manager : User
     {
         int userID = GetUserFromUserName(username).Result.GetUserID();
         int journalEntryID = -1;
+        
         try
         {
             var insertSql = "INSERT INTO JournalEntry VALUES(null, @DATE, @STATUS, @COMMENT, @REFERENCE, @USERID)";
@@ -229,8 +230,9 @@ public class Manager : User
 
         return true;
     }*/
-    public static bool CreateJournalEntryDetails(int accountNum, double amount, string debitCredit, int journalEntryID)
+    public static bool CreateJournalEntryDetails(int accountNum, double amount, string debitCredit, int journalEntryID, string username)
     {
+        int userID = GetUserFromUserName(username).Result.GetUserID();
         try
         {
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
@@ -242,7 +244,18 @@ public class Manager : User
             command.Parameters.AddWithValue("@AMOUNT", amount);
             command.Parameters.AddWithValue("@JE", journalEntryID);
             command.Parameters.AddWithValue("@DC", debitCredit);
-
+            if (debitCredit.Equals("Debit"))
+            {
+                Account.UpdateAccountDebit(accountNum, amount, username);
+            }
+            else if (debitCredit.Equals("Credit"))
+            {
+                Account.UpdateAccountCredit(accountNum, amount, username);
+            }
+            else
+            {
+                throw new Exception("Debit or Credit must be selected");
+            }
             command.ExecuteNonQuery();
             connection.Close();
         }
@@ -269,6 +282,32 @@ public class Manager : User
             command.Parameters.AddWithValue("@JOURNALENTRYID", journalEntryID);
 
             command.ExecuteNonQuery();
+            
+            //need to get info to update the account 
+            var retrieveSql =
+                "SELECT JED.AccountNumber, JED.Amount, JED.DebitCredit, User.Username FROM JournalEntryDetails AS JED INNER JOIN JOURNAL ENTRY AS JE ON JED.JournalEntryID = JE.ID INNER JOIN User ON JE.UserID = User.Username WHERE ID = @ID";
+            var retrieveCommand = new SqliteCommand(retrieveSql, connection);
+            
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    int accountNum = reader.GetInt32(0);
+                    double amount = reader.GetDouble(1);
+                    string debitCredit = reader.GetString(2);
+                    string username = reader.GetString(3);
+
+                    if (debitCredit.Equals("Debit"))
+                    {
+                        Account.UpdateAccountDebit(accountNum, amount, username);
+                    }
+                    else if (debitCredit.Equals("Credit"))
+                    {
+                        Account.UpdateAccountCredit(accountNum, amount, username);
+                    }
+                }
+            }
             
             connection.Close();
         }
@@ -340,7 +379,14 @@ public class Manager : User
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        entries.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            entries.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            entries.Add("");
+                        }
                     }
                 }
             }
@@ -397,7 +443,14 @@ public class Manager : User
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        results.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            results.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            results.Add("");
+                        }
                     }
                 }
             }
@@ -446,7 +499,14 @@ public class Manager : User
                 {
                     for (int i = 0; i < 9; i++)
                     {
-                        result.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            result.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            result.Add("");
+                        }
                     }
                 }
             }

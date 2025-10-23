@@ -292,7 +292,14 @@ public class Accountant : User
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        entries.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            entries.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            entries.Add("");
+                        }
                     }
                 }
             }
@@ -348,7 +355,14 @@ public class Accountant : User
                 {
                     for (int i = 0; i < 10; i++)
                     {
-                        results.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            results.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            results.Add("");
+                        }
                     }
                 }
             }
@@ -397,7 +411,14 @@ public class Accountant : User
                 {
                     for (int i = 0; i < 9; i++)
                     {
-                        result.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            result.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            result.Add("");
+                        }
                     }
                 }
             }

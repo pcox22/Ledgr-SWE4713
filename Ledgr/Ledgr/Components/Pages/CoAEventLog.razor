@@ -50,10 +50,10 @@
     <nav class="app-nav" aria-label="Primary">
         <div class="app-nav__inner">
             <ul class="app-nav__list">
-                <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
+                <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
                 <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-                <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
-                <li><a @onclick="CoAEventLogCall" class="app-nav__link" href="#">Event Log</a></li>
+                <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
+                <li><a @onclick="CoAEventLogCall" class="app-nav__link is-active" href="#">Event Log</a></li>
                 <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
             </ul>
         </div>
@@ -101,7 +101,7 @@
 <!-- Main -->
 <main class="container container--xl">
 
-    <section class="card card--fluid card--animate" aria-labelledby="logH">
+    <section class="card1 card--fluid card--animate" aria-labelledby="logH">
         <header class="card__header">
             <h1 id="logH" class="h2">Chart of Accounts — Event Log</h1>
             <p class="body1 muted">Filter and export all account changes.</p>
@@ -272,16 +272,20 @@
     {
         NavigationManager.NavigateTo($"/journal/{Username}");
     }
+    public void LedgerCall()
+    {
+        NavigationManager.NavigateTo($"/ledger/{Username}");
+    }
     
     public void AccountEdit(int index)
     {
-        string AccountNum = EventLog[index + 1];
+        string AccountNum = EventLog[index + 2];
         NavigationManager.NavigateTo($"/CoAFormEdit/{Username}/{AccountNum}"); 
     }
 
     public void AccountView(int index)
     {
-        string AccountNum = EventLog[index + 1];
+        string AccountNum = EventLog[index + 2];
         NavigationManager.NavigateTo($"/CoAFormView/{Username}/{AccountNum}"); 
     }
 

@@ -48,3 +48,5 @@ public class AccountBalanceGreaterThanZeroException(string message) : Exception(
 public class EmptyAccountFieldException(string message) : Exception(message);
 
 public class InvalidAccountFieldException(string message) : Exception(message);
+
+public class UniqueAccountNameException(string message) : Exception(message);

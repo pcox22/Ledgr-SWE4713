@@ -51,7 +51,7 @@
       <ul class="app-nav__list">
         <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
         <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
         <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
       </ul>
@@ -98,7 +98,7 @@
 </div>
 
 <!-- MAIN -->
-<main class="container">
+<main class="containerDashboard">
   <h1 class="page-title">Admin Dashboard</h1>
 
   <section class="cards">
@@ -201,6 +201,10 @@
   public void Journal()
   {
     NavigationManager.NavigateTo($"/journal/{Username}");
+  }
+  public void LedgerCall()
+  {
+    NavigationManager.NavigateTo($"/ledger/{Username}");
   }
   public void ManageUser()
   {

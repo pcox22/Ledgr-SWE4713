@@ -51,13 +51,25 @@
             <ul class="app-nav__list">
                 <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
                 <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-                <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+                <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
                 <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
                 <li><a @onclick="JournalCall" class="app-nav__link is-active" href="#">Journal</a></li>
             </ul>
         </div>
     </nav>
 </header>
+
+<SideBar>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    @if (Role == "Admin")
+    {
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+    }
+</SideBar>
 
 <!-- DATE DROPDOWN BOX -->
 <div class="toolbar">
@@ -173,6 +185,13 @@
 @code{
 
     [Parameter] public string Username { get; set; }
+    public string Role { get; set; } = string.Empty;
+    
+    // Get the permissions of the User
+    protected override async Task OnParametersSetAsync()
+    {
+        Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+    }
 
     public void JournalEntry()
     {
@@ -209,6 +228,10 @@
     public void JournalCall()
     {
         NavigationManager.NavigateTo($"/journal/{Username}");
+    }
+    public void LedgerCall()
+    {
+        NavigationManager.NavigateTo($"/ledger/{Username}");
     }
     public void LogOut()
     {

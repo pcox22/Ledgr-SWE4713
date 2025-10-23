@@ -10,10 +10,9 @@
   <title>View Account</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Base + Page Styles -->
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="accounts.css" />
-  <!-- Base + Page Styles -->
-  <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body class="page page--dashboard">
@@ -51,7 +50,7 @@
       <ul class="app-nav__list">
         <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
         <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
         <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
       </ul>
@@ -246,7 +245,7 @@
   </section>
 
   <!-- Event log card -->
-  <section class="card card--fluid card--animate card--stagger-2" aria-labelledby="logTitle" style="margin-top:16px;">
+  <section class="card1 card--fluid card--animate card--stagger-2" aria-labelledby="logTitle" style="margin-top:16px;">
     <header class="card__header">
       <h2 id="logTitle" class="h3">Recent Changes (This Account)</h2>
     </header>
@@ -422,6 +421,10 @@
   public void Journal()
   {
     NavigationManager.NavigateTo($"/journal/{Username}");
+  }
+  public void LedgerCall()
+  {
+    NavigationManager.NavigateTo($"/ledger/{Username}");
   }
   public void LogOut()
   {

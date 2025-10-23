@@ -27,6 +27,9 @@ public static class Account
             case("Balance"):
                 sql = "SELECT * FROM Account WHERE Active = 1 ORDER BY Balance DESC";
                 break;
+            default:
+                sql = "SELECT * FROM Account WHERE Active = 1 ORDER BY Number ASC";
+                break;
         }
 
         try
@@ -64,6 +67,7 @@ public static class Account
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             using var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
 
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
@@ -80,6 +84,7 @@ public static class Account
         }
         catch (Exception e)
         {
+            Console.WriteLine("Error notif");
             Console.WriteLine(e);
         }
         return Account;

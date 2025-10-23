@@ -15,6 +15,8 @@
     <!-- Base + Page Styles -->
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/ledger.css" />
+    <link rel="stylesheet" href="/accounts.css" />
+
 </head>
 <body class="page page--ledger" data-page="ledger">
 
@@ -48,15 +50,27 @@
     <nav class="app-nav" aria-label="Primary">
         <div class="app-nav__inner">
             <ul class="app-nav__list">
-                <li><a class="app-nav__link" href="dashboard.html">Dashboard</a></li>
-                <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
-                <li><a class="app-nav__link is-active" href="ledger.html">Ledger</a></li>
-                <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
-                <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+                <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
+                <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
+                <li><a @onclick="LedgerCall" class="app-nav__link is-active" href="#">Ledger</a></li>
+                <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
+                <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
             </ul>
         </div>
     </nav>
 </header>
+
+<SideBar>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    @if (Role == "Admin")
+    {
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+    }
+</SideBar>
 
 <!-- ---------- DATE PICKER ---------- -->
 <div class="toolbar">
@@ -85,7 +99,7 @@
 </div>
 
 <!-- ---------- MAIN CONTENT ---------- -->
-<main class="container">
+<main class="containerLedger">
 
     <!-- Page Heading -->
     <section class="page-head">
@@ -96,7 +110,7 @@
     </section>
 
     <!-- Account summary card -->
-    <section id="accountCard" class="card hide">
+    <section id="accountCard" class="card1 hide">
         <div class="grid grid--2">
             <div>
                 <div class="muted">Account</div>
@@ -117,7 +131,7 @@
     </section>
 
     <!-- Ledger Table -->
-    <section class="card">
+    <section class="card1">
         <div class="table-wrap">
             <table class="table" id="ledgerTable" role="grid" aria-label="Account ledger">
                 <!-- Filters -->
@@ -229,6 +243,14 @@
 @code {
 
     [Parameter] public string Username { get; set; }
+    
+    public string Role { get; set; } = string.Empty;
+    
+    // Get the permissions of the User
+    protected override async Task OnParametersSetAsync()
+    {
+        Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+    }
     
     public void Home()
     {

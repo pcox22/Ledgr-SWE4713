@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="accounts.css" />
   <!-- Base + Page Styles -->
-  <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body class="page page--dashboard">
@@ -51,7 +50,7 @@
       <ul class="app-nav__list">
         <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
         <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
         <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
       </ul>
@@ -101,7 +100,7 @@
 <main class="container container--xl">
 
   <!-- Form card -->
-  <section class="card card--fluid card--animate" aria-labelledby="formTitle">
+  <section class="card1 card--fluid card--animate" aria-labelledby="formTitle">
     <header class="card__header">
       <h1 id="formTitle" class="h2">Add / Edit Account</h1>
     </header>
@@ -291,6 +290,10 @@
   public void Journal()
   {
     NavigationManager.NavigateTo($"/journal/{Username}");
+  }
+  public void LedgerCall()
+  {
+    NavigationManager.NavigateTo($"/ledger/{Username}");
   }
   public void LogOut()
   {

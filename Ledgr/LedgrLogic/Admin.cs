@@ -1038,10 +1038,10 @@ public class Admin : User
         //getting admin ID for event log
         User temp = User.GetUserFromUserName(adminUsername).Result;
         int adminID = temp.GetUserID();
-        
+
         if (!UniqueAccountName(tempName))
         {
-            return false;
+            throw new UniqueAccountNameException("The account name entered already exists");
         }
 
         try

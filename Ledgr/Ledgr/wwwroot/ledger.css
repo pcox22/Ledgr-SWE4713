@@ -94,7 +94,7 @@
 .cal__day.is-selected{ background: var(--brand-500); color: var(--neutral-100); }
 
 /* ---------- Main container & page head ---------- */
-.container{ max-width:1440px; margin:0 auto; padding:0 20px 56px; }
+.containerLedger{ max-width:1440px; margin:0 auto; padding:0 20px 56px; }
 .page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; margin:1.25rem 0; }
 
 /* ---------- Page toolbar (filters) ---------- */
@@ -109,7 +109,7 @@
 .field--search .field__input{ min-width:18rem; }
 
 /* ---------- Cards ---------- */
-.card{
+.card1{
     width:100%; margin:0 auto; display:block;
     max-width:clamp(960px, 88vw, 1280px);
     padding:24px 28px; background:var(--neutral-100);

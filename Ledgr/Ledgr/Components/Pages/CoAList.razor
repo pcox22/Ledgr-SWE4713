@@ -14,44 +14,51 @@
   <link rel="stylesheet" href="styles.css" />
   <!-- Accounts-only styles -->
   <link rel="stylesheet" href="accounts.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+
 </head>
 
 <body class="page">
   
 <!-- Header -->
-<header class="app-header app-header--band">
-  <div class="app-header__inner">
-    <!-- Left: Brand -->
-    <a @onclick="Home" class="app-header__brand" href="#" aria-label="LEDGR Home">
-      <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
-    </a>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-header__top">
+    <div class="brand">
+      <img src="/logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
+    </div>
 
-    <!-- Center: Primary Nav (inside the dark band) -->
-    <nav class="app-nav" aria-label="Primary">
-      <div class="app-nav__inner">
-        <ul class="app-nav__list">
-          <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
-          <li><a @onclick="CoAListCall" class="app-nav__link" href="#">Chart of Accounts</a></li>
-          <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
-          <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
-          <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
-        </ul>
-      </div>
-    </nav>
+    <div class="user">
+      <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+        <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+        </svg>
+        <span class="user__name">@Username</span>
+        <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
+      </button>
 
-    <!-- Right: Notifications + User -->
-    <div class="app-header__right">
-      <button class="icon-btn bell" aria-label="Notifications">🔔</button>
-      <div class="user-chip" title="Signed in as">
-        <span class="avatar" aria-hidden="true">A</span>
-        <span class="user-chip__text">
-          <strong id="userName">Admin User</strong>
-          <span class="muted">Admin</span>
-        </span>
+      <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+        <button @onclick="LogOut" class="menu__item" role="menuitem">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
+          </svg>
+          Log out
+        </button>
       </div>
-      <button class="icon-btn caret" aria-label="User menu" title="User menu">▾</button>
     </div>
   </div>
+
+  <nav class="app-nav" aria-label="Primary">
+    <div class="app-nav__inner">
+      <ul class="app-nav__list">
+        <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
+        <li><a @onclick="CoAListCall" class="app-nav__link is-active" href="#">Chart of Accounts</a></li>
+        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
+        <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
+        <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
 <SideBar>
@@ -84,7 +91,7 @@
     <button type="button" @onclick="AddAccount" class="btn btn--primary btn--small" role="button">Add Account</button>
   </section>
 
-  <section class="card card--fluid" aria-labelledby="coaTitle">      
+  <section class="card1 card--fluid" aria-labelledby="coaTitle">      
     <header class="card__header">
       <h1 id="coaTitle" class="h2">Chart of Accounts</h1>
       <p class="body1 muted">Search and filter accounts; click an account to open its ledger.</p>
@@ -362,9 +369,19 @@
   {
     NavigationManager.NavigateTo($"/journal/{Username}"); 
   }
+  public void LedgerCall()
+  {
+    NavigationManager.NavigateTo($"/ledger/{Username}");
+  }
   public void ManageUser()
   {
     NavigationManager.NavigateTo($"/manageUsers/{Username}"); 
+  }
+
+  public void LogOut()
+  {
+    NavigationManager.NavigateTo("/"); 
+
   }
 
 }

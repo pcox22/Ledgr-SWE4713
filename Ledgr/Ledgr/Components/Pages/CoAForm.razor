@@ -1,6 +1,8 @@
 @page "/CoAForm/{Username}"
 @using LedgrLogic
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
 
 <!doctype html>
 <html lang="en">
@@ -101,7 +103,7 @@
 <main class="container container--xl">
 
   <!-- Form card -->
-  <section class="card card--fluid card--animate" aria-labelledby="formTitle">
+  <section class="card1 card--fluid card--animate" aria-labelledby="formTitle">
     <header class="card__header">
       <h1 id="formTitle" class="h2">Add / Edit Account</h1>
       <p class="body1 muted">Fields marked * are required. <br>Account number must follow the category’s starting digit rule.</p>
@@ -111,6 +113,13 @@
       <span class="alert__dot" aria-hidden="true"></span>
       <span class="alert__text" id="formAlertText"></span>
     </div>
+  
+    @if (Alert != string.Empty)
+    {
+      <div class="alert">
+        <p><strong>@Alert</strong></p>
+      </div>
+    }
 
     <div class="card__body">
       <form id="accountForm" novalidate class="form-grid">
@@ -174,7 +183,7 @@
                   <InputSelect @bind-Value="SubCategory" id="subcategory" class="input" required>
                     <option value="" selected>Select…</option>
                     <option value="Current Asset">Current Asset</option>
-                    <option value="Non-Current Asset">Non-Current Asset</option>
+                    <option value="Long-Term Asset">Long-Term Asset</option>
                     <option value="Contra Asset">Contra Asset</option>
                   </InputSelect>
                 }
@@ -268,7 +277,7 @@
             <InputTextArea @bind-Value="Comment" id="comment" class="input" rows="3" placeholder="Reason for change"></InputTextArea>
           </div>
 
-          <!-- Active Status -->
+          <!-- Active Status 
           <div class="input-group">
             <label class="label" for="active">Active</label>
             <div>
@@ -276,6 +285,7 @@
             </div>
             <small class="hint" id="activeHint">You cannot deactivate when balance &gt; 0.</small>
           </div>
+          -->
 
           <div class="row-right" style="margin-top:8px;">
             <button type="button" id="btnCancel" class="btn btn--secondary">Cancel</button>
@@ -333,6 +343,13 @@
 <script src="/dashboard.js"></script>
 
 <script>
+  function scrollToTop() {
+    document.documentElement.scrollTop = 0; // For modern browsers
+    document.body.scrollTop = 0; // For older browsers
+  }
+</script>
+
+<script>
     // Initialize the form page
     window.accountsForm?.init?.();
   </script>
@@ -360,14 +377,85 @@
   private string Statement { get; set; } = string.Empty;
   private string Comment { get; set; } = string.Empty;
   private bool Active { get; set; }
+  
+  // Alerts
+  public string Alert { get; set; } = string.Empty;
 
   protected override async Task OnParametersSetAsync()
   {
     Role = (await Admin.GetUserFromUserName(Username)).GetRole();
   }
+
+  private async void Validate()
+  {
+    // Don't allow any empty Account names
+    if (AccountName == string.Empty)
+    {
+      throw new EmptyAccountFieldException("Account name cannot be empty");
+    }
+
+    // Ensure that the User's custom account number is bound to the constraints specified by Finance principals
+    if (AccountNumber.Length > 0)
+    {
+      switch (Category)
+      {
+        case "Asset":
+          if (AccountNumber[0] != '1')
+          {
+            throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'1\'");
+          }
+
+          break;
+        case "Liability":
+          if (AccountNumber[0] != '2')
+          {
+            throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'2\'");
+          }
+
+          break;
+        case "Equity":
+          if (AccountNumber[0] != '3')
+          {
+            throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'3\'");
+          }
+
+          break;
+        case "Revenue":
+          if (AccountNumber[0] != '4')
+          {
+            throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'4\'");
+          }
+
+          break;
+        case "Expense":
+          if (AccountNumber[0] != '5')
+          {
+            throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'5\'");
+          }
+
+          break;
+      }
+    }
+    else
+    {
+      throw new EmptyAccountFieldException("Please input an Account Number");
+    }
+
+    if (Convert.ToInt32(Order) < 1)
+    {
+      throw new InvalidAccountFieldException("Order must be greater than or equal to 1");
+    }
+
+    if (Statement == string.Empty)
+    {
+      throw new EmptyAccountFieldException("Please select a valid Statement for the account");
+    }
+  }
   
   private async void CreateAccount()
   {
+    Alert = string.Empty;
+    
     char NS = 'L';
 
     switch (Category)
@@ -394,11 +482,76 @@
     // Convert to proper data
     try
     {
+      // Don't allow any empty Account names
+      if (AccountName == string.Empty)
+      {
+        throw new EmptyAccountFieldException("Account name cannot be empty");
+      }
+
+      // Ensure that the User's custom account number is bound to the constraints specified by Finance principals
+      if (AccountNumber.Length > 1)
+      {
+        switch (Category)
+        {
+          case "Asset":
+            if (AccountNumber[0] != '1')
+            {
+              throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'1\'");
+            }
+
+            break;
+          case "Liability":
+            if (AccountNumber[0] != '2')
+            {
+              throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'2\'");
+            }
+
+            break;
+          case "Equity":
+            if (AccountNumber[0] != '3')
+            {
+              throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'3\'");
+            }
+
+            break;
+          case "Revenue":
+            if (AccountNumber[0] != '4')
+            {
+              throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'4\'");
+            }
+
+            break;
+          case "Expense":
+            if (AccountNumber[0] != '5')
+            {
+              throw new InvalidAccountFieldException("Accounts of type Asset must begin with \'5\'");
+            }
+
+            break;
+          default:
+            throw new EmptyAccountFieldException("Please select a valid Category");
+        }
+      }
+      else
+      {
+        throw new EmptyAccountFieldException("Please enter a valid Account Number");
+      }
+
+      if (Convert.ToInt32(Order) < 1)
+      {
+        throw new InvalidAccountFieldException("Order must be greater than or equal to 1");
+      }
+
+      if (Statement == string.Empty)
+      {
+        throw new EmptyAccountFieldException("Please select a valid Statement for the account");
+      }
       if (NS == 'X')
       {
         // Make a custom error later
-        throw new Exception("Please select a valid category");
+        throw new InvalidAccountFieldException("Please select a valid category");
       }
+
       int AN = Convert.ToInt32(AccountNumber);
       double IB = Convert.ToDouble(InitialBalance);
       double DB = Convert.ToDouble(Debit);
@@ -407,9 +560,19 @@
 
       int userID = Admin.GetUserFromUserName(Username).Result.GetUserID();
       int tempOrder = Convert.ToInt32(Order);
-      
+
       Admin.CreateAccount(AN, AccountName, Description, NS, Category, SubCategory, IB, DB, CR, Bal, DT, userID, tempOrder, Statement, Username);
       NavigationManager.NavigateTo($"/CoAList/{Username}");
+    }
+    catch (EmptyAccountFieldException e)
+    {
+      Alert = e.Message;
+      await ScrollTop();
+    }
+    catch (InvalidAccountFieldException e)
+    {
+      Alert = e.Message;
+      await ScrollTop();
     }
     catch (Exception e)
     {
@@ -418,7 +581,13 @@
 
   }
   
-  // Nav Buttons - Linked to side bar
+  // When there is an error - Scroll to top of page so User can see what's wrong
+  private async Task ScrollTop()
+  {
+    await JSRuntime.InvokeVoidAsync("scrollToTop");
+  }
+  
+  // Nav Buttons - Linked to nav & side bar
   public void Home()
   {
     NavigationManager.NavigateTo($"/dashboard/{Username}");

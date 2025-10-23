@@ -44,3 +44,7 @@ public class InvalidEmployeeIDException(string message) : Exception(message);
 public class AccountAlreadyExistsException(string message) : Exception(message);
 
 public class AccountBalanceGreaterThanZeroException(string message) : Exception(message);
+
+public class EmptyAccountFieldException(string message) : Exception(message);
+
+public class InvalidAccountFieldException(string message) : Exception(message);

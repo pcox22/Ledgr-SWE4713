@@ -290,7 +290,7 @@ public class Accountant : User
             {
                 while (reader.Read())
                 {
-                    for (int i = 0; i < 10; i++)
+                    for (int i = 0; i < 9; i++)
                     {
                         if (!reader.IsDBNull(i))
                         {

@@ -270,10 +270,12 @@
     public string Role { get; set; } = string.Empty;
     public int EntryLines { get; set; } = 0;
     public List<string> EntryBalances { get; set; } = new List<string>();
+    public List<string> AccountNumbers { get; set; } = new List<string>();
     public List<string> AccountNames { get; set; } = new List<string>();
     public List<string> SelectedValues { get; set; } = new List<string>();
     
     // Journal Specific
+    public string Comment { get; set; } = string.Empty;
     public List<string> AccountNameLine { get; set; } = new List<string>();
     public List<Double> DebitLines { get; set; } = new List<Double>();
     public List<Double> CreditLines { get; set; } = new List<Double>();
@@ -343,6 +345,7 @@
         List<string> Accounts = Account.GetAccounts("").Result;
         for (int i = 0; i < Accounts.Count; i += 15)
         {
+            AccountNumbers.Add(Accounts[i]);
             AccountNames.Add(Accounts[i + 1]);
             SelectedValues.Add(string.Empty);
             AccountNameLine.Add(string.Empty);
@@ -351,6 +354,26 @@
         }
         
         StateHasChanged();
+    }
+
+    public async void SubmitEntry()
+    {
+        if (Date == string.Empty)
+        {
+            Alert = "Please select an account for this journal entry";
+        }
+        else if (Difference != 0)
+        {
+            Alert = "Accounts are not balanced - Please verify Total of Debits is equal to Total of Credits";
+        }
+        else
+        {
+            int journalID = Accountant.CreateJournalEntry(Date, Description, Username);
+            for (int i = 0; i < DebitLines.Count; i++)
+            {
+                Accountant.CreateJournalEntryDetails(Convert.ToInt32(AccountNumbers[i]), DebitLines[i], "Debit", journalID);
+            }
+        }
     }
     
     // Nav Buttons - Linked to side bar

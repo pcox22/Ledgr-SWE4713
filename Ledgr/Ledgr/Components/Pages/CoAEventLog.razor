@@ -78,7 +78,7 @@
         <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
         </svg>
-        <span id="dateText">October 16th, 2025</span>
+        <span id="dateText">October 23rd, 2025</span>
     </button>
     <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -159,9 +159,10 @@
                     <thead>
                     <tr>
                         <th>Event ID</th>
+                        <th>Before/After</th>
                         <th>Account No</th>
                         <th>Account Name</th>
-                        <th>User</th>
+                        <th>User ID</th>
                         <th>Date/Time</th>
                         <th>Description</th>
                         <th class="text-right">Details</th>
@@ -172,10 +173,18 @@
                         int index = i;
                         <tr>
                             <td>@EventLog[index]</td>
+                            @if (EventLog[index + 1] == "a")
+                            {
+                                <td>After</td>
+                            }
+                            @if (EventLog[index + 1] == "b")
+                            {
+                            <td>Before</td>
+                            }
                             <td>@EventLog[index + 2]</td>
                             <td>@EventLog[index + 3]</td>
-                            <td>@EventLog[index + 17]</td>
                             <td>@EventLog[index + 16]</td>
+                            <td>@EventLog[index + 17]</td>
                             <td>@EventLog[index + 4]</td>
                             @if (Role == "Admin")
                             {

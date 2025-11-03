@@ -76,7 +76,7 @@
     <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
     </svg>
-    <span id="dateText">October 16th, 2025</span>
+    <span id="dateText">October 23rd, 2025</span>
   </button>
   <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -263,14 +263,25 @@
           <thead>
           <tr>
             <th>Event ID</th>
-            <th>Action</th>
-            <th>User</th>
+            <th>Account Number</th>
+            <th>Account Name</th>
+            <th>User ID</th>
             <th>Date/Time</th>
-            <th>Before</th>
-            <th>After</th>
-            <th>Comment</th>
+            <th>Description</th>
           </tr>
           </thead>
+          @for (int i = 0; i < EventLog.Count; i += 19)
+          {
+            int index = i;
+            <tr>
+              <td>@EventLog[index]</td>
+              <td>@EventLog[index + 2]</td>
+              <td>@EventLog[index + 3]</td>
+              <td>@EventLog[index + 13]</td>
+              <td>@EventLog[index + 12]</td>
+              <td>@EventLog[index + 4]</td>
+            </tr>
+          }
           <tbody id="eventRows">
           <tr class="muted"><td colspan="7" style="text-align:center; padding:16px;">No events yet</td></tr>
           </tbody>
@@ -329,6 +340,9 @@
   private string Comment { get; set; } = string.Empty;
   private bool Active { get; set; }
   
+  // Recent Changes
+  public List<string> EventLog { get; set; }
+  
   // Alerts
   public string Alert { get; set; } = string.Empty;
   
@@ -356,6 +370,8 @@
     Active = AccountDetails[14] == "1";
 
     Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+
+    EventLog = await Accountant.GetAccountEventLog(Convert.ToInt32(AccountNum));
     
 
     //UserID = user.GetUserID();

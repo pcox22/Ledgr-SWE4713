@@ -78,7 +78,7 @@
         <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
         </svg>
-        <span id="dateText">October 16th, 2025</span>
+        <span id="dateText">October 23rd1`, 2025</span>
     </button>
     <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -138,14 +138,48 @@
                     </div>
 
                     <div id="lineItems" class="line-items">
-                        
+                        @for (int i = 0; i < EntryLines; i++)
+                        {
+                            int index = i;
+                            <div class="line-item">
+                                <InputSelect @bind-Value="AccountNameLine[index]" @onchange="(e) => OnSelectChange(index, e)">
+                                    @for (int j = 0; j < AccountNames.Count; j++)
+                                    {
+                                        int index2 = j;
+                                        if (!SelectedValues.Contains(AccountNames[index]))
+                                        {
+                                            <option value="@AccountNames[index2]">@AccountNames[index2]</option>
+                                        }
+                                    }
+                                </InputSelect>
+                                <!-- Enable/Disable Debit Section approrpiately -->
+                                @if (CreditLines[index] != 0.00)
+                                {
+                                    <input placeholder="-- --" readonly style="text-align: center"/>
+                                }
+                                @if (CreditLines[index] == 0.00)
+                                {
+                                <InputNumber @bind-Value="DebitLines[index]" style="text-align: right"></InputNumber>
+                                }
+                                
+                                <!-- Enable / Disable the credit field appropriately -->
+                                @if (DebitLines[index] != 0.00)
+                                {
+                                    <input placeholder="-- --" style="text-align: center" readonly/>
+                                }
+                                @if (DebitLines[index] == 0.00)
+                                {
+                                <InputNumber @bind-Value="CreditLines[index]" style="text-align: right"></InputNumber>
+                                }
+                            </div>
+                        }
                     </div>
 
                     <div class="totals">
                         <div class="totals__row">
                             <span>Totals</span>
-                            <output id="totalDebit" class="num">$0.00</output>
-                            <output id="totalCredit" class="num">$0.00</output>
+                            <output id="totalDebit" class="num">$@TotalDebits</output>
+                            <output id="totalCredit" class="num">$@TotalCredits</output>
                             <span></span>
                         </div>
 
@@ -154,8 +188,25 @@
                         </div>
 
                         <div id="balanceState" class="balance balance--notok" aria-live="polite">
-                            <span class="badge badge--error" id="balanceBadge">Not Balanced</span>
-                            <span class="muted" id="balanceDiff">(Difference: $0.00)</span>
+                            @if (EntryLines < 2)
+                            {
+                                <span class="badge badge--error" id="balanceBadge">Not Balanced</span>
+                                <span class="muted" id="balanceDiff">Not enough Accounts</span>
+                            }
+                            @if (EntryLines >= 2)
+                            {
+                                if (Difference != 0)
+                                {
+                                    <span class="badge badge--error" id="balanceBadge">Not Balanced</span>
+                                    <span class="muted" id="balanceDiff">(Difference: $@DifferenceFormat)</span>
+                                }
+
+                                if (Difference == 0)
+                                {
+                                    <span class="badge badge--error" style="color: green" id="balanceBadge">Balanced</span>
+                                    <span class="muted" id="balanceDiff">(Difference: $@DifferenceFormat)</span>
+                                }
+                            }
                         </div>
                     </div>
                 </fieldset>
@@ -166,7 +217,7 @@
                     <InputTextArea @bind-Value="Description" id="jeDesc" rows="3" placeholder="Enter details about this journal entry…"></InputTextArea>
                 </label>
 
-                <!-- Attatchments -->
+                <!-- Attachments -->
                 <fieldset class="attachments">
                     <legend class="legend">Attach Documents <span class="muted">(optional)</span></legend>
                     <div class="attachments-inner">
@@ -218,22 +269,62 @@
     
     public string Role { get; set; } = string.Empty;
     public int EntryLines { get; set; } = 0;
-    public ArrayList? EntryBalances { get; set; }
+    public List<string> EntryBalances { get; set; } = new List<string>();
+    public List<string> AccountNames { get; set; } = new List<string>();
+    public List<string> SelectedValues { get; set; } = new List<string>();
+    
+    // Journal Specific
+    public List<string> AccountNameLine { get; set; } = new List<string>();
+    public List<Double> DebitLines { get; set; } = new List<Double>();
+    public List<Double> CreditLines { get; set; } = new List<Double>();
+
+    public double TotalDebits => DebitLines.Sum();
+    public double TotalCredits => CreditLines.Sum();
+    public double Difference => ((TotalDebits) - (TotalCredits));
+
+    public string TotalDebitsFormat => TotalDebits.ToString("F2");
+    public string TotalCreditsFormat => TotalDebits.ToString("F2");
+    public string DifferenceFormat => Difference.ToString("F2");
     
     // Passing Parameters
     public string Date { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    private IBrowserFile RefDoc;
+    private IBrowserFile? RefDoc;
+    
+    // Alerts
+    public string Alert { get; set; } = string.Empty;
     
 
     public void AddLine()
     {
-        EntryLines++;
+        try
+        {
+            if (EntryLines == AccountNames.Count)
+            {
+                throw new InsufficientAccountNamesException("Cannot have more journal entries than valid accounts");
+            }
+            EntryLines++;
+        }
+        catch (InsufficientAccountNamesException e)
+        {
+            Alert = e.Message;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
     }
 
     public async Task HandleFile(InputFileChangeEventArgs e)
     {
         RefDoc = e.File;
+    }
+
+    private void OnSelectChange(int index, ChangeEventArgs e)
+    {
+        SelectedValues[index] = e.Value?.ToString();
+        StateHasChanged();
     }
 
     private void ResetForm()
@@ -243,10 +334,23 @@
         RefDoc = null;
     }
     
-    // Get the permissions of the User
     protected override async Task OnParametersSetAsync()
     {
+        // Get the permissions of the User
         Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+        
+        // Gather each account and get the names of each of them
+        List<string> Accounts = Account.GetAccounts("").Result;
+        for (int i = 0; i < Accounts.Count; i += 15)
+        {
+            AccountNames.Add(Accounts[i + 1]);
+            SelectedValues.Add(string.Empty);
+            AccountNameLine.Add(string.Empty);
+            DebitLines.Add(0.00);
+            CreditLines.Add(0.00);
+        }
+        
+        StateHasChanged();
     }
     
     // Nav Buttons - Linked to side bar

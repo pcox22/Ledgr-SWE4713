@@ -60,6 +60,7 @@ body{
   margin: 0 auto;
   padding: 24px;
 }
+
 .container--center{
   display: grid;
   place-items: center;
@@ -94,13 +95,17 @@ body{
 
 /* ========= Card ========= */
 .card{
-  width: 420px;           /* matches your comp width */
+  width: 420px;          
   max-width: 92vw;
   background: var(--neutral-100);
   border: 1px solid var(--ui-400);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   padding: 24px 24px 20px;
+}
+.card1 {
+  position:relative;display:flex;flex-direction:column;min-width:0;word-wrap:break-word;background-color:#fff;
+  background-clip:border-box;border:1px solid rgba(0,0,0,.125);border-radius:.25rem
 }
 
 /* ========= Typography ========= */
@@ -460,6 +465,7 @@ body{
   padding-bottom: 96px;
 }
 
+/*
 .card{
   width: 420px;
   background: var(--white);
@@ -468,6 +474,7 @@ body{
   box-shadow: var(--shadow-card);
   padding: 24px;
 }
+*/
 
 
 /* Typography */

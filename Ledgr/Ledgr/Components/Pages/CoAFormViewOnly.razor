@@ -1,4 +1,4 @@
-@page "/CoAFormEdit/{Username}/{AccountNum}"
+@page "/CoAFormView/{Username}/{AccountNum}"
 @using LedgrLogic
 @inject NavigationManager NavigationManager
 
@@ -7,13 +7,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Add / Edit Account</title>
+  <title>View Account</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Base + Page Styles -->
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="accounts.css" />
-<!-- Base + Page Styles -->
-<link rel="stylesheet" href="/dashboard.css">
+  <link rel="stylesheet" href="/dashboard.css">
 </head>
 <body class="page page--dashboard">
 
@@ -101,12 +101,9 @@
 
   <!-- Form card -->
   <section class="card1 card--fluid card--animate" aria-labelledby="formTitle">
-    <div>
-      <header class="card__header">
-        <h1 id="formTitle" class="h2">Add / Edit Account</h1>
-        <p class="body1 muted">Fields marked * are required. <br>Account number must follow the category’s starting digit rule.</p>
-      </header>
-    </div>
+    <header class="card__header">
+      <h1 id="formTitle" class="h2">View Account</h1>
+    </header>
 
     <div id="formAlert" class="alert -error is-hidden" role="alert" aria-live="polite">
       <span class="alert__dot" aria-hidden="true"></span>
@@ -119,14 +116,14 @@
         <div class="form-col">
           <div class="input-group">
             <label class="label" for="accountName">Account Name *</label>
-            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" required/>
+            <InputText @bind-Value="AccountName" id="accountName" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" readonly />
             <p class="field-error" id="accountNameError"></p>
           </div>
 
           <!-- Account Nr. -->
           <div class="input-group">
             <label class="label" for="accountNo">Account Number *</label>
-            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" required/>
+            <InputText @bind-Value="AccountNumber" id="accountNo" class="input" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g., 101" title="Digits only • No decimals, spaces or letters" readonly />
             <small class="hint" id="acctHint">Assets start with <b>1</b>, Liabilities <b>2</b>, Equity <b>3</b>, Revenue <b>4</b>, Expense <b>5</b>.</small>
             <br>
             <small class="hint" id="acctHint">Digits only • No decimals, spaces or letters </small>
@@ -136,14 +133,14 @@
           <!-- Account Description -->
           <div class="input-group">
             <label class="label" for="description">Description</label>
-            <InputTextArea @bind-Value="Description" id="description" class="input" rows="3" placeholder="Short description"></InputTextArea>
+            <InputTextArea @bind-Value="Description" id="description" class="input" rows="3" placeholder="Short description" readonly></InputTextArea>
           </div>
 
           <!-- Normal Side -->
           <div class="grid grid--gap grid--cols-2">
             <div class="input-group">
-              <label class="label" for="normalSide">Normal Side *</label>
-              <InputSelect @bind-Value="NormalSide" id="normalSide" class="input" required>
+              <label class="label" for="normalSide">Normal Side</label>
+              <InputSelect @bind-Value="NormalSide" id="normalSide" class="input" readonly>
                 <option value="" selected>Select…</option>
                 <option value="Debit">Debit</option>
                 <option value="Credit">Credit</option>
@@ -153,8 +150,8 @@
             <!-- Account Category -->
             <div class="grid grid--gap grid--cols-2">
               <div class="input-group">
-                <label class="label" for="category">Category *</label>
-                <InputSelect @bind-Value="Category" id="category" class="input" required>
+                <label class="label" for="category">Category</label>
+                <InputSelect @bind-Value="Category" id="category" class="input" readonly>
                   <option value="" selected>Select…</option>
                   <option value="Asset">Asset</option>
                   <option value="Liability">Liability</option>
@@ -167,59 +164,59 @@
               <!-- Account Subcategory -->
               <div class="input-group">
                 <label class="label" for="subcategory">Subcategory</label>
-                <InputText @bind-Value="SubCategory" id="subcategory" class="input" type="text" placeholder="e.g., Current Assets"/>
+                <InputText @bind-Value="SubCategory" id="subcategory" class="input" type="text" placeholder="e.g., Current Assets" readonly/>
               </div>
             </div>
-
+            
             <!-- Balance + tracking fields section -->
             <div class="grid grid--gap grid--cols-2">
               <!-- Initial Balance -->
               <div class="input-group">
-                <label class="label" for="initialBalance">Initial Balance *</label>
-                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" required/>
+                <label class="label" for="initialBalance">Initial Balance</label>
+                <InputText @bind-Value="InitialBalance" id="initialBalance" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Debit -->
               <div class="input-group">
                 <label class="label" for="debit">Debit</label>
-                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly/>
+                <InputText @bind-Value="Debit" id="debit" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Credit -->
               <div class="input-group">
                 <label class="label" for="credit">Credit</label>
-                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly/>
+                <InputText @bind-Value="Credit" id="credit" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Balance -->
               <div class="input-group">
                 <label class="label" for="balance">Balance</label>
-                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly/>
+                <InputText @bind-Value="Balance" id="balance" class="input" type="number" step="0.01" readonly />
               </div>
 
               <!-- Date/Time Account Added -->
               <div class="input-group">
                 <label class="label" for="created">Date Created</label>
-                <InputText @bind-Value="DateCreated" id="created" class="input" readonly/>
+                <InputText @bind-Value="DateCreated" id="created" class="input" readonly />
               </div>
 
               <!-- User ID -->
               <div class="input-group">
                 <label class="label" for="addedBy">User ID</label>
-                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly/>
+                <InputText @bind-Value="Username" id="addedBy" class="input" type="text" readonly />
               </div>
 
               <!-- Order -->
               <div class="input-group">
                 <label class="label" for="order">Order</label>
-                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0"/>
+                <InputText @bind-Value="Order" id="order" class="input" type="number" step="1" min="0" readonly/>
               </div>
             </div>
 
             <!-- Statement -->
             <div class="input-group">
-              <label class="label" for="statement">Statement *</label>
-              <InputSelect @bind-Value="Statement" id="statement" class="input" required>
+              <label class="label" for="statement">Statement</label>
+              <InputSelect @bind-Value="Statement" id="statement" class="input" readonly>
                 <option value="" selected>Select…</option>
                 <option value="IS">Income Statement (IS)</option>
                 <option value="BS">Balance Sheet (BS)</option>
@@ -228,25 +225,20 @@
             </div>
           </div>
 
-          <!-- Comment -->
-          <div class="input-group">
-            <label class="label" for="comment">Comment (optional)</label>
-            <InputTextArea @bind-Value="Comment" id="comment" class="input" rows="3" placeholder="Reason for change"></InputTextArea>
-          </div>
-
           <!-- Active Status -->
           <div class="input-group">
-            <label class="label" for="active">Active </label>
+            <label class="label" for="active">Active</label>
             <div>
-              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" checked/>
+              <InputCheckbox @bind-Value="Active" id="active" type="checkbox" readonly/>
             </div>
           </div>
 
-
+          <!--
           <div class="row-right" style="margin-top:8px;">
             <button type="button" id="btnCancel" class="btn btn--secondary">Cancel</button>
             <button @onclick="CreateAccount" type="button" id="btnSave" class="btn btn--primary">Save</button>
           </div>
+          -->
         </div>
       </form>
     </div>
@@ -263,25 +255,14 @@
           <thead>
           <tr>
             <th>Event ID</th>
-            <th>Account Number</th>
-            <th>Account Name</th>
-            <th>User ID</th>
+            <th>Action</th>
+            <th>User</th>
             <th>Date/Time</th>
-            <th>Description</th>
+            <th>Before</th>
+            <th>After</th>
+            <th>Comment</th>
           </tr>
           </thead>
-          @for (int i = 0; i < EventLog.Count; i += 19)
-          {
-            int index = i;
-            <tr>
-              <td>@EventLog[index]</td>
-              <td>@EventLog[index + 2]</td>
-              <td>@EventLog[index + 3]</td>
-              <td>@EventLog[index + 13]</td>
-              <td>@EventLog[index + 12]</td>
-              <td>@EventLog[index + 4]</td>
-            </tr>
-          }
           <tbody id="eventRows">
           <tr class="muted"><td colspan="7" style="text-align:center; padding:16px;">No events yet</td></tr>
           </tbody>
@@ -311,8 +292,8 @@
     // Initialize the form page
     window.accountsForm?.init?.();
   </script>
-</body>
 <script src="/dashboard.js"></script>
+</body>
 </html>
 
 @code{
@@ -340,9 +321,6 @@
   private string Comment { get; set; } = string.Empty;
   private bool Active { get; set; }
   
-  // Recent Changes
-  public List<string> EventLog { get; set; }
-  
   // Alerts
   public string Alert { get; set; } = string.Empty;
   
@@ -350,8 +328,7 @@
   protected override async Task OnParametersSetAsync()
   {
     //Set Parameters here
-    Console.WriteLine(AccountNum);
-    List<string> AccountDetails = await Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum));
+    List<string> AccountDetails = Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum)).Result;
 
     AccountNumber = AccountDetails[0];
     AccountName = AccountDetails[1];
@@ -370,8 +347,6 @@
     Active = AccountDetails[14] == "1";
 
     Role = (await Admin.GetUserFromUserName(Username)).GetRole();
-
-    EventLog = await Accountant.GetAccountEventLog(Convert.ToInt32(AccountNum));
     
 
     //UserID = user.GetUserID();
@@ -442,6 +417,7 @@
   {
     NavigationManager.NavigateTo($"/pwReport/{Username}");
   }
+
   public void Journal()
   {
     NavigationManager.NavigateTo($"/journal/{Username}");

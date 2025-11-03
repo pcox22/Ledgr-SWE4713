@@ -12,39 +12,52 @@
     <!-- Global theme -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/dashboard.css">
     <!-- Accounts-only styles -->
     <link rel="stylesheet" href="accounts.css" />
 </head>
 
-<body class="page">
+<body class="page page--dashboard">
 
-<!-- Header -->
-<header class="app-header app-header--band">
-    <div class="app-header__inner">
-        <!-- Left: Brand -->
-        <a class="app-header__brand" href="/dashboard.html">
-            <img src="logo-slogan.png" class="app-header__logo" alt="LEDGR"/>
-        </a>
-        <!-- Center: Primary Nav (inside the dark band) -->
-        <nav class="nav nav--primary">
-            <a class="nav__link" @onclick="CoAList" href="#">Accounts</a>
-            <a class="nav__link" href="/je-create.html">Journal</a>
-            <a class="nav__link" href="/reports.html">Reports</a>
-            <a class="nav__link" href="/dashboard.html">Dashboard</a>
-        </nav>
 
-        <!-- Right: Notifications + User -->
-        <div class="app-header__right">
-            <button class="icon-btn" aria-label="Notifications">🔔</button>
-            <div class="user-chip">
-                <span class="avatar">A</span>
-                <span class="user-chip__text"><strong>@Username</strong>
-                    <span class="muted">Admin</span>
-                </span>
+<!-- HEADER -->
+<header class="app-header">
+    <div class="app-header__top">
+        <div class="brand">
+            <img src="/logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
+        </div>
+
+        <div class="user">
+            <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+                <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+                </svg>
+                <span class="user__name">Admin</span>
+                <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
+            </button>
+
+            <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+                <button @onclick="LogOut" class="menu__item" role="menuitem">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
+                    </svg>
+                    Log out
+                </button>
             </div>
-            <button class="icon-btn" aria-label="User menu">▾</button>
         </div>
     </div>
+
+    <nav class="app-nav" aria-label="Primary">
+        <div class="app-nav__inner">
+            <ul class="app-nav__list">
+                <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
+                <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
+                <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
+                <li><a @onclick="CoAEventLogCall" class="app-nav__link is-active" href="#">Event Log</a></li>
+                <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
+            </ul>
+        </div>
+    </nav>
 </header>
 
 <SideBar>
@@ -52,14 +65,43 @@
     <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
     <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
     <button @onclick="CoAEventLogCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
-    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    @if (Role == "Admin")
+    {
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
     <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+    }
 </SideBar>
+
+<!-- DATE DROPDOWN BOX -->
+<div class="toolbar">
+    <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+        </svg>
+        <span id="dateText">October 23rd, 2025</span>
+    </button>
+    <input id="dateInput" type="date" class="visually-hidden">
+</div>
+
+<!-- CALENDAR -->
+<div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
+    <div class="cal__inner">
+        <div class="cal__header">
+            <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+            <div id="calLabel" class="cal__label">October 2025</div>
+            <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+        </div>
+        <div class="cal__grid cal__dow">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div id="calGrid" class="cal__grid"></div>
+    </div>
+</div>
 
 <!-- Main -->
 <main class="container container--xl">
 
-    <section class="card card--fluid card--animate" aria-labelledby="logH">
+    <section class="card1 card--fluid card--animate" aria-labelledby="logH">
         <header class="card__header">
             <h1 id="logH" class="h2">Chart of Accounts — Event Log</h1>
             <p class="body1 muted">Filter and export all account changes.</p>
@@ -117,9 +159,10 @@
                     <thead>
                     <tr>
                         <th>Event ID</th>
+                        <th>Before/After</th>
                         <th>Account No</th>
                         <th>Account Name</th>
-                        <th>User</th>
+                        <th>User ID</th>
                         <th>Date/Time</th>
                         <th>Description</th>
                         <th class="text-right">Details</th>
@@ -130,12 +173,31 @@
                         int index = i;
                         <tr>
                             <td>@EventLog[index]</td>
+                            @if (EventLog[index + 1] == "a")
+                            {
+                                <td>After</td>
+                            }
+                            @if (EventLog[index + 1] == "b")
+                            {
+                            <td>Before</td>
+                            }
                             <td>@EventLog[index + 2]</td>
                             <td>@EventLog[index + 3]</td>
-                            <td>@EventLog[index + 17]</td>
                             <td>@EventLog[index + 16]</td>
+                            <td>@EventLog[index + 17]</td>
                             <td>@EventLog[index + 4]</td>
-                            <td><button type="button" class = "btn btn--secondary">View</button></td>
+                            @if (Role == "Admin")
+                            {
+                                <td><button @onclick="(() => AccountEdit(index))" type="button" class = "btn btn--secondary">View</button></td>
+                            }
+                            @if (Role == "Manager")
+                            {
+                            <td><button @onclick="(() => AccountView(index))" type="button" class = "btn btn--secondary">View</button></td>
+                            }
+                            @if (Role == "Accountant")
+                            {
+                            <td><button @onclick="(() => AccountView(index))" type="button" class = "btn btn--secondary">View</button></td>
+                            }
                         </tr>
                     }
                 </table>
@@ -166,19 +228,27 @@
 <!-- Global JS + Accounts module -->
 <script src="app.js"></script>
 <script src="accounts-events.js"></script>
+<script src="/dashboard.js"></script>
+
 </body>
 </html>
 @code{
 
     [Parameter] public string Username { get; set; }
     [Parameter] public string AcctNum { get; set; }
+    public string Role { get; set; } = string.Empty;
 
     private List<string> EventLog = Admin.GetEventLog("Account").Result;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+    }
     
     // Nav Buttons - Linked to side bar
     public void Home()
     {
-        NavigationManager.NavigateTo($"/adminHome/{Username}");
+        NavigationManager.NavigateTo($"/dashboard/{Username}");
     }
 
     public void CoAList()
@@ -194,9 +264,38 @@
     {
         NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
     }
+    public void ManageUser()
+    {
+        NavigationManager.NavigateTo($"/manageUsers/{Username}");
+    }
     public void PasswordReport()
     {
         NavigationManager.NavigateTo($"/pwReport/{Username}");
+    }
+    public void LogOut()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    
+    public void Journal()
+    {
+        NavigationManager.NavigateTo($"/journal/{Username}");
+    }
+    public void LedgerCall()
+    {
+        NavigationManager.NavigateTo($"/ledger/{Username}");
+    }
+    
+    public void AccountEdit(int index)
+    {
+        string AccountNum = EventLog[index + 2];
+        NavigationManager.NavigateTo($"/CoAFormEdit/{Username}/{AccountNum}"); 
+    }
+
+    public void AccountView(int index)
+    {
+        string AccountNum = EventLog[index + 2];
+        NavigationManager.NavigateTo($"/CoAFormView/{Username}/{AccountNum}"); 
     }
 
 }

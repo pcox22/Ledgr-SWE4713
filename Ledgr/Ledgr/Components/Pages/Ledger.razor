@@ -1,0 +1,296 @@
+@page "/ledger/{Username}"
+@using LedgrLogic
+@inject NavigationManager NavigationManager
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ledger • LEDGR</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Base + Page Styles -->
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/ledger.css" />
+    <link rel="stylesheet" href="/accounts.css" />
+
+</head>
+<body class="page page--ledger" data-page="ledger">
+
+<!-- ---------- HEADER ---------- -->
+<header class="app-header">
+    <div class="app-header__top">
+        <div class="brand">
+            <img src="logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
+        </div>
+
+        <div class="user">
+            <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+                <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+                </svg>
+                <span class="user__name">@Username</span>
+                <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
+            </button>
+
+            <!-- Dropdown -->
+            <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+                <button class="menu__item" role="menuitem" id="logoutBtn">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+                    Log out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Primary nav -->
+    <nav class="app-nav" aria-label="Primary">
+        <div class="app-nav__inner">
+            <ul class="app-nav__list">
+                <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
+                <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
+                <li><a @onclick="LedgerCall" class="app-nav__link is-active" href="#">Ledger</a></li>
+                <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
+                <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+
+<SideBar>
+    <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    @if (Role == "Admin")
+    {
+    <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+    <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+    }
+</SideBar>
+
+<!-- ---------- DATE PICKER ---------- -->
+<div class="toolbar">
+    <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+        </svg>
+        <span id="dateText">October 23rd, 2025</span>
+    </button>
+    <input id="dateInput" type="date" class="visually-hidden">
+</div>
+
+<!-- ---------- CALENDAR ---------- -->
+<div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
+    <div class="cal__inner">
+        <div class="cal__header">
+            <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+            <div id="calLabel" class="cal__label">October 2025</div>
+            <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+        </div>
+        <div class="cal__grid cal__dow">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div id="calGrid" class="cal__grid"></div>
+    </div>
+</div>
+
+<!-- ---------- MAIN CONTENT ---------- -->
+<main class="containerLedger">
+
+    <!-- Page Heading -->
+    <section class="page-head">
+        <div>
+            <h1 class="h2">Account Ledger</h1>
+            <h2 class="h3">Select an account from Chart of Accounts or use search.</h2>
+        </div>
+    </section>
+
+    <!-- Account summary card -->
+    <section id="accountCard" class="card1 hide">
+        <div class="grid grid--2">
+            <div>
+                <div class="muted">Account</div>
+                <div class="h3" id="acctName">—</div>
+                <div class="muted" id="acctNumber">—</div>
+            </div>
+            <div class="grid grid--2">
+                <div>
+                    <div class="muted">Normal Side</div>
+                    <div id="acctNormal">—</div>
+                </div>
+                <div>
+                    <div class="muted">Category</div>
+                    <div id="acctCategory">—</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ledger Table -->
+    <section class="card1">
+        <div class="table-wrap">
+            <table class="table" id="ledgerTable" role="grid" aria-label="Account ledger">
+                <!-- Filters -->
+                <section class="toolbar">
+                    <div class="toolbar__group">
+                        <label class="field">
+                            <span class="field__label">From</span>
+                            <input type="date" id="dateFrom" class="field__input" />
+                        </label>
+                        <label class="field">
+                            <span class="field__label">To</span>
+                            <input type="date" id="dateTo" class="field__input" />
+                        </label>
+                    </div>
+                    <div class="toolbar__group">
+                        <label class="field field--search">
+                            <span class="sr-only">Search</span>
+                            <input type="search" id="searchBox" class="field__input" placeholder="Search by account name, amount, or PR" />
+                        </label>
+                        <button id="clearFiltersBtn" class="btn btn--secondary">Clear</button>
+                        <button id="exportCsvBtn" class="btn btn--primary">Export CSV</button>
+                    </div>
+                </section>
+                <!-- Table: First Row -->
+                <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" class="num">Debit</th>
+                    <th scope="col" class="num">Credit</th>
+                    <th scope="col" class="num">Running Balance</th>
+                    <th scope="col">PR</th>
+                </tr>
+                </thead>
+                <tbody id="ledgerTbody">
+                <!-- rows injected dynamically -->
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th colspan="2" class="right">Totals</th>
+                    <th class="num" id="totalDebit">—</th>
+                    <th class="num" id="totalCredit">—</th>
+                    <th class="num" id="endingBalance">Ending Balance —</th>
+                    <th></th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Empty state message -->
+        <div id="emptyState" class="empty-state hide">
+            <p>No entries match your filters.</p>
+            <button id="resetFiltersBtn" class="btn btn--ghost">Reset filters</button>
+        </div>
+    </section>
+</main>
+
+<!-- ---------- JOURNAL MODAL (read-only) ---------- -->
+<dialog id="journalModal" class="modal">
+    <form method="dialog" class="modal__card">
+        <header class="modal__head">
+            <h2 class="h3">Journal Entry</h2>
+            <button class="icon-btn" value="close" aria-label="Close">✕</button>
+        </header>
+        <div class="modal__body" id="journalBody">
+            <!-- populated by JS -->
+        </div>
+        <footer class="modal__foot">
+            <button class="btn" value="close">Close</button>
+        </footer>
+    </form>
+</dialog>
+
+<!-- ---------- EVENT LOG MODAL ---------- -->
+<dialog id="eventLogModal" class="modal">
+    <form method="dialog" class="modal__card">
+        <header class="modal__head">
+            <h2 class="h3">Event Log</h2>
+            <button class="icon-btn" value="close" aria-label="Close">✕</button>
+        </header>
+        <div class="modal__body">
+            <div id="eventLogList"></div>
+        </div>
+        <footer class="modal__foot">
+            <button class="btn" value="close">Close</button>
+        </footer>
+    </form>
+</dialog>
+
+<!-- Footer -->
+<footer class="app-footer">
+    <div class="app-footer__inner">
+        <nav class="footer-nav">
+            <a href="/help.html" class="link">Help</a>
+            <a href="/privacy.html" class="link">Privacy</a>
+            <a href="/terms.html" class="link">Terms</a>
+        </nav>
+        <small class="muted">© 2025 LEDGR · Build v0.1</small>
+    </div>
+</footer>
+
+<!-- ---------- SCRIPTS ---------- -->
+<script src="/app.js"></script>
+<script src="/journal.js"></script>
+<script src="/ledger.js"></script>
+</body>
+</html>
+
+@code {
+
+    [Parameter] public string Username { get; set; }
+    
+    public string Role { get; set; } = string.Empty;
+    
+    // Get the permissions of the User
+    protected override async Task OnParametersSetAsync()
+    {
+        Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+    }
+    
+    public void Home()
+    {
+        NavigationManager.NavigateTo($"/dashboard/{Username}");
+    }
+
+    public void CoAList()
+    {
+        NavigationManager.NavigateTo($"/CoAList/{Username}");
+    }
+    
+    public void CoAForm()
+    {
+        NavigationManager.NavigateTo($"/CoAForm/{Username}");
+    }
+    public void CoAEventLog()
+    {
+        NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
+    }
+    public void Journal()
+    {
+        NavigationManager.NavigateTo($"/journal/{Username}");
+    }
+
+    public void LedgerCall()
+    {
+        NavigationManager.NavigateTo($"/ledger/{Username}");
+    }
+    public void ManageUser()
+    {
+        NavigationManager.NavigateTo($"/manageUsers/{Username}");
+    }
+    public void PasswordReport()
+    {
+        NavigationManager.NavigateTo($"/pwReport/{Username}");
+    }
+
+    public void LogOut()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+}

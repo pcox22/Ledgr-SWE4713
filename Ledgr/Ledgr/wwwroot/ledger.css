@@ -1,0 +1,202 @@
+/* ---------- Utilities (page-local) ---------- */
+.visually-hidden{
+    position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+}
+.icon{ width:22px; height:22px; fill:currentColor }
+
+/* ---------- Header / Brand bar ---------- */
+.app-header { position: sticky; top: 0; z-index: 1000; background: var(--brand-500); box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+.app-header__top{ display:flex; align-items:center; justify-content:space-between; padding:20px 24px 16px; }
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand__logo{ height:56px; width:auto; display:block; object-fit:contain; }
+
+.user{ position:relative; }
+.user__btn{
+    display:flex; align-items:center; gap:12px;
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.16);
+    color:#fff; padding:10px 14px; border-radius:14px; cursor:pointer;
+    transition: background .2s, border-color .2s;
+}
+.user__btn:hover{ background:rgba(255,255,255,.25); border-color:rgba(255,255,255,.35); }
+.user__name{ font-size:.95rem; }
+.icon--caret{ width:18px; height:18px; opacity:.9; }
+
+/* dropdown */
+/* UPDATE IN OTHER FILES. LOGOUT BUTTON NOW WORKS! */
+.menu{
+    position:absolute; right:0; top:calc(100% + 8px);
+    min-width:200px; background:var(--neutral-100); color:var(--ui-900);
+    border:1px solid var(--ui-400); border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card); padding:6px; display:none; z-index:20;
+}
+.menu.is-open{ display:block; }
+.menu__item{
+    width:100%; display:flex; align-items:center; gap:10px;
+    background:var(--neutral-100); border:0; padding:12px 14px;
+    border-radius:10px; cursor:pointer; font-weight:600; color:var(--ui-900);
+}
+.menu__item:hover{ background:var(--ui-200); }
+
+/* ---------- Primary nav ---------- */
+.app-nav{ padding:0 12px 16px; }
+.app-nav__inner{ max-width:1200px; margin:0 auto; }
+.app-nav__list{
+    list-style:none; margin:0; padding:0; display:flex; justify-content:space-evenly; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.app-nav__link{
+    display:inline-block; padding:10px 14px; border-radius:12px;
+    color:#D7E1F2; text-decoration:none; font-weight:600; font-size:.95rem;
+}
+.app-nav__link:hover{ background: rgba(255,255,255,.06); }
+.app-nav__link.is-active{ background:var(--neutral-100); color:var(--brand-500); }
+
+/* ---------- Date toolbar ---------- */
+/* UPDATE IN OTHER FILES. CALENDAR NOW WORKS! */
+.toolbar{
+    width:100%; margin:18px 0 0; padding:0 40px 6px;
+    display:flex; align-items:flex-start; justify-content:flex-start;
+}
+.date-btn{
+    display:flex; align-items:center; gap:10px;
+    background: var(--ui-200); border:1px solid var(--ui-400);
+    border-radius:16px; padding:12px 16px; color:var(--ui-900);
+    cursor:pointer; box-shadow: var(--shadow-card);
+    font-family: var(--font-body); font-size:.875rem; font-weight:500;
+}
+.date-btn:hover{ background: var(--ui-100); }
+
+/* ---------- Calendar popover ---------- */
+/* UPDATE IN OTHER FILES. CALENDAR NOW WORKS! */
+.cal[hidden]{ display:none; }
+.cal{ position:absolute; inset:auto auto auto 20px; margin-top:8px; z-index:30; }
+.cal__inner{
+    background:var(--neutral-100); border:1px solid var(--ui-400); border-radius:16px;
+    box-shadow: var(--shadow-card); padding:12px; width:320px;
+}
+.cal__header{ display:flex; align-items:center; justify-content:space-between; margin:4px 6px 8px; }
+.cal__label{ font-weight:700; }
+.cal__nav{
+    width:36px; height:36px; border-radius:10px; border:1px solid var(--ui-400);
+    background:var(--neutral-100); cursor:pointer; font-size:22px; line-height:1;
+}
+.cal__nav:hover{ background:var(--ui-200); }
+.cal__grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; padding:6px; }
+.cal__dow span{ text-align:center; font-weight:600; color:var(--ui-600); font-size:.85rem; }
+.cal__day{
+    display:flex; align-items:center; justify-content:center; height:40px;
+    border-radius:12px; border:1px solid transparent; cursor:pointer; font-weight:600;
+}
+.cal__day:hover{ background:var(--ui-200); }
+.cal__day.is-muted{ color: var(--ui-500); }
+.cal__day.is-today{ border-color: var(--brand-500); }
+.cal__day.is-selected{ background: var(--brand-500); color: var(--neutral-100); }
+
+/* ---------- Main container & page head ---------- */
+.containerLedger{ max-width:1440px; margin:0 auto; padding:0 20px 56px; }
+.page-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; margin:1.25rem 0; }
+
+/* ---------- Page toolbar (filters) ---------- */
+.toolbar + .toolbar{
+    display:flex; flex-wrap:wrap; align-items:end; justify-content:space-between; gap:1rem;
+    margin:0 0 1rem; padding:0 20px;
+}
+.toolbar__group{ display:flex; gap:.75rem; align-items:end; }
+.field{ display:grid; gap:.25rem; }
+.field__label{ font-size:.85rem; color:var(--text-muted, #667085); }
+.field__input{ min-width:11rem; }
+.field--search .field__input{ min-width:18rem; }
+
+/* ---------- Cards ---------- */
+.card1{
+    width:100%; margin:0 auto; display:block;
+    max-width:clamp(960px, 88vw, 1280px);
+    padding:24px 28px; background:var(--neutral-100);
+    border:1px solid var(--ui-400); border-radius:16px;
+    box-shadow: var(--shadow-card); transition: transform .2s ease, box-shadow .2s ease;
+}
+.card:hover{ transform: translateY(-3px); box-shadow: 0 4px 18px rgba(20,30,50,.1); }
+.card.hide{ display:none; }
+.muted{ color: var(--ui-600); }
+
+#accountCard .grid{ display:grid; grid-template-columns: 1.2fr 1fr; gap:2rem; }
+
+/* ---------- Ledger table style ---------- */
+.table-wrap{ overflow:auto; }
+
+/* base table */
+.table{
+    width:100%;
+    border-collapse: separate; border-spacing: 0;
+    font-size:.95rem;
+}
+
+/* header */
+.table thead th{
+    position:sticky; top:0;
+    background: var(--ui-200);
+    color: var(--ui-900);
+    padding:12px 14px;
+    border-top:1px solid var(--ui-400);
+    border-bottom:1px solid var(--ui-400);
+    text-align:left;
+}
+.table thead th.num{ text-align:right; }
+
+/* body */
+.table tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--ui-300);
+}
+.table tbody td.num{ text-align:right; }
+
+/* indent credit lines */
+#ledgerTable tbody tr.credit td:first-child,
+#ledgerTable tbody tr.credit td:nth-child(2) {
+    padding-left: 3rem;
+}
+
+/* zebra */
+.table tbody tr:nth-child(even) td{ background: var(--ui-100); }
+
+/* rounded corners for table in a card */
+.table thead th:first-child{ border-top-left-radius:12px; }
+.table thead th:last-child{ border-top-right-radius:12px; }
+
+/* footer */
+.table tfoot th{
+    background: var(--neutral-100);
+    padding:12px 14px;
+    border-top:1px solid var(--ui-400);
+}
+
+.table tfoot th.num {
+    text-align: right;
+}
+#endingBalance{ font-weight:700; }
+
+/* ---------- Empty state ---------- */
+.empty-state{ text-align:center; padding:1.25rem; color:var(--text-muted, #667085); }
+.empty-state.hide{ display:none; }
+
+/* ---------- Modals ---------- */
+.modal{ border:0; border-radius:.75rem; padding:0; width:min(880px, 96vw); }
+.modal__card{ border:0; padding:0; }
+.modal__head{
+    padding:1rem 1.25rem; border-bottom:1px solid var(--border, #E4E7EC);
+    display:flex; align-items:center; justify-content:space-between;
+}
+.modal__body{ padding:1rem 1.25rem; }
+.modal__foot{
+    padding:1rem 1.25rem; border-top:1px solid var(--border, #E4E7EC);
+    display:flex; justify-content:flex-end; gap:.5rem;
+}
+.icon-btn{ background:transparent; border:0; line-height:1; font-size:1rem; cursor:pointer; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px){
+    .toolbar + .toolbar .toolbar__group{ width:100%; }
+    .field__input{ width:100%; min-width:unset; }
+    #accountCard .grid{ grid-template-columns: 1fr; gap:1rem; }
+}

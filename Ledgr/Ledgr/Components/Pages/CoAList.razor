@@ -14,39 +14,51 @@
   <link rel="stylesheet" href="styles.css" />
   <!-- Accounts-only styles -->
   <link rel="stylesheet" href="accounts.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+
 </head>
 
 <body class="page">
   
 <!-- Header -->
-<header class="app-header app-header--band">
-  <div class="app-header__inner">
-    <!-- Left: Brand -->
-    <a class="app-header__brand" href="/dashboard.html" aria-label="LEDGR Home">
-      <img src="logo-slogan.png" alt="LEDGR — The smart way to balance business" class="app-header__logo" />
-    </a>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="app-header__top">
+    <div class="brand">
+      <img src="/logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
+    </div>
 
-    <!-- Center: Primary Nav (inside the dark band) -->
-    <nav class="nav nav--primary">
-      <NavLink class="nav__link is-active" href="/CoAList">Accounts</NavLink>
-      <NavLink class="nav__link" href="../journal/je-create.html">Journal</NavLink>
-      <NavLink class="nav__link" href="../reports/reports.html">Reports</NavLink>
-      <NavLink class="nav__link" href="../dashboard.html">Dashboard</NavLink>
-    </nav>
+    <div class="user">
+      <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+        <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+        </svg>
+        <span class="user__name">@Username</span>
+        <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
+      </button>
 
-    <!-- Right: Notifications + User -->
-    <div class="app-header__right">
-      <button class="icon-btn bell" aria-label="Notifications">🔔</button>
-      <div class="user-chip" title="Signed in as">
-        <span class="avatar" aria-hidden="true">A</span>
-        <span class="user-chip__text">
-          <strong id="userName">Admin User</strong>
-          <span class="muted">Admin</span>
-        </span>
+      <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+        <button @onclick="LogOut" class="menu__item" role="menuitem">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
+          </svg>
+          Log out
+        </button>
       </div>
-      <button class="icon-btn caret" aria-label="User menu" title="User menu">▾</button>
     </div>
   </div>
+
+  <nav class="app-nav" aria-label="Primary">
+    <div class="app-nav__inner">
+      <ul class="app-nav__list">
+        <li><a @onclick="Home" class="app-nav__link" href="#">Dashboard</a></li>
+        <li><a @onclick="CoAListCall" class="app-nav__link is-active" href="#">Chart of Accounts</a></li>
+        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
+        <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
+        <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
 <SideBar>
@@ -54,9 +66,38 @@
   <button @onclick="CoAListCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
   <button @onclick="CoAForm" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
   <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
-  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  @if (Role == "Admin")
+  {
+  <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
   <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+  }
 </SideBar>
+
+<!-- DATE DROPDOWN BOX -->
+<div class="toolbar">
+  <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+    <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+    </svg>
+    <span id="dateText">October 23rd, 2025</span>
+  </button>
+  <input id="dateInput" type="date" class="visually-hidden">
+</div>
+
+<!-- CALENDAR -->
+<div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
+  <div class="cal__inner">
+    <div class="cal__header">
+      <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+      <div id="calLabel" class="cal__label">October 2025</div>
+      <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+    </div>
+    <div class="cal__grid cal__dow">
+      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+    </div>
+    <div id="calGrid" class="cal__grid"></div>
+  </div>
+</div>
 
 <!-- Main -->
 <main class="container container--xl">
@@ -76,7 +117,7 @@
     <button type="button" @onclick="AddAccount" class="btn btn--primary btn--small" role="button">Add Account</button>
   </section>
 
-  <section class="card card--fluid" aria-labelledby="coaTitle">      
+  <section class="card1 card--fluid" aria-labelledby="coaTitle">      
     <header class="card__header">
       <h1 id="coaTitle" class="h2">Chart of Accounts</h1>
       <p class="body1 muted">Search and filter accounts; click an account to open its ledger.</p>
@@ -146,7 +187,7 @@
 
     <div class="card__body">
       <div class="table-actions">
-        <a href="./coa-event-log.html" class="btn btn--secondary" type="button" title="View all account changes">View Event Log</a>
+        <a @onclick="CoAEventLog" href="#" class="btn btn--secondary" type="button" title="View all account changes">View Event Log</a>
         <button id="btnExportCsv" class="btn btn--secondary" type="button">Export CSV</button>
       </div>
 
@@ -164,8 +205,8 @@
           <tr>
             <th>Account No.</th>
             <th>Name</th>
-            <th>Description</th>
-            <th>Normal Side</th>
+            <!-- th>Description</th -->
+            <!-- <th>Normal Side</th> -->
             <th>Category</th>
             <th>Subcategory</th>
             <th>Initial Balance</th>
@@ -191,8 +232,8 @@
 
                 <td>@Accounts[index]</td>
                 <td>@Accounts[index + 1]</td>
-                <td>@Accounts[index + 2]</td>
-                <td>@Accounts[index + 3]</td>
+                <!-- td>@Accounts[index + 2]</td -->
+                <!-- <td>@Accounts[index + 3]</td> -->
                 <td>@Accounts[index + 4]</td>
                 <td>@Accounts[index + 5]</td>
                 <td>@Accounts[index + 6]</td>
@@ -204,7 +245,18 @@
                 <td>@Accounts[index + 12]</td>
                 <td>@Accounts[index + 13]</td>
                 <td>@Accounts[index + 14]</td>
-                <td><button @onclick="(() => EventLogEdit(index))" type="button" class="btn btn-primary">View</button></td>
+                @if (Role == "Admin")
+                {
+                  <td><button @onclick="(() => AccountEdit(index))" type="button" class="btn btn-primary">View</button></td>
+                }
+                @if (Role == "Manager")
+                {
+                  <td><button @onclick="(() => AccountView(index))" type="button" class="btn btn-primary">View</button></td>
+                }
+                @if (Role == "Accountant")
+                {
+                <td><button @onclick="(() => AccountView(index))" type="button" class="btn btn-primary">View</button></td>
+                }
               </tr>
             } 
           }
@@ -236,17 +288,17 @@
 <footer class="app-footer">
   <div class="app-footer__inner">
     <nav class="footer-nav">
-      <a href="../help.html" class="link">Help</a>
-      <a href="../privacy.html" class="link">Privacy</a>
-      <a href="../terms.html" class="link">Terms</a>
+      <a href="/help.html" class="link">Help</a>
+      <a href="/privacy.html" class="link">Privacy</a>
+      <a href="/terms.html" class="link">Terms</a>
     </nav>
     <small class="muted">© 2025 LEDGR · Build v0.1</small>
   </div>
 </footer>
 
 <!-- Global JS + Accounts module -->
-<script src="../assets/js/app.js"></script>
-<script src="../assets/js/accounts.js"></script> 
+<script src="app.js"></script>
+<script src="accounts.js"></script> 
 <script>
   window.addEventListener('DOMContentLoaded', function(){
     window.coa?.initListPage?.({
@@ -271,6 +323,7 @@
 @code{
 
   [Parameter] public string? Username { get; set; }
+  public string Role { get; set; } = string.Empty;
 
   private List<string> Accounts = Account.GetAccounts("").Result;
   private bool showActions { get; set; } = false;
@@ -285,6 +338,11 @@
   private string AcctMin { get; set; } = string.Empty;
   private string AcctMax { get; set; } = string.Empty;
   private string Search { get; set; } = string.Empty;
+
+  protected override async Task OnParametersSetAsync()
+  {
+    Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+  }
   
   public void showActionsDialog(int index)
   {
@@ -300,7 +358,7 @@
   // Nav Buttons - Linked to side bar
   public void Home()
   {
-    NavigationManager.NavigateTo($"/adminHome/{Username}");
+    NavigationManager.NavigateTo($"/dashboard/{Username}");
   }
 
   public void CoAListCall()
@@ -321,10 +379,35 @@
     NavigationManager.NavigateTo($"/pwReport/{Username}");
   }
 
-  public void EventLogEdit(int index)
+  public void AccountEdit(int index)
   {
     string AccountNum = Accounts[index];
     NavigationManager.NavigateTo($"/CoAFormEdit/{Username}/{AccountNum}"); 
+  }
+
+  public void AccountView(int index)
+  {
+    string AccountNum = Accounts[index];
+    NavigationManager.NavigateTo($"/CoAFormView/{Username}/{AccountNum}"); 
+  }
+
+  public void Journal()
+  {
+    NavigationManager.NavigateTo($"/journal/{Username}"); 
+  }
+  public void LedgerCall()
+  {
+    NavigationManager.NavigateTo($"/ledger/{Username}");
+  }
+  public void ManageUser()
+  {
+    NavigationManager.NavigateTo($"/manageUsers/{Username}"); 
+  }
+
+  public void LogOut()
+  {
+    NavigationManager.NavigateTo("/"); 
+
   }
 
 }

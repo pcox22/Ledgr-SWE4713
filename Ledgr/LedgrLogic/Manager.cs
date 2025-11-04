@@ -898,10 +898,9 @@ public class Manager : User
             {
                 while (reader.Read())
                 {
-                    for(int i=0; i<1;i++){
-                        incomeStatement.Add(reader.GetString(i));
-                        char normalSide = reader.GetChar(i + 1);
-                        relevantEntries = GetLedgerByDateRange(toDate, fromDate, reader.GetInt32(i));
+                        incomeStatement.Add(reader.GetString(0));
+                        char normalSide = reader.GetChar(1);
+                        relevantEntries = GetLedgerByDateRange(toDate, fromDate, reader.GetInt32(0));
                         List<string> temp = new List<string>();
                         
                         //creating a list containing only DebitCredit and Amount to get the total
@@ -915,7 +914,6 @@ public class Manager : User
 
                         double balance = GetAccountBalance(temp, normalSide);
                         incomeStatement.Add("" + balance);
-                    }
                 }
             }
             connection.Close();

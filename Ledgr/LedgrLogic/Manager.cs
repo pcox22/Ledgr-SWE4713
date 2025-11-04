@@ -34,8 +34,8 @@ public class Manager : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
+            
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
             insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -82,8 +82,8 @@ public class Manager : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
+            
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
             insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -130,8 +130,8 @@ public class Manager : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
+            
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
             insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -557,17 +557,18 @@ public class Manager : User
     //GetLedger returns all approved journal entries for a specific account, orders them by Date (asc)/ also gets acct info
     //To get Normal side for an account, you can use Account.GetAccountFromAccountNumber and get the 3rd element in the list
     //(DONE) (NOT TESTED)
-    public static List<string> GetLedger()
+    public static List<string> GetLedger(int accountNum)
     {
         List<string> ledger = new List<string>();
         try
         {
             var sql =
-                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' ORDER BY JED.DebitCredit DESC, JE.Date ASC";
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' AND Acct.Number = @NUM ORDER BY JED.DebitCredit DESC, JE.Date ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
             var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NUM", accountNum);
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -575,7 +576,14 @@ public class Manager : User
                 {
                     for (int i = 0; i < 6; i++)
                     {
-                        ledger.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            ledger.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            ledger.Add("");
+                        }
                     }
                 }
             }
@@ -598,6 +606,50 @@ public class Manager : User
     
     //CreateJournalEntry() creates a new entry in the JournalEntry table, and returns the ID of that new entry
     //Comments and reference docs are optional, so there will be multiple methods but with different paramaters
+    public static List<string> GetLedgerByDateRange(string toDate, string fromDate, int accountNum)
+    {
+        List<string> ledger = new List<string>();
+        try
+        {
+            var sql =
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' AND Acct.Number = @ACCOUNT AND JE.Date BETWEEN @FIRST AND @LAST BY JED.DebitCredit DESC, JE.Date ASC";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+            
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ACCOUNT", accountNum);
+            command.Parameters.AddWithValue("@FIRST", fromDate);
+            command.Parameters.AddWithValue("@LAST", toDate);
+            
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        if (!reader.IsDBNull(i))
+                        {
+                            ledger.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            ledger.Add("");
+                        }
+                    }
+                }
+            }
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return ledger;
+    }
+    
     public static int CreateAdjustingJournalEntry(string date, string comment, Blob reference, string username)
     { 
         int userID = GetUserFromUserName(username).Result.GetUserID();
@@ -619,8 +671,7 @@ public class Manager : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
             insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -666,8 +717,7 @@ public class Manager : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
             insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -714,8 +764,7 @@ public class Manager : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
             insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -761,8 +810,7 @@ public class Manager : User
                 /*var selectSql =
                     "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-                var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
-
+                var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
                 var selectCommand = new SqliteCommand(selectSql, connection);
                 /*insertCommand.Parameters.AddWithValue("@DATE", date);
                 insertCommand.Parameters.AddWithValue("@STATUS", 'P');
@@ -846,13 +894,16 @@ public class Manager : User
         return entries;
     }
     
-    //Financial Statements
+//Financial Statements
     public static List<string> GetIncomeStatement(string fromDate, string toDate)
     {
         List<string> incomeStatement = new List<string>();
+        List<string> relevantEntries = new List<string>();
         try
         {
-            var sql = "Select Acct.Name, JED.Amount, JED.DebitCredit, JED.NormalSide FROM JournalEntryDetails AS JED INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Category = 'Revenue' OR Acct.Category = 'Expense' AND Date BETWEEN @START AND @LAST ORDER BY Acct.Category DESC, Acct.Order ASC";
+            //var sql = "Select Acct.Name, JED.Amount, JED.DebitCredit, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Category = 'Revenue'  AND JE.Date BETWEEN '2025-10-01' AND '2025-11-03' OR Acct.Category = 'Expense'  AND JE.Date BETWEEN @START AND @LAST ORDER BY Acct.Category DESC, Acct.\"Order\" ASC";
+            var sql =
+                "SELECT Acct.Number, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Name = 'Revenue' AND JE.Date BETWEEN @FIRST AND @LAST OR Acct.Name = 'Expense' AND JE.Date BETWEEN @FIRST AND @LAST ORDER BY Acct.\"Order\" ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -868,12 +919,29 @@ public class Manager : User
             {
                 while (reader.Read())
                 {
-                    for(int i=0; i<3;i++){
+                    for(int i=0; i<1;i++){
                         incomeStatement.Add(reader.GetString(i));
+                        char normalSide = reader.GetChar(i + 1);
+                        relevantEntries = GetLedgerByDateRange(toDate, fromDate, reader.GetInt32(i));
+                        List<string> temp = new List<string>();
+                        
+                        //creating a list containing only DebitCredit and Amount to get the total
+                        for (int j = 0; j < relevantEntries.Count / 6; j++)
+                        {
+                            for (int k = 4; k < 6; k++)
+                            {
+                                temp.Add(relevantEntries[k]);
+                            }
+                        }
+
+                        double balance = GetAccountBalance(temp, normalSide);
+                        incomeStatement.Add("" + balance);
                     }
                 }
             }
             connection.Close();
+            
+            
         }
         catch (Exception e)
         {
@@ -882,5 +950,45 @@ public class Manager : User
         }
 
         return incomeStatement;
+    }
+
+    //Takes in a list of entries for a single account, list contains Amount and DebitCredit
+    public static double GetAccountBalance(List<string> entries, char normalSide)
+    {
+        double balance = 0.00;
+        
+            for (int i = 0; i < ((entries.Count / 2) - 1); i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    if (normalSide == 'R')
+                    {
+                        if (entries[j].Equals("Debit"))
+                        {
+                            j++;
+                            balance += double.Parse(entries[j]);
+                        }
+                        else
+                        {
+                            j++;
+                            balance -= double.Parse(entries[j]);
+                        }
+                    }
+                    else
+                    {
+                        if (entries[j].Equals("Debit"))
+                        {
+                            j++;
+                            balance -= double.Parse(entries[j]);
+                        }
+                        else
+                        {
+                            j++;
+                            balance += double.Parse(entries[j]);
+                        }
+                    }
+                }
+            }
+        return balance;
     }
 }

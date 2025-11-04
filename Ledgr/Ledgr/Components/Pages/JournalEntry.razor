@@ -230,7 +230,7 @@
                 <div class="form-actions">
                     <!--<button type="button" id="saveDraft" class="btn btn--secondary">Save Draft</button>-->
                     <button @onclick="ResetForm" type="button" id="resetForm" class="btn btn--secondary">Reset Form</button>
-                    <button type="submit" id="submitForApproval" class="btn btn--primary">Submit for Approval</button>
+                    <button @onclick="SubmitEntry" type="button" id="submitForApproval" class="btn btn--primary">Submit for Approval</button>
                 </div>
 
                 <!-- Activity Log 
@@ -371,7 +371,17 @@
             int journalID = Accountant.CreateJournalEntry(Date, Description, Username);
             for (int i = 0; i < DebitLines.Count; i++)
             {
-                Accountant.CreateJournalEntryDetails(Convert.ToInt32(AccountNumbers[i]), DebitLines[i], "Debit", journalID);
+                if (DebitLines[i] != 0)
+                {
+                    Accountant.CreateJournalEntryDetails(Convert.ToInt32(AccountNumbers[i]), DebitLines[i], "Debit", journalID);
+                }
+            }
+            for (int i = 0; i < CreditLines.Count; i++)
+            {
+                if (CreditLines[i] != 0)
+                {
+                    Accountant.CreateJournalEntryDetails(Convert.ToInt32(AccountNumbers[i]), CreditLines[i], "Credit", journalID);
+                }
             }
         }
     }

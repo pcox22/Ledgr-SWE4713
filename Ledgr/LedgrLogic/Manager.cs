@@ -882,7 +882,7 @@ public class Manager : User
         {
             //var sql = "Select Acct.Name, JED.Amount, JED.DebitCredit, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Category = 'Revenue'  AND JE.Date BETWEEN '2025-10-01' AND '2025-11-03' OR Acct.Category = 'Expense'  AND JE.Date BETWEEN @START AND @LAST ORDER BY Acct.Category DESC, Acct.\"Order\" ASC";
             var sql =
-                "SELECT Acct.Number, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Name = 'Revenue' AND JE.Date BETWEEN @FIRST AND @LAST OR Acct.Name = 'Expense' AND JE.Date BETWEEN @FIRST AND @LAST ORDER BY Acct.\"Order\" ASC";
+                "SELECT Acct.Name, Acct.Number, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Name = 'Revenue' AND JE.Date BETWEEN @FIRST AND @LAST OR Acct.Name = 'Expense' AND JE.Date BETWEEN @FIRST AND @LAST ORDER BY Acct.\"Order\" ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -899,8 +899,8 @@ public class Manager : User
                 while (reader.Read())
                 {
                         incomeStatement.Add(reader.GetString(0));
-                        char normalSide = reader.GetChar(1);
-                        relevantEntries = GetLedgerByDateRange(toDate, fromDate, reader.GetInt32(0));
+                        char normalSide = reader.GetChar(2);
+                        relevantEntries = GetLedgerByDateRange(toDate, fromDate, reader.GetInt32(1));
                         List<string> temp = new List<string>();
                         
                         //creating a list containing only DebitCredit and Amount to get the total

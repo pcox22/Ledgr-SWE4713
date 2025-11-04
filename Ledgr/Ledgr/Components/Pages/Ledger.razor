@@ -1,4 +1,4 @@
-@page "/ledger/{Username}"
+@page "/ledger/{Username}/{AccountNum}"
 @using LedgrLogic
 @inject NavigationManager NavigationManager
 
@@ -243,13 +243,21 @@
 @code {
 
     [Parameter] public string Username { get; set; }
+    [Parameter] public string AccountNum { get; set; }
     
     public string Role { get; set; } = string.Empty;
+    public List<string> LedgerList { get; set; }
     
-    // Get the permissions of the User
+    // Get the permissions of the User and Initialize data for page
     protected override async Task OnParametersSetAsync()
     {
         Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+        LedgerList = Manager.GetLedger(Convert.ToInt32(AccountNum));
+        Console.WriteLine(AccountNum);
+        foreach (string field in LedgerList)
+        {
+            Console.WriteLine(field);
+        }
     }
     
     public void Home()

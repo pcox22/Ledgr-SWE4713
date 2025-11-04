@@ -204,7 +204,8 @@
   }
   public void LedgerCall()
   {
-    NavigationManager.NavigateTo($"/ledger/{Username}");
+    // Temp account number
+    NavigationManager.NavigateTo($"/ledger/{Username}/{1001}");
   }
   public void ManageUser()
   {

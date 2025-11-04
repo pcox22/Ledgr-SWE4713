@@ -469,17 +469,18 @@ public class Accountant : User
     //GetLedger returns all approved journal entries for a specific account, orders them by Date (asc)/ also gets acct info
     //To get Normal side for an account, you can use Account.GetAccountFromAccountNumber and get the 3 element in the list
     //(DONE) (NOT TESTED)
-    public static List<string> GetLedger()
+    public static List<string> GetLedger(int accountNum)
     {
         List<string> ledger = new List<string>();
         try
         {
             var sql =
-                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' ORDER BY JED.DebitCredit DESC, JE.Date ASC";
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' AND Acct.Number = @NUM ORDER BY JED.DebitCredit DESC, JE.Date ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
             var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@NUM", accountNum);
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
@@ -487,7 +488,58 @@ public class Accountant : User
                 {
                     for (int i = 0; i < 6; i++)
                     {
-                        ledger.Add(reader.GetString(i));
+                        if (!reader.IsDBNull(i))
+                        {
+                            ledger.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            ledger.Add("");
+                        }
+                    }
+                }
+            }
+            connection.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return ledger;
+    }
+    
+    public static List<string> GetLedgerByDateRange(string toDate, string fromDate, int accountNum)
+    {
+        List<string> ledger = new List<string>();
+        try
+        {
+            var sql =
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' AND Acct.Number = @ACCOUNT AND JE.Date BETWEEN @FIRST AND @LAST BY JED.DebitCredit DESC, JE.Date ASC";
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+            
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@ACCOUNT", accountNum);
+            command.Parameters.AddWithValue("@FIRST", fromDate);
+            command.Parameters.AddWithValue("@LAST", toDate);
+            
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        if (!reader.IsDBNull(i))
+                        {
+                            ledger.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            ledger.Add("");
+                        }
                     }
                 }
             }

@@ -945,12 +945,12 @@ public class Manager : User
                         if (entries[j].Equals("Debit"))
                         {
                             j++;
-                            balance += double.Parse(entries[j]);
+                            balance -= double.Parse(entries[j]);
                         }
                         else
                         {
                             j++;
-                            balance -= double.Parse(entries[j]);
+                            balance += double.Parse(entries[j]);
                         }
                     }
                     else

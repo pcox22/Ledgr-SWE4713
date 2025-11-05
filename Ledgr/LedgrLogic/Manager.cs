@@ -968,4 +968,109 @@ public class Manager : User
             }
         return balance;
     }
+
+    public static List<string> GetBalanceSheetCategory(string fromDate, string toDate, string category)
+    {
+        List<string> balanceSheet = new List<string>();
+        var sql = "";
+        switch (category)
+        {
+            case "Asset":
+                sql =
+                    "SELECT Acct.Name, Acct.Number, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Name = 'Asset' AND JE.Date BETWEEN @FIRST AND @LAST ORDER BY Acct.\"Order\" ASC";
+                break;
+            case "Liability":
+                sql =
+                    "SELECT Acct.Name, Acct.Number, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Name = 'Liability' AND JE.Date BETWEEN @FIRST AND @LAST ORDER BY Acct.\"Order\" ASC";
+                break;
+            case "Equity":
+                sql =
+                    "SELECT Acct.Name, Acct.Number, Acct.NormalSide FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE Acct.Name = 'Capital' AND JE.Date BETWEEN @FIRST AND @LAST ORDER BY Acct.\"Order\" ASC";
+                break;
+        }
+        
+        try
+        {
+            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+            connection.Open();
+
+            var command = new SqliteCommand(sql, connection);
+            command.Parameters.AddWithValue("@START", fromDate);
+            command.Parameters.AddWithValue("@LAST", toDate);
+
+            command.ExecuteNonQuery();
+
+
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    List<string> returnedEntries = new List<string>();
+                    balanceSheet.Add(reader.GetString(0));
+                    char normalSide = reader.GetChar(2);
+                    List<string> relevantEntries = GetLedgerByDateRange(toDate, fromDate, reader.GetInt32(1));
+                    List<string> temp = new List<string>();
+
+                    //creating a list containing only DebitCredit and Amount to get the total
+                    for (int j = 0; j < relevantEntries.Count / 6; j++)
+                    {
+                        for (int k = 4; k < 6; k++)
+                        {
+                            temp.Add(relevantEntries[k]);
+                        }
+                    }
+
+                    double balance = GetAccountBalance(temp, normalSide);
+                    balanceSheet.Add("" + balance);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return balanceSheet;
+    }
+
+    public static List<string> GetBalanceSheet(string fromDate, string toDate)
+    {
+        List<string> balanceSheet = new List<string>();
+        try
+        {
+            //getting assets first
+            List<string> temp = new List<string>();
+            temp = GetBalanceSheetCategory(fromDate, toDate, "Asset");
+            //putting the assets into the balance sheet
+            for (int i = 0; i < temp.Count; i++)
+            {
+                balanceSheet.Add(temp[i]); 
+            }
+            
+            //getting liabilities next
+            temp = GetBalanceSheetCategory(fromDate, toDate, "Liability");
+            //putting the liabilities into the balance sheet
+            for (int i = 0; i < temp.Count; i++)
+            {
+                balanceSheet.Add(temp[i]); 
+            }
+            
+            //getting equity last
+            temp = GetBalanceSheetCategory(fromDate, toDate, "Equity");
+            //putting the equity into the balance sheet
+            for (int i = 0; i < temp.Count; i++)
+            {
+                balanceSheet.Add(temp[i]); 
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return balanceSheet;
+    }
 }

@@ -1073,4 +1073,31 @@ public class Manager : User
 
         return balanceSheet;
     }
+
+    public static List<string> GetTrialBalance(string fromDate, string toDate)
+    {
+        List<string> trialBalance = new List<string>();
+        try
+        {
+            //adds stuff from balance sheet
+            trialBalance = GetBalanceSheet(fromDate, toDate);
+            
+            //adds revenue and expenses
+            List<string> temp = GetIncomeStatement(fromDate, toDate);
+            for (int i = 0; i < temp.Count/2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    trialBalance.Add(temp[j]);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return trialBalance;
+    }
 }

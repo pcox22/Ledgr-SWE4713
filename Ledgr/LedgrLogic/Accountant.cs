@@ -450,7 +450,7 @@ public class Accountant : User
         try
         {
             var sql =
-                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' ORDER BY JED.DebitCredit DESC, JE.Date ASC";
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount, JED.ID FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' ORDER BY JED.DebitCredit DESC, JE.Date ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -460,7 +460,7 @@ public class Accountant : User
             {
                 while (reader.Read())
                 {
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 7; i++)
                     {
                         ledger.Add(reader.GetString(i));
                     }
@@ -724,5 +724,25 @@ public class Accountant : User
         }
 
         return entries;
+    }
+
+    public static string GetNextJEDNumber()
+    {
+        using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+        var sql = "Select ID From JournalEntry ORDER BY ID DESC LIMIT 1";
+        var selectCommand = new SqliteCommand(sql, connection);
+        
+        connection.Open();
+        using var reader = selectCommand.ExecuteReader();
+        string ID = "";
+        if (reader.HasRows)
+        {
+            while (reader.Read())
+            {
+                ID = Convert.ToString(reader.GetInt32(0) + 1);
+            }
+        }
+        connection.Close();
+        return ID;
     }
 }

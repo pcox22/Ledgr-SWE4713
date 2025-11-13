@@ -230,8 +230,8 @@
               int index = i;
               <tr class="muted">
 
-                <td>@Accounts[index]</td>
-                <td>@Accounts[index + 1]</td>
+                <td><a @onclick="(() => ViewLedger(Accounts[index]))" href="#">@Accounts[index]</a></td>
+                <td><a @onclick="(() => ViewLedger(Accounts[index]))" href="#">@Accounts[index + 1]</a></td>
                 <!-- td>@Accounts[index + 2]</td -->
                 <!-- <td>@Accounts[index + 3]</td> -->
                 <td>@Accounts[index + 4]</td>
@@ -354,6 +354,11 @@
   {
     NavigationManager.NavigateTo($"/CoAForm/{Username}");
   }
+
+  public void ViewLedger(string acctNum)
+  {
+    NavigationManager.NavigateTo($"/ledger/{Username}/{acctNum}");
+  }
   
   // Nav Buttons - Linked to side bar
   public void Home()
@@ -403,11 +408,9 @@
   {
     NavigationManager.NavigateTo($"/manageUsers/{Username}"); 
   }
-
   public void LogOut()
   {
     NavigationManager.NavigateTo("/"); 
-
   }
 
 }

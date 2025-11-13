@@ -563,7 +563,7 @@ public class Manager : User
         try
         {
             var sql =
-                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' AND Acct.Number = @NUM ORDER BY JED.DebitCredit DESC, JE.Date ASC";
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount, JED.ID FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' AND Acct.Number = @NUM ORDER BY JED.DebitCredit DESC, JE.Date ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -572,10 +572,9 @@ public class Manager : User
             using var reader = command.ExecuteReader();
             if (reader.HasRows)
             {
-                Console.WriteLine("Connected");
                 while (reader.Read())
                 {
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 7; i++)
                     {
                         if (!reader.IsDBNull(i))
                         {
@@ -588,7 +587,6 @@ public class Manager : User
                     }
                 }
             }
-            Console.WriteLine("Disconnected");
             connection.Close();
         }
         catch (Exception e)

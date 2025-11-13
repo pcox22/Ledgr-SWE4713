@@ -116,7 +116,7 @@
         <div class="form-col">
           <div class="input-group">
             <label class="label" >Username</label>
-            <InputText @bind-Value="Username" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" readonly />
+            <InputText @bind-Value="UsernameEdit" class="input" type="text" autocomplete="off" placeholder="e.g., Cash" readonly />
             <p class="field-error" id="accountNameError"></p>
           </div>
 
@@ -164,7 +164,7 @@
           <div class="grid grid--gap grid--cols-2">
             <div class="input-group">
               <label class="label" for="normalSide">Role</label>
-              <InputSelect @bind-Value="Role" id="normalSide" class="input" required>
+              <InputSelect @bind-Value="NewRole" id="normalSide" class="input" required>
                 <option value="" selected>...Select</option>
                 <option value="Admin">Admin</option>
                 <option value="Manager">Manager</option>
@@ -219,22 +219,30 @@
 
   [Parameter] public string Username { get; set; }
   [Parameter] public string TargetUser { get; set; }
+  
+  // Permissions
+  private string Role { get; set; }
 
+  // Update Data
+  private string UsernameEdit { get; set; } = string.Empty;
   private int UserID { get; set; } = -1;
   private string Email { get; set; } = string.Empty;
   private string FN { get; set; } = string.Empty;
   private string LN { get; set; } = string.Empty;
   private string DoB { get; set; } = string.Empty;
   private string Address { get; set; } = string.Empty;
-  private string Role { get; set; } = string.Empty;
+  private string NewRole { get; set; } = string.Empty;
   private bool Active { get; set; } = false;
   
 
   
   protected override async Task OnParametersSetAsync()
   {
+    Role = Admin.GetUserFromUserName(Username).Result.GetRole();
+    
     User user = await User.GetUserFromUserName(TargetUser);
 
+    UsernameEdit = user.GetUserName();
     UserID = user.GetUserID();
     Email = user.GetEmail();
     Active = user.GetIsActive();
@@ -242,8 +250,9 @@
     LN = user.GetLastName();
     DoB = user.GetDoB();
     Address = user.GetAddress();
-    Role = user.GetRole();
+    NewRole = user.GetRole();
     StateHasChanged();
+    
   }
 
   public async void SaveChanges()

@@ -218,6 +218,7 @@
     private async Task EditUser(int index)
     {
         string targetUsername = users[index + 1];
+        Console.WriteLine(targetUsername);
         NavigationManager.NavigateTo($"/editUser/{Username}/{targetUsername}");
     }
 

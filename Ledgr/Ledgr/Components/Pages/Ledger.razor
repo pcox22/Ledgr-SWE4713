@@ -1,5 +1,7 @@
 @page "/ledger/{Username}/{AccountNum}"
 @using LedgrLogic
+@using Microsoft.AspNetCore.Components.Sections
+@using MudBlazor.Charts
 @inject NavigationManager NavigationManager
 
 <!doctype html>
@@ -114,17 +116,13 @@
         <div class="grid grid--2">
             <div>
                 <div class="muted">Account</div>
-                <div class="h3" id="acctName">—</div>
-                <div class="muted" id="acctNumber">—</div>
+                <div class="h3" id="acctName">@AccountDetails[1]</div>
+                <div class="muted" id="acctNumber">@AccountDetails[0]</div>
             </div>
             <div class="grid grid--2">
                 <div>
-                    <div class="muted">Normal Side</div>
-                    <div id="acctNormal">—</div>
-                </div>
-                <div>
                     <div class="muted">Category</div>
-                    <div id="acctCategory">—</div>
+                    <div id="acctCategory">@AccountDetails[4]</div>
                 </div>
             </div>
         </div>
@@ -133,49 +131,77 @@
     <!-- Ledger Table -->
     <section class="card1">
         <div class="table-wrap">
+             <!-- Filters -->
+            <section class="toolbar">
+                <div class="toolbar__group">
+                    <label class="field">
+                        <span class="field__label">From</span>
+                        <input type="date" id="dateFrom" class="field__input"/>
+                    </label>
+                    <label class="field">
+                        <span class="field__label">To</span>
+                        <input type="date" id="dateTo" class="field__input"/>
+                    </label>
+                </div>
+                <div class="toolbar__group">
+                    <label class="field field--search">
+                        <!--span class="sr-only">Search</!--span-->
+                        <input type="search" id="searchBox" class="field__input" placeholder="Search by account name, amount, or PR"/>
+                    </label>
+                    <button id="clearFiltersBtn" class="btn btn--secondary">Clear</button>
+                    <button id="exportCsvBtn" class="btn btn--primary">Export CSV</button>
+                </div>
+            </section>
             <table class="table" id="ledgerTable" role="grid" aria-label="Account ledger">
-                <!-- Filters -->
-                <section class="toolbar">
-                    <div class="toolbar__group">
-                        <label class="field">
-                            <span class="field__label">From</span>
-                            <input type="date" id="dateFrom" class="field__input" />
-                        </label>
-                        <label class="field">
-                            <span class="field__label">To</span>
-                            <input type="date" id="dateTo" class="field__input" />
-                        </label>
-                    </div>
-                    <div class="toolbar__group">
-                        <label class="field field--search">
-                            <span class="sr-only">Search</span>
-                            <input type="search" id="searchBox" class="field__input" placeholder="Search by account name, amount, or PR" />
-                        </label>
-                        <button id="clearFiltersBtn" class="btn btn--secondary">Clear</button>
-                        <button id="exportCsvBtn" class="btn btn--primary">Export CSV</button>
-                    </div>
-                </section>
                 <!-- Table: First Row -->
                 <thead>
                 <tr>
                     <th scope="col">Date</th>
                     <th scope="col">Description</th>
-                    <th scope="col" class="num">Debit</th>
-                    <th scope="col" class="num">Credit</th>
-                    <th scope="col" class="num">Running Balance</th>
+                    <th scope="col" >Debit</th>
+                    <th scope="col" >Credit</th>
+                    <th scope="col" >Running Balance</th>
                     <th scope="col">PR</th>
                 </tr>
                 </thead>
                 <tbody id="ledgerTbody">
-                <!-- rows injected dynamically -->
+                @for (int i = 0; i < LedgerList.Count; i += 7)
+                {
+                    int index = i;
+                    <tr>
+                        <td>@LedgerList[index + 2]</td>
+                        @if (LedgerList[index + 3] == string.Empty)
+                        {
+                            <td>-- --</td>
+                        }
+                        @if (LedgerList[index + 3] != string.Empty)
+                        {
+                            <td>@LedgerList[index + 3]</td>
+                        }
+                        @if (LedgerList[index + 4] == "Debit")
+                        {
+                            <td>@LedgerList[index + 5]</td>
+                            <td></td>
+
+                        }
+                        @if (LedgerList[index + 4] == "Credit")
+                        {
+                            <td></td>
+                            <td>@LedgerList[index + 5]</td>
+                        }
+                        <td>@RunningBalance[index / 7]</td>
+                        <td>JE-@LedgerList[index + 6]</td>
+                    </tr>
+                }
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="2" class="right">Totals</th>
-                    <th class="num" id="totalDebit">—</th>
-                    <th class="num" id="totalCredit">—</th>
-                    <th class="num" id="endingBalance">Ending Balance —</th>
+                    <th class="">Totals</th>
                     <th></th>
+                    <th class="num" id="totalDebit">@FormattedDebits</th>
+                    <th class="num" id="totalCredit">@FormattedCredits</th>
+                    <th class="num" id="endingBalance">Ending Balance</th>
+                    <th>@RunningBalance[RunningBalance.Count - 1]</th>
                 </tr>
                 </tfoot>
             </table>
@@ -236,7 +262,7 @@
 <!-- ---------- SCRIPTS ---------- -->
 <script src="/app.js"></script>
 <script src="/journal.js"></script>
-<script src="/ledger.js"></script>
+<!--script src="/ledger.js"></!--script-->
 </body>
 </html>
 
@@ -247,16 +273,62 @@
     
     public string Role { get; set; } = string.Empty;
     public List<string> LedgerList { get; set; }
+    public List<string> RunningBalance { get; set; } = new List<string>();
+    public List<string> AccountDetails;
+
+    public List<double> TotalDebits { get; set; } = new List<double>();
+    public List<double> TotalCredits { get; set; } = new List<double>();
+
+    public string FormattedDebits => TotalDebits.Sum().ToString("F2");
+    public string FormattedCredits => TotalCredits.Sum().ToString("F2");
+    
+    
+
     
     // Get the permissions of the User and Initialize data for page
     protected override async Task OnParametersSetAsync()
     {
+        AccountDetails =  Account.GetAccountFromAccountNumber(Convert.ToInt32(AccountNum)).Result;
         Role = (await Admin.GetUserFromUserName(Username)).GetRole();
         LedgerList = Manager.GetLedger(Convert.ToInt32(AccountNum));
-        Console.WriteLine(AccountNum);
-        foreach (string field in LedgerList)
+        
+        for (int i = 0; i < LedgerList.Count; i+=7)
         {
-            Console.WriteLine(field);
+            // Separate Section for Balance Handling
+            if (LedgerList[i + 4] == "Debit")
+            {
+                TotalDebits.Add(Convert.ToDouble(LedgerList[i+5]));
+            }
+            else
+            {
+                TotalCredits.Add(Convert.ToDouble(LedgerList[i+5]));
+            }
+            
+            if (RunningBalance.Count == 0)
+            {
+                if (LedgerList[i + 4] == "Credit")
+                {
+                    string formattedBalanceNeg = (Convert.ToDouble(LedgerList[i + 5]) * -1).ToString("F2");
+                    RunningBalance.Add(formattedBalanceNeg);
+                    continue;
+                }
+                string formattedBalance = (Convert.ToDouble(LedgerList[i + 5])).ToString("F2");
+                RunningBalance.Add(formattedBalance);
+                continue;
+            }
+
+            if (LedgerList[i + 4] == "Credit")
+            {
+                double sub = Convert.ToDouble(LedgerList[i + 5]);
+                double diff = Convert.ToDouble(RunningBalance[(i/7) - 1]) - sub;
+                string formDiff = diff.ToString("F2");
+                RunningBalance.Add(formDiff);
+                continue;
+            } 
+            double add = Convert.ToDouble(LedgerList[i + 5]);
+            double sum = Convert.ToDouble(RunningBalance[(i/7) - 1]) + add;
+            string formSum = sum.ToString("F2");
+            RunningBalance.Add(formSum);
         }
     }
     

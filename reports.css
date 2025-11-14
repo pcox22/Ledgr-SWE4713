@@ -1,0 +1,75 @@
+/* ---- Adjusting Journal: tabs + filters ---- */
+.tabs { margin-top: .75rem; }
+.tabs input[type="radio"] { display: none; }
+
+.tabs label[role="tab"] {
+  display: inline-block;
+  padding: .45rem .9rem;
+  margin-right: .25rem;
+  border-radius: .75rem;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: .9rem;
+}
+
+.tab-panel {
+  display: none;
+  border-radius: 1rem;
+  padding: .75rem .75rem 1rem;
+  background: #f8fafc;
+  margin-top: .5rem;
+}
+
+#tabPending:checked ~ #panelPending,
+#tabApproved:checked ~ #panelApproved,
+#tabRejected:checked ~ #panelRejected {
+  display: block;
+}
+
+.filters {
+  background: #f8fafc;
+  border-radius: .75rem;
+  padding: .6rem .75rem;
+  margin: .6rem 0 1rem;
+}
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr auto;
+  gap: .5rem;
+  align-items: end;
+}
+.filter-group label {
+  display: block;
+  font-size: .8rem;
+  color: #64748b;
+  margin-bottom: .2rem;
+}
+.filter-actions { text-align: right; }
+
+.tab-panel .table th.right,
+.tab-panel .table td.right { text-align: right; }
+
+/* alert (errors) */
+.alert.alert-danger {
+  color: #b91c1c;
+  background: #fee2e2;
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid #fecaca;
+}
+.alert[hidden] { display: none !important; }
+
+/* misc */
+.req { color: #dc2626; }
+.btn--sm { padding: 8px 14px; font-size: .85rem; }
+
+/* OVERRIDES */
+/* Adjusting Journal: make the Adjusting Entry Lines fieldset span both columns */
+.page-adjusting-journal #ajeForm {display: block;}
+
+.page-adjusting-journal #ajeForm > .field-group {
+  grid-column: 1 / -1;   /* span full width of the grid */
+  width: 100%;
+}

@@ -1,0 +1,108 @@
+/* Statement of Retained Earnings (reports-retained-earnings.html) */
+
+.page-report-retained-earnings .cards {
+  margin-top: 24px;
+}
+
+.page-report-retained-earnings .report-card--retained-earnings {
+  padding-bottom: 24px;
+}
+
+/* Filters – same pattern as other reports */
+
+.report-filters {
+  margin-top: 16px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.report-filters__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.report-filters__row--secondary {
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 8px;
+}
+
+.report-filters .filter-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+}
+
+.report-filters .filter-group label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.export-actions {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Report body */
+
+.report-body {
+  margin-top: 18px;
+}
+
+.report-header {
+  margin-bottom: 8px;
+}
+
+.report-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Table styles */
+
+.report-table thead th {
+  background: #f8fafc;
+}
+
+.report-table .right {
+  text-align: right;
+}
+
+.subtotal-row td {
+  border-top: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+
+.report-totals {
+  background: #eef2f7;
+  font-weight: 700;
+}
+
+/* Utility */
+.small {
+  font-size: 0.8rem;
+}
+
+@media (max-width: 720px) {
+  .report-filters__row {
+    align-items: stretch;
+  }
+
+  .export-actions {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,71 @@
+/* Reports Landing Page (manager-reports.html) */
+
+.page-manager-reports .reports-landing {
+  margin-top: 24px;
+}
+
+.page-manager-reports .reports-card-wrap {
+  padding-bottom: 24px;
+}
+
+/* Grid of report tiles */
+.reports-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .reports-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Individual report card (clickable) */
+.report-card {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  text-decoration: none;
+  color: inherit;
+  transition: background .12s ease, box-shadow .12s ease, transform .12s ease;
+}
+
+.report-card:hover {
+  background: #f1f5f9;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Icon circle (TB / IS / BS / RE) */
+.report-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  background: #0f172a;
+  color: #f9fafb;
+}
+
+/* Text */
+.report-card__title {
+  font-family: var(--font-head, "Oswald", system-ui, sans-serif);
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+}
+
+.report-card__desc {
+  margin: 0;
+  font-size: .9rem;
+  color: #6b7280;
+}

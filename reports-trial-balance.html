@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trial Balance • LEDGR</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Base Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/journal.css" />
+  <link rel="stylesheet" href="assets/css/reports.css" />
+  <link rel="stylesheet" href="assets/css/reports-trial-balance.css" />
+</head>
+
+<body class="page page-report-trial-balance">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-header__top">
+      <div class="brand">
+        <img src="assets/img/logo.png" alt="LEDGR Logo" class="brand__logo" />
+      </div>
+
+      <div class="user">
+        <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+          <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+          </svg>
+          <span class="user__name">Manager</span>
+          <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 10l5 5 5-5H7z"/>
+          </svg>
+        </button>
+
+        <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+          <button class="menu__item" role="menuitem" id="logoutBtn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
+            </svg>
+            Log out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="app-nav" aria-label="Primary">
+      <div class="app-nav__inner">
+        <ul class="app-nav__list">
+          <li><a class="app-nav__link" href="dashboard.html">Dashboard</a></li>
+          <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
+          <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+          <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
+          <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+          <li><a class="app-nav__link" href="manager-adjusting-entries.html">Adjusting Entries</a></li>
+          <li><a class="app-nav__link is-active" href="manager-reports.html">Reports</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- DATE BAR -->
+  <div class="toolbar">
+    <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+      <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+      </svg>
+      <span id="dateText">October 16th, 2025</span>
+    </button>
+    <input id="dateInput" type="date" class="visually-hidden">
+  </div>
+
+  <!-- MAIN -->
+  <main class="container">
+    <section class="cards">
+      <article class="card card--page report-card report-card--trial-balance">
+        <!-- Header -->
+        <header class="page-head page-head--stack">
+          <div>
+            <h1 class="h2">Trial Balance</h1>
+            <p class="muted">
+              View all account balances and confirm that total debits equal total credits for a selected date or period.
+            </p>
+          </div>
+          <div class="page-head__actions">
+            <a href="manager-reports.html" class="btn btn--ghost btn--sm">Back to Reports</a>
+          </div>
+        </header>
+
+        <!-- Filters / Controls -->
+        <form class="report-filters" method="get" data-form="trial-balance" data-action="generate-trial-balance">
+          <div class="report-filters__row">
+            <div class="filter-group">
+              <label for="tbAsOf">As of date</label>
+              <input type="date" id="tbAsOf" name="asOf" />
+            </div>
+
+            <div class="filter-group">
+              <label for="tbBasis">Basis</label>
+              <select id="tbBasis" name="basis">
+                <option value="accrual">Accrual</option>
+                <option value="cash">Cash</option>
+              </select>
+            </div>
+
+            <div class="filter-actions">
+              <button type="submit" class="btn btn--primary">Generate</button>
+            </div>
+          </div>
+
+          <div class="report-filters__row report-filters__row--secondary">
+            <span class="muted small">
+              Use the controls below to save or share this report once generated.
+            </span>
+            <div class="export-actions">
+              <button type="button" class="btn btn--secondary btn--sm">Save</button>
+              <button type="button" class="btn btn--secondary btn--sm">Email</button>
+              <button type="button" class="btn btn--secondary btn--sm">Print</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Report body -->
+        <section class="report-body">
+          <header class="report-header">
+            <h2 class="report-title">Trial Balance</h2>
+            <p class="muted small" id="tbPeriodLabel">
+              As of October 31, 2025
+            </p>
+          </header>
+
+          <div class="table-wrap">
+            <table class="table table-hover report-table">
+              <thead>
+                <tr>
+                  <th>Account No.</th>
+                  <th>Account Name</th>
+                  <th class="right">Debit</th>
+                  <th class="right">Credit</th>
+                </tr>
+              </thead>
+              <tbody id="tbBody">
+                <!-- Example static rows for layout -->
+                <tr>
+                  <td>1010</td>
+                  <td>Cash</td>
+                  <td class="right">$12,500.00</td>
+                  <td class="right">—</td>
+                </tr>
+                <tr>
+                  <td>1200</td>
+                  <td>Accounts Receivable</td>
+                  <td class="right">$4,800.00</td>
+                  <td class="right">—</td>
+                </tr>
+                <tr>
+                  <td>2000</td>
+                  <td>Accounts Payable</td>
+                  <td class="right">—</td>
+                  <td class="right">$6,300.00</td>
+                </tr>
+                <tr>
+                  <td>3000</td>
+                  <td>Owner’s Equity</td>
+                  <td class="right">—</td>
+                  <td class="right">$11,000.00</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="report-totals">
+                  <th colspan="2">Totals</th>
+                  <td class="right" id="tbTotalDebit">$17,300.00</td>
+                  <td class="right" id="tbTotalCredit">$17,300.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <p class="muted small">
+            The trial balance is used to verify that total debits equal total credits before preparing financial statements.
+          </p>
+        </section>
+      </article>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="app-footer__inner">
+      <nav class="footer-nav">
+        <a href="help.html" class="link">Help</a>
+        <a href="privacy.html" class="link">Privacy</a>
+        <a href="terms.html" class="link">Terms</a>
+      </nav>
+      <small class="muted">© 2025 LEDGR · Build v0.1</small>
+    </div>
+  </footer>
+
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

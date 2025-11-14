@@ -1,5 +1,3 @@
-/* Uses tokens from assets/css/styles.css */
-
 /* ---------- Utilities ---------- */
 .visually-hidden{
   position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
@@ -170,5 +168,210 @@
   .card__icon {
     justify-self: center;
     margin-bottom: 12px;
+  }
+}
+
+/* ---------- Dashboard layout ---------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(260px, 1fr);
+  gap: 24px;
+  margin: 32px 0 0;
+}
+
+.dashboard-panel {
+  background: var(--neutral-100);
+  border: 1px solid var(--ui-400);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 20px 22px 24px;
+}
+
+.section-header {
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font: 600 1.1rem/1.3 var(--font-head);
+  margin: 0 0 4px;
+}
+
+.section-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ui-600);
+}
+
+/* ---------- Ratio cards ---------- */
+.ratio-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.ratio-card {
+  border-radius: 12px;
+  border: 1px solid var(--ui-300);
+  padding: 14px 16px;
+  background: var(--neutral-100);
+  display: grid;
+  gap: 4px;
+  box-shadow: 0 1px 4px rgba(10, 20, 40, 0.04);
+}
+
+.ratio-card__name {
+  font-weight: 600;
+  margin: 0;
+}
+
+.ratio-card__value {
+  font: 700 1.4rem/1 var(--font-head);
+  margin: 2px 0;
+}
+
+.ratio-card__formula {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ui-600);
+}
+
+/* Color codes (Requirement 123) */
+.ratio--good {
+  border-color: #1f8c4d;
+  background: #e4f7eb;
+}
+
+.ratio--warning {
+  border-color: #c4971d;
+  background: #fff5da;
+}
+
+.ratio--bad {
+  border-color: #c0392b;
+  background: #ffe4e0;
+}
+
+/* ---------- Ratio table ---------- */
+.ratio-table-wrapper {
+  margin-top: 20px;
+}
+
+.ratio-table__title {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.ratio-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.ratio-table th,
+.ratio-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--ui-300);
+  text-align: left;
+}
+
+.ratio-table th {
+  background: var(--ui-100);
+  font-weight: 600;
+}
+
+.status-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-dot::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.status-dot--good::before {
+  background: #1f8c4d;
+}
+
+.status-dot--warning::before {
+  background: #c4971d;
+}
+
+.status-dot--bad::before {
+  background: #c0392b;
+}
+
+/* ---------- Messages & legend ---------- */
+.dashboard-side {
+  display: grid;
+  gap: 16px;
+  align-content: flex-start;
+}
+
+.messages-panel {
+  min-height: 140px;
+}
+
+.messages-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.messages-list li {
+  font-size: 0.9rem;
+}
+
+.messages-list__empty {
+  color: var(--ui-600);
+  font-style: italic;
+}
+
+/* Legend */
+.legend-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.legend-dot--good {
+  background: #1f8c4d;
+}
+
+.legend-dot--warning {
+  background: #c4971d;
+}
+
+.legend-dot--bad {
+  background: #c0392b;
+}
+
+.legend-label {
+  font-size: 0.9rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
 }

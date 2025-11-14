@@ -1,4 +1,4 @@
-const $ = (sel, root=document) => root.querySelector(sel);
+const $ = window.$, $$ = window.$$;  
 
 /* === User dropdown === */
 (() => {
@@ -136,3 +136,40 @@ const $ = (sel, root=document) => root.querySelector(sel);
     setPretty(selected); render();
   });
 })();
+
+// ---------- Ratios + messages helpers ----------
+
+function updateRatioCard(id, value, status) {
+  const valueEl = document.getElementById(id);
+  if (!valueEl) return;
+
+  valueEl.textContent = value ?? "--";
+
+  // Status is "good" | "warning" | "bad"
+  const card = valueEl.closest(".ratio-card");
+  if (!card || !status) return;
+
+  card.classList.remove("ratio--good", "ratio--warning", "ratio--bad");
+  card.classList.add(`ratio--${status}`);
+}
+
+function setImportantMessages(messages) {
+  const list = document.getElementById("messagesList");
+  if (!list) return;
+
+  list.innerHTML = "";
+
+  if (!messages || messages.length === 0) {
+    const li = document.createElement("li");
+    li.className = "messages-list__empty";
+    li.textContent = "No important messages at this time.";
+    list.appendChild(li);
+    return;
+  }
+
+  messages.forEach(msg => {
+    const li = document.createElement("li");
+    li.textContent = msg;
+    list.appendChild(li);
+  });
+}

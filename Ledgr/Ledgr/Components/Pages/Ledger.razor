@@ -158,10 +158,10 @@
                 <tr>
                     <th scope="col">Date</th>
                     <th scope="col">Description</th>
+                    <th scope="col">PR</th>
                     <th scope="col" >Debit</th>
                     <th scope="col" >Credit</th>
                     <th scope="col" >Running Balance</th>
-                    <th scope="col">PR</th>
                 </tr>
                 </thead>
                 <tbody id="ledgerTbody">
@@ -178,6 +178,7 @@
                         {
                             <td>@LedgerList[index + 3]</td>
                         }
+                        <td>JE-@LedgerList[index + 6]</td>
                         @if (LedgerList[index + 4] == "Debit")
                         {
                             <td>@LedgerList[index + 5]</td>
@@ -190,18 +191,17 @@
                             <td>@LedgerList[index + 5]</td>
                         }
                         <td>@RunningBalance[index / 7]</td>
-                        <td>JE-@LedgerList[index + 6]</td>
                     </tr>
                 }
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th class="">Totals</th>
-                    <th></th>
-                    <th class="num" id="totalDebit">@FormattedDebits</th>
-                    <th class="num" id="totalCredit">@FormattedCredits</th>
-                    <th class="num" id="endingBalance">Ending Balance</th>
-                    <th>@RunningBalance[RunningBalance.Count - 1]</th>
+                    <td class="" scope="col">Totals</td>
+                    <td scope="col"></td>
+                    <td class="num" scope="col" id="endingBalance"></td>
+                    <td class="num" scope="col" id="totalDebit">$@FormattedDebits</td>
+                    <td class="num" scope="col" id="totalCredit">$@FormattedCredits</td>
+                    <td scope="col">$@RunningBalance[RunningBalance.Count - 1]</td>
                 </tr>
                 </tfoot>
             </table>

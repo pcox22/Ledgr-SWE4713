@@ -1,0 +1,272 @@
+@page "/adjustJournalEntry/{Username}/{EntryID}"
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adjusting Journal Entry • LEDGR</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Base + Page Styles -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/journal.css" />
+  <link rel="stylesheet" href="assets/css/adjusting-entry.css" />
+</head>
+
+<body class="page page-adjusting-entry">
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-header__top">
+      <div class="brand">
+        <img src="assets/img/logo.png" alt="LEDGR Logo" class="brand__logo" />
+      </div>
+
+      <div class="user">
+        <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
+          <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
+          </svg>
+          <span class="user__name">Admin</span>
+          <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 10l5 5 5-5H7z"/>
+          </svg>
+        </button>
+
+        <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
+          <button class="menu__item" role="menuitem" id="logoutBtn">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10 17l1.41-1.41L8.83 13H21v-2H8.83l2.58-2.59L10 7l-5 5 5 5zM4 19h6v2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6v2H4v14z"/>
+            </svg>
+            Log out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="app-nav" aria-label="Primary">
+      <div class="app-nav__inner">
+        <ul class="app-nav__list">
+          <li><a class="app-nav__link" href="dashboard.html">Dashboard</a></li>
+          <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
+          <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
+          <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
+          <li><a class="app-nav__link" href="journal.html">Journal</a></li>
+          <li><a class="app-nav__link is-active" href="adjusting-journal.html">Adjusting Entries</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- DATE TOOLBAR (same as other pages) -->
+  <div class="toolbar">
+    <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+      <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+      </svg>
+      <span id="dateText">October 16th, 2025</span>
+    </button>
+    <input id="dateInput" type="date" class="visually-hidden">
+  </div>
+
+  <!-- CALENDAR POPOVER -->
+  <div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
+    <div class="cal__inner">
+      <div class="cal__header">
+        <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+        <div id="calLabel" class="cal__label">October 2025</div>
+        <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+      </div>
+      <div class="cal__grid cal__dow">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div id="calGrid" class="cal__grid"></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="container">
+    <section class="cards">
+      <article class="card card--page aje-detail">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="adjusting-journal.html" class="breadcrumb__back">
+            ← Return to Adjusting Entries
+          </a>
+        </div>
+
+        <!-- Header -->
+        <header class="page-head page-head--stack">
+          <div>
+            <h1 class="h2">Adjusting Journal Entry</h1>
+            <p class="muted" id="ajeSubtitle">
+              Details for adjusting entry <span id="ajeId">AJE-2025-11-001</span>.
+            </p>
+          </div>
+          <div class="page-head__actions">
+            <span class="pill pill--status pill--pending" id="ajeStatus">
+              Pending
+            </span>
+          </div>
+        </header>
+
+        <!-- Meta info -->
+        <section class="entry-meta" aria-labelledby="metaHeading">
+          <h2 id="metaHeading" class="section-title">Entry Information</h2>
+          <dl class="entry-meta__grid">
+            <div class="entry-meta__item">
+              <dt>Reference #</dt>
+              <dd id="ajeRef">JE-2025-11-13-PK8W3E</dd>
+            </div>
+            <div class="entry-meta__item">
+              <dt>Date</dt>
+              <dd id="ajeDate">11/13/2025</dd>
+            </div>
+            <div class="entry-meta__item">
+              <dt>Prepared by</dt>
+              <dd id="ajePreparedBy">Admin User</dd>
+            </div>
+            <div class="entry-meta__item">
+              <dt>Approved by</dt>
+              <dd id="ajeApprovedBy">—</dd>
+            </div>
+            <div class="entry-meta__item">
+              <dt>Created</dt>
+              <dd id="ajeCreatedAt">11/13/2025 10:24 AM</dd>
+            </div>
+            <div class="entry-meta__item">
+              <dt>Last Updated</dt>
+              <dd id="ajeUpdatedAt">11/13/2025 10:24 AM</dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- Lines -->
+        <section class="entry-lines" aria-labelledby="linesHeading">
+          <div class="section-header">
+            <h2 id="linesHeading" class="section-title">Adjusting Entry Lines</h2>
+            <div class="section-actions">
+              <a href="ledger.html" class="btn btn--ghost btn--sm" id="viewLedgerBtn">
+                View in Ledger
+              </a>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Account</th>
+                  <th class="right">Debit</th>
+                  <th class="right">Credit</th>
+                </tr>
+              </thead>
+              <tbody id="ajeLinesBody">
+                <!-- Static example of rows for layout -->
+                <tr>
+                  <td>1</td>
+                  <td>Supplies Expense (5200)</td>
+                  <td class="right">$250.00</td>
+                  <td class="right">—</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Supplies (1200)</td>
+                  <td class="right">—</td>
+                  <td class="right">$250.00</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="totals-row">
+                  <th colspan="2">Totals</th>
+                  <td class="right" id="ajeTotalDebit">$250.00</td>
+                  <td class="right" id="ajeTotalCredit">$250.00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <p class="muted small">
+            Adjusting entries must contain at least one debit and one credit, and total debits must equal total credits.
+          </p>
+        </section>
+
+        <!-- Description -->
+        <section class="entry-description" aria-labelledby="descHeading">
+          <h2 id="descHeading" class="section-title">Description</h2>
+          <p id="ajeDescription">
+            To record supplies expense for the period based on physical count of remaining supplies.
+          </p>
+        </section>
+
+        <!-- Attachments -->
+        <section class="entry-attachments" aria-labelledby="attachHeading">
+          <h2 id="attachHeading" class="section-title">Attachments</h2>
+          <p class="muted small">Supporting files linked to this adjusting entry.</p>
+
+          <ul class="file-list" id="ajeAttachments">
+            <!-- Example rows -->
+            <li class="file-list__item">
+              <a href="#" class="file-list__name">supplies-count-2025-10.pdf</a>
+              <span class="file-list__meta">PDF · 124 KB</span>
+            </li>
+            <li class="file-list__item">
+              <a href="#" class="file-list__name">trial-balance-oct.xlsx</a>
+              <span class="file-list__meta">Excel · 42 KB</span>
+            </li>
+          </ul>
+
+          <p class="muted small" id="noAttachments" hidden>
+            No attachments uploaded for this entry.
+          </p>
+        </section>
+
+        <!-- Audit trail -->
+        <section class="entry-audit" aria-labelledby="auditHeading">
+          <div class="section-header">
+            <h2 id="auditHeading" class="section-title">Audit Trail</h2>
+            <div class="section-actions">
+              <a href="accounts/coa-event-log.html" class="btn btn--ghost btn--sm">
+                View Event Log
+              </a>
+            </div>
+          </div>
+
+          <dl class="audit-list" id="ajeAudit">
+            <!-- Example audit events -->
+            <div class="audit-list__item">
+              <dt>11/13/2025 10:24 AM</dt>
+              <dd>Entry created by Admin User.</dd>
+            </div>
+            <div class="audit-list__item">
+              <dt>—</dt>
+              <dd>No further changes.</dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- Actions -->
+        <footer class="entry-actions">
+          <a href="adjusting-journal.html" class="btn btn--ghost">Back to Adjusting Entries</a>
+        </footer>
+      </article>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="app-footer__inner">
+      <nav class="footer-nav">
+        <a href="help.html" class="link">Help</a>
+        <a href="privacy.html" class="link">Privacy</a>
+        <a href="terms.html" class="link">Terms</a>
+      </nav>
+      <small class="muted">© 2025 LEDGR · Build v0.1</small>
+    </div>
+  </footer>
+
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

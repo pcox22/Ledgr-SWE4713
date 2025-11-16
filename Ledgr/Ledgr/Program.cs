@@ -1,4 +1,5 @@
 using Ledgr.Components;
+using LedgrLogic;
 using MudBlazor.Services;
 
 
@@ -11,6 +12,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
+builder.Services.AddScoped<Navigation>();
 
 var app = builder.Build();
 

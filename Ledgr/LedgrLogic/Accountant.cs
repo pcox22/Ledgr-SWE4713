@@ -82,7 +82,7 @@ public class Accountant : User
             /*var selectSql =
                 "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
 
-            var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
+            var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
 
             var selectCommand = new SqliteCommand(selectSql, connection);
             /*insertCommand.Parameters.AddWithValue("@DATE", date);
@@ -450,7 +450,7 @@ public class Accountant : User
         try
         {
             var sql =
-                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' ORDER BY JED.DebitCredit DESC, JE.Date ASC";
+                "SELECT Acct.Name, Acct.Number, JE.Date, JE.Comment, JED.DebitCredit, JED.Amount, JED.ID FROM JournalEntry AS JE INNER JOIN JournalEntryDetails AS JED ON JE.ID = JED.JournalEntryID INNER JOIN Account AS Acct ON JED.AccountNumber = Acct.Number WHERE JE.Status = 'A' ORDER BY JED.DebitCredit DESC, JE.Date ASC";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -460,7 +460,7 @@ public class Accountant : User
             {
                 while (reader.Read())
                 {
-                    for (int i = 0; i < 6; i++)
+                    for (int i = 0; i < 7; i++)
                     {
                         ledger.Add(reader.GetString(i));
                     }
@@ -477,61 +477,6 @@ public class Accountant : User
         return ledger;
     }
     
-    //Adjusting Journal Entries
-    
-    //Create adjusting journal entries (Done) (Not tested)
-    //Because a journal entry can contain any number of debits or credits, creating a journal entry will be broken up into multiple methods
-    
-    //CreateJournalEntry() creates a new entry in the JournalEntry table, and returns the ID of that new entry
-    //Comments and reference docs are optional, so there will be multiple methods but with different paramaters
-    /*public static int CreateAdjustingJournalEntry(string date, string comment, Blob reference, string username)
-    {
-        int userID = GetUserFromUserName(username).Result.GetUserID();
-        int journalEntryID = -1;
-        try
-        {
-            var insertSql = "INSERT INTO AdjustingJournalEntry VALUES(null, @DATE, @STATUS, @COMMENT, @REFERENCE, @USERID)";
-            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-            connection.Open();
-            
-            var insertCommand = new SqliteCommand(insertSql, connection);
-            insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);
-            insertCommand.Parameters.AddWithValue("@USERID", userID);
-
-            insertCommand.ExecuteNonQuery();
-
-            /*var selectSql =
-                "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
-
-            /*var selectSql = "SELECT ID FROM AdjustingJournalEntry ORDER BY DESC LIMIT 1";
-
-            var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);
-
-            using var reader = selectCommand.ExecuteReader();
-            if (reader.HasRows)
-            {
-                while (reader.Read())
-                {
-                    journalEntryID = reader.GetInt32(0);
-                }
-            }
-            connection.Close();
-        }
-        catch(Exception e)
-        {
-            Console.WriteLine(e);
-            //throw some error here
-        }
-
-        return journalEntryID;
-    }*/
 
     public static int CreateAdjustingJournalEntry(string date, string comment, Blob reference, string username)
     { 
@@ -779,5 +724,25 @@ public class Accountant : User
         }
 
         return entries;
+    }
+
+    public static string GetNextJEDNumber()
+    {
+        using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+        var sql = "Select ID From JournalEntry ORDER BY ID DESC LIMIT 1";
+        var selectCommand = new SqliteCommand(sql, connection);
+        
+        connection.Open();
+        using var reader = selectCommand.ExecuteReader();
+        string ID = "";
+        if (reader.HasRows)
+        {
+            while (reader.Read())
+            {
+                ID = Convert.ToString(reader.GetInt32(0) + 1);
+            }
+        }
+        connection.Close();
+        return ID;
     }
 }

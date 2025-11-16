@@ -1155,7 +1155,7 @@ public class Admin : User
                 isAdmin = 1;
                 isManager = 0;
             }
-            else if (Role == "Employee")
+            else if (Role == "Manager")
             {
                 isAdmin = 0;
                 isManager = 1;
@@ -1177,8 +1177,8 @@ public class Admin : User
             var command7 = new SqliteCommand(sql2, connection);
             command7.Parameters.AddWithValue("@ISMANAGER", isManager);
             command7.Parameters.AddWithValue("@EMPLOYEEID", employeeID);
-            command7.ExecuteNonQuery();
-
+            Console.WriteLine("Permissions Updated: " + command7.ExecuteNonQuery());
+            
             await connection.CloseAsync();
 
         }

@@ -43,7 +43,11 @@
           Log out
         </button>
       </div>
-    </div>
+        <button class="btn btn--secondary" style="padding-top: 10px">
+          <span>Compose</span>
+          <img src="emailSymbol.png" style="height:50px; width:50px;" alt="Email"/>
+        </button>
+      </div>
   </div>
 
   <nav class="app-nav" aria-label="Primary">
@@ -102,24 +106,27 @@
   <h1 class="page-title">Admin Dashboard</h1>
 
   <section class="cards">
-    <!-- Account Management -->
-    <article class="card">
-      <div class="card__icon">
-        <img src="AccountManage.svg" alt="" />
-      </div>
-      <div class="card__body">
-        <h2 class="card__title">User Management</h2>
-        <p class="card__desc">Manage and organize all your user accounts in one place. View employees, approve requests, and maintain accurate records.</p>
-      </div>
-      <div class="card__cta">
-        <a @onclick="ManageUser" class="btn btn--primary" href="#">Select</a>
-      </div>
-    </article>
+    @if (Role == "Admin")
+    {
+      <!-- Account Management -->
+      <article class="card">
+        <div class="card__icon">
+          <img src="AccountManage.svg" alt=""/>
+        </div>
+        <div class="card__body">
+          <h2 class="card__title">User Management</h2>
+          <p class="card__desc">Manage and organize all your user accounts in one place. View employees, approve requests, and maintain accurate records.</p>
+        </div>
+        <div class="card__cta">
+          <a @onclick="ManageUser" class="btn btn--primary" href="#">Select</a>
+        </div>
+      </article>
+    }
 
     <!-- Chart of Accounts -->
     <article class="card">
       <div class="card__icon">
-        <img src="/COA.svg" alt="" />
+        <img src="/COA.svg" alt=""/>
       </div>
       <div class="card__body">
         <h2 class="card__title">Chart of Accounts</h2>
@@ -133,7 +140,7 @@
     <!-- Event Logs -->
     <article class="card">
       <div class="card__icon">
-        <img src="/EventLogs.svg" alt="" />
+        <img src="/EventLogs.svg" alt=""/>
       </div>
       <div class="card__body">
         <h2 class="card__title">Event Logs</h2>
@@ -204,7 +211,10 @@
   }
   public void LedgerCall()
   {
-    NavigationManager.NavigateTo($"/ledger/{Username}");
+    // Temp account number
+    // Mock Navigation: Remove from Dashboard later
+    Console.WriteLine("Navigated to Ledger from Dashboard. Remove from Dashboard");
+    NavigationManager.NavigateTo($"/ledger/{Username}/{1001}");
   }
   public void ManageUser()
   {

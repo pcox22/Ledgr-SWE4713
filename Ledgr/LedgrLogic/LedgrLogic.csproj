@@ -11,6 +11,7 @@
       <PackageReference Include="Google.Apis.Auth" Version="1.71.0" />
       <PackageReference Include="Google.Apis.Gmail.v1" Version="1.70.0.3833" />
       <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.68.0.1869" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.22" />
       <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0-rc.1.25451.107" />
       <PackageReference Include="MimeKit" Version="4.14.0" />
     </ItemGroup>

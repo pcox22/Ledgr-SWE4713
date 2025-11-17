@@ -2,6 +2,7 @@
 @using LedgrLogic
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject Navigation Nav
 
 
 <!doctype html>
@@ -51,25 +52,26 @@
   <nav class="app-nav" aria-label="Primary">
     <div class="app-nav__inner">
       <ul class="app-nav__list">
-        <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
-        <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
-        <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
-        <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
+        <li><a @onclick="(() => Nav.Home(Username))" class="app-nav__link" href="#">Dashboard</a></li>
+        <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
+        <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
+        <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
+        <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#l">Reports</a></li>
       </ul>
     </div>
   </nav>
 </header>
 
 <SideBar>
-  <button @onclick="Home" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
-  <button @onclick="CoAList" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
-  <button @onclick="CoAFormCall" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
-  <button @onclick="CoAEventLog" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+  <button @onclick="(() => Nav.Home(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+  <button @onclick="(() => Nav.CoAListCall(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+  <button @onclick="(() => Nav.CoAForm(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+  <button @onclick="(() => Nav.CoAEventLog(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
   @if (Role == "Admin")
   {
-  <button @onclick="ManageUser" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
-  <button @onclick="PasswordReport" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+  <button @onclick="() => Nav.ManageUser(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  <button @onclick="() => Nav.PasswordReport(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
   }
 </SideBar>
 

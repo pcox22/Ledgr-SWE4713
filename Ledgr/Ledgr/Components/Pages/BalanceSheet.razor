@@ -53,13 +53,12 @@
   <nav class="app-nav" aria-label="Primary">
     <div class="app-nav__inner">
       <ul class="app-nav__list">
-        <li><a @onclick="(() => Nav.Home(Username))" class="app-nav__link" href="dashboard.html">Dashboard</a></li>
-        <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
-        <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
-        <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
-        <li><a class="app-nav__link" href="journal.html">Journal</a></li>
-        <li><a class="app-nav__link" href="manager-adjusting-entries.html">Adjusting Entries</a></li>
-        <li><a class="app-nav__link is-active" href="manager-reports.html">Reports</a></li>
+        <li><a @onclick="(() => Nav.Home(Username))" class="app-nav__link" href="#">Dashboard</a></li>
+        <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
+        <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
+        <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
+        <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#l">Reports</a></li>
       </ul>
     </div>
   </nav>
@@ -89,7 +88,7 @@
           </p>
         </div>
         <div class="page-head__actions">
-          <a href="manager-reports.html" class="btn btn--ghost btn--sm">Back to Reports</a>
+          <a @onclick="(() => Nav.Reports(Username))" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
         </div>
       </header>
 

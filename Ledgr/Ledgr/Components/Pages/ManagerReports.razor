@@ -1,4 +1,4 @@
-@page "/trialBalance/{Username}"
+@page "/managerReports/{Username}"
 @using LedgrLogic
 @inject Navigation Nav
 
@@ -7,7 +7,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Trial Balance • LEDGR</title>
+  <title>Financial Reports (Manager) • LEDGR</title>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
@@ -16,10 +16,10 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="journal.css" />
   <link rel="stylesheet" href="reports.css" />
-  <link rel="stylesheet" href="trialBalance.css" />
+  <link rel="stylesheet" href="reportsLanding.css" />
 </head>
 
-<body class="page page-report-trial-balance">
+<body class="page page-manager-reports">
 <!-- HEADER -->
 <header class="app-header">
   <div class="app-header__top">
@@ -70,8 +70,8 @@
   <button @onclick="(() => Nav.CoAEventLog(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
   @if (Role == "Admin")
   {
-    <button @onclick="() => Nav.ManageUser(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
-    <button @onclick="() => Nav.PasswordReport(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+  <button @onclick="() => Nav.ManageUser(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+  <button @onclick="() => Nav.PasswordReport(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
   }
 </SideBar>
 
@@ -88,114 +88,63 @@
 
 <!-- MAIN -->
 <main class="container">
-  <section class="cards">
-    <article class="card card--page report-card report-card--trial-balance">
-      <!-- Header -->
+  <section class="cards reports-landing">
+    <article class="card card--page reports-card-wrap">
       <header class="page-head page-head--stack">
         <div>
-          <h1 class="h2">Trial Balance</h1>
+          <h1 class="h2">Financial Reports</h1>
           <p class="muted">
-            View all account balances and confirm that total debits equal total credits for a selected date or period.
+            Generate and view key financial statements for your organization.
           </p>
-        </div>
-        <div class="page-head__actions">
-          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
         </div>
       </header>
 
-      <!-- Filters / Controls -->
-      <form class="report-filters" method="get" data-form="trial-balance" data-action="generate-trial-balance">
-        <div class="report-filters__row">
-          <div class="filter-group">
-            <label for="tbAsOf">As of date</label>
-            <input type="date" id="tbAsOf" name="asOf" />
+      <!-- Grid of report types -->
+      <div class="reports-grid">
+        <!-- Trial Balance -->
+        <a @onclick="() => Nav.TrialBalanceCall(Username)" href="#" class="report-card">
+          <div class="report-card__icon">TB</div>
+          <div class="report-card__body">
+            <h2 class="report-card__title">Trial Balance</h2>
+            <p class="report-card__desc">
+              View all account balances and confirm total debits equal total credits before preparing financial statements.
+            </p>
           </div>
+        </a>
 
-          <div class="filter-group">
-            <label for="tbBasis">Basis</label>
-            <select id="tbBasis" name="basis">
-              <option value="accrual">Accrual</option>
-              <option value="cash">Cash</option>
-            </select>
+        <!-- Income Statement -->
+        <a @onclick="() => Nav.IncomeStatementCall(Username)" href="#l" class="report-card">
+          <div class="report-card__icon">IS</div>
+          <div class="report-card__body">
+            <h2 class="report-card__title">Income Statement</h2>
+            <p class="report-card__desc">
+              Summarize revenues and expenses over a period to calculate net income or net loss.
+            </p>
           </div>
+        </a>
 
-          <div class="filter-actions">
-            <button type="submit" class="btn btn--primary">Generate</button>
+        <!-- Balance Sheet -->
+        <a @onclick="() => Nav.BalanceSheetCall(Username)" href="#" class="report-card">
+          <div class="report-card__icon">BS</div>
+          <div class="report-card__body">
+            <h2 class="report-card__title">Balance Sheet</h2>
+            <p class="report-card__desc">
+              See the company’s assets, liabilities, and equity at a specific date.
+            </p>
           </div>
-        </div>
+        </a>
 
-        <div class="report-filters__row report-filters__row--secondary">
-          <span class="muted small">
-            Use the controls below to save or share this report once generated.
-          </span>
-          <div class="export-actions">
-            <button type="button" class="btn btn--secondary btn--sm">Save</button>
-            <button type="button" class="btn btn--secondary btn--sm">Email</button>
-            <button type="button" class="btn btn--secondary btn--sm">Print</button>
+        <!-- Statement of Retained Earnings -->
+        <a @onclick="() => Nav.RetainedEarningsCall(Username)" href="#" class="report-card">
+          <div class="report-card__icon">RE</div>
+          <div class="report-card__body">
+            <h2 class="report-card__title">Statement of Retained Earnings</h2>
+            <p class="report-card__desc">
+              Track changes in retained earnings from beginning to end of the period.
+            </p>
           </div>
-        </div>
-      </form>
-
-      <!-- Report body -->
-      <section class="report-body">
-        <header class="report-header">
-          <h2 class="report-title">Trial Balance</h2>
-          <p class="muted small" id="tbPeriodLabel">
-            As of October 31, 2025
-          </p>
-        </header>
-
-        <div class="table-wrap">
-          <table class="table table-hover report-table">
-            <thead>
-            <tr>
-              <th>Account No.</th>
-              <th>Account Name</th>
-              <th class="right">Debit</th>
-              <th class="right">Credit</th>
-            </tr>
-            </thead>
-            <tbody id="tbBody">
-            <!-- Example static rows for layout -->
-            <tr>
-              <td>1010</td>
-              <td>Cash</td>
-              <td class="right">$12,500.00</td>
-              <td class="right">—</td>
-            </tr>
-            <tr>
-              <td>1200</td>
-              <td>Accounts Receivable</td>
-              <td class="right">$4,800.00</td>
-              <td class="right">—</td>
-            </tr>
-            <tr>
-              <td>2000</td>
-              <td>Accounts Payable</td>
-              <td class="right">—</td>
-              <td class="right">$6,300.00</td>
-            </tr>
-            <tr>
-              <td>3000</td>
-              <td>Owner’s Equity</td>
-              <td class="right">—</td>
-              <td class="right">$11,000.00</td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr class="report-totals">
-              <th colspan="2">Totals</th>
-              <td class="right" id="tbTotalDebit">$17,300.00</td>
-              <td class="right" id="tbTotalCredit">$17,300.00</td>
-            </tr>
-            </tfoot>
-          </table>
-        </div>
-
-        <p class="muted small">
-          The trial balance is used to verify that total debits equal total credits before preparing financial statements.
-        </p>
-      </section>
+        </a>
+      </div>
     </article>
   </section>
 </main>

@@ -1,4 +1,7 @@
-@page "/JournalAdjustments/{Username}/{JournalID}"
+@page "/JournalAdjustments/{Username}"
+@using LedgrLogic
+@inject Navigation Nav
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,9 +13,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
 
     <!-- Base + Page Styles -->
-    <link rel="stylesheet" href="assets/css/styles.css" />
-    <link rel="stylesheet" href="assets/css/journal.css" />
-    <link rel="stylesheet" href="assets/css/reports.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="journal.css" />
+    <link rel="stylesheet" href="reports.css" />
 
 
 </head>
@@ -22,7 +25,7 @@
 <header class="app-header">
     <div class="app-header__top">
         <div class="brand">
-            <img src="assets/img/logo.png" alt="LEDGR Logo" class="brand__logo" />
+            <img src="logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
         </div>
 
         <div class="user">
@@ -48,16 +51,28 @@
     <nav class="app-nav" aria-label="Primary">
         <div class="app-nav__inner">
             <ul class="app-nav__list">
-                <li><a class="app-nav__link" href="dashboard.html">Dashboard</a></li>
-                <li><a class="app-nav__link" href="accounts/coa-list.html">Chart of Accounts</a></li>
-                <li><a class="app-nav__link" href="ledger.html">Ledger</a></li>
-                <li><a class="app-nav__link" href="accounts/coa-event-log.html">Event Log</a></li>
-                <li><a class="app-nav__link" href="journal.html">Journal</a></li>
-                <li><a class="app-nav__link is-active" href="adjusting-journal.html">Adjusting Entries</a></li>
+                <li><a @onclick="() => Nav.Home(Username)" class="app-nav__link" href="#">Dashboard</a></li>
+                <li><a @onclick="() => Nav.CoAListCall(Username)" class="app-nav__link" href="#">Chart of Accounts</a></li>
+                <li><a @onclick="() => Nav.CoAEventLog(Username)" class="app-nav__link" href="#">Event Log</a></li>
+                <li><a @onclick="() => Nav.JournalCall(Username)" class="app-nav__link" href="#">Journal</a></li>
+                <li><a @onclick="() => Nav.JournalEntryAdjustManager(Username)" class="app-nav__link" href="#">Adjusting Entries</a></li>
+                <li><a @onclick="() => Nav.Reports(Username)" class="app-nav__link is-active" href="#">Reports</a></li>
             </ul>
         </div>
     </nav>
 </header>
+
+<SideBar>
+    <button @onclick="(() => Nav.Home(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Dashboard</button>
+    <button @onclick="(() => Nav.CoAListCall(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Chart of Accounts List</button>
+    <button @onclick="(() => Nav.CoAForm(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Form</button>
+    <button @onclick="(() => Nav.CoAEventLog(Username))" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none" >Chart of Accounts Event Log</button>
+    @if (Role == "Admin")
+    {
+        <button @onclick="() => Nav.ManageUser(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Manage Users</button>
+        <button @onclick="() => Nav.PasswordReport(Username)" type="button" class="btn-nav" style="background-color: #1e1e2f; color: #FFFFFF; border: none">Password Report</button>
+    }
+</SideBar>
 
 <!-- DATE DROPDOWN BOX -->
 <div class="toolbar">
@@ -88,243 +103,243 @@
 <!-- MAIN -->
 <main class="container">
 
-    <!-- CREATE ADJUSTING ENTRY PANEL -->
-    <section class="cards">
-        <article id="aje-form-card" class="card card--page">
-            <div class="page-head page-head--stack">
-                <div>
-                    <h1 class="h2">Adjusting Journal (Accountant)</h1>
-                    <p class="muted">
-                        Create and submit adjusting journal entries. Approved entries will post to the ledger and financial statements.
-                    </p>
-                </div>
-                <div class="page-head__actions">
-                    <a class="btn btn--secondary" href="accounts/coa-event-log.html">View Event Log</a>
-                </div>
+<!-- CREATE ADJUSTING ENTRY PANEL -->
+<section class="cards">
+    <article id="aje-form-card" class="card card--page">
+        <div class="page-head page-head--stack">
+            <div>
+                <h1 class="h2">Adjusting Journal (Accountant)</h1>
+                <p class="muted">
+                    Create and submit adjusting journal entries. Approved entries will post to the ledger and financial statements.
+                </p>
+            </div>
+            <div class="page-head__actions">
+                <a @onclick="() => Nav.CoAEventLog(Username)" class="btn btn--secondary" href="#">View Event Log</a>
+            </div>
+        </div>
+
+        <!-- Errors surface (MUST be red) -->
+        <div id="aje-errors" class="alert alert-danger" role="alert" aria-live="polite" hidden></div>
+
+        <!-- Form body -->
+        <form id="ajeForm" class="form-grid"
+              method="post"
+              enctype="multipart/form-data"
+              data-form="adjusting-journal"
+              data-action="create-aj-entry">
+
+            <!-- Top row: Date + Description -->
+            <div class="form-grid">
+                <label class="field">
+                    <span class="label">Date <span class="req">*</span></span>
+                    <div class="date-field">
+                        <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+                        </svg>
+                        <input type="date" id="jeDate" name="jeDate" required />
+                    </div>
+                </label>
+
+                <label class="field">
+                    <span class="label">Description <span class="muted">(optional)</span></span>
+                    <input type="text" id="jeDesc" name="jeDesc" placeholder="Short description" />
+                </label>
             </div>
 
-            <!-- Errors surface (MUST be red) -->
-            <div id="aje-errors" class="alert alert-danger" role="alert" aria-live="polite" hidden></div>
+            <!-- Line items -->
+            <fieldset class="field-group">
+                <legend class="legend">Adjusting Entry Lines</legend>
 
-            <!-- Form body -->
-            <form id="ajeForm" class="form-grid"
-                  method="post"
-                  enctype="multipart/form-data"
-                  data-form="adjusting-journal"
-                  data-action="create-aj-entry">
+                <div class="line-items">
+                    <div class="line-items__header">
+                        <span>#</span>
+                        <span>Account <span class="req">*</span></span>
+                        <span class="right">Debit</span>
+                        <span class="right">Credit</span>
+                        <span class="center visually-hidden">Actions</span>
+                    </div>
 
-                <!-- Top row: Date + Description -->
-                <div class="form-grid">
-                    <label class="field">
-                        <span class="label">Date <span class="req">*</span></span>
-                        <div class="date-field">
-                            <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
-                            </svg>
-                            <input type="date" id="jeDate" name="jeDate" required />
+                    <!-- starter row – integrator renders more -->
+                    <div class="line">
+                        <span class="line__index">1</span>
+
+                        <label class="line__field">
+                            <span class="visually-hidden">Account</span>
+                            <select name="lines[0].accountId" required data-src="coa">
+                                <option value="" selected disabled>Select account…</option>
+                            </select>
+                        </label>
+
+                        <label class="line__field line__field--num">
+                            <span class="visually-hidden">Debit</span>
+                            <input type="number" name="lines[0].debit" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
+                        </label>
+
+                        <label class="line__field line__field--num">
+                            <span class="visually-hidden">Credit</span>
+                            <input type="number" name="lines[0].credit" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
+                        </label>
+
+                        <div class="line__actions">
+                            <button type="submit"
+                                    name="op"
+                                    value="removeRow:0"
+                                    class="btn btn--secondary btn--icon"
+                                    title="Remove row 1">
+                                &times;<span class="visually-hidden">Remove row 1</span>
+                            </button>
                         </div>
-                    </label>
+                    </div>
 
-                    <label class="field">
-                        <span class="label">Description <span class="muted">(optional)</span></span>
-                        <input type="text" id="jeDesc" name="jeDesc" placeholder="Short description" />
-                    </label>
+                    <!-- totals row -->
+                    <div class="totals">
+                        <div class="totals__row">
+                            <span>Totals</span>
+                            <output id="totalDebit" name="totalDebit" class="num">0.00</output>
+                            <output id="totalCredit" name="totalCredit" class="num">0.00</output>
+                            <span></span>
+                        </div>
+                        <p class="muted small">
+                            Each adjusting entry must include at least one debit and one credit. Total debits must equal total credits.
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Line items -->
-                <fieldset class="field-group">
-                    <legend class="legend">Adjusting Entry Lines</legend>
+                <!-- line controls -->
+                <div class="line-actions">
+                    <button type="submit" class="btn btn--secondary" name="op" value="addRow">+ Add Row</button>
+                </div>
+            </fieldset>
 
-                    <div class="line-items">
-                        <div class="line-items__header">
-                            <span>#</span>
-                            <span>Account <span class="req">*</span></span>
-                            <span class="right">Debit</span>
-                            <span class="right">Credit</span>
-                            <span class="center visually-hidden">Actions</span>
-                        </div>
+            <!-- Attachments -->
+            <fieldset class="attachments">
+                <legend class="legend">Attachments</legend>
+                <div class="attachments-inner">
+                    <p class="muted small">Accepted: PDF, Word, Excel, CSV, JPG, PNG</p>
+                    <input type="file"
+                           id="attachments"
+                           name="attachments"
+                           multiple
+                           accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png" />
+                </div>
+            </fieldset>
 
-                        <!-- starter row – integrator renders more -->
-                        <div class="line">
-                            <span class="line__index">1</span>
+            <!-- Hidden -->
+            <input type="hidden" name="jeType" value="adjusting" />
+            <input type="hidden" name="origin" value="adjusting-journal" />
 
-                            <label class="line__field">
-                                <span class="visually-hidden">Account</span>
-                                <select name="lines[0].accountId" required data-src="coa">
-                                    <option value="" selected disabled>Select account…</option>
-                                </select>
-                            </label>
+            <!-- form buttons -->
+            <div class="form-actions">
+                <button type="reset" class="btn btn--secondary">Reset</button>
+                <button type="submit" class="btn btn--primary" name="op" value="submitForApproval">
+                    Submit for Approval
+                </button>
+            </div>
+        </form>
+    </article>
+</section>
 
-                            <label class="line__field line__field--num">
-                                <span class="visually-hidden">Debit</span>
-                                <input type="number" name="lines[0].debit" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
-                            </label>
+<!-- ADJUSTING ENTRIES LIST PANEL -->
+<section class="cards">
+    <article id="aje-status-card" class="card card--page">
+        <header class="page-head page-head--inline">
+            <h2 class="h2">Adjusting Entries</h2>
+        </header>
 
-                            <label class="line__field line__field--num">
-                                <span class="visually-hidden">Credit</span>
-                                <input type="number" name="lines[0].credit" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
-                            </label>
+        <div class="tabs tabs-compact" role="tablist" aria-label="Adjusting entry status">
+            <input type="radio" name="ajeTab" id="tabPending" checked />
+            <label role="tab" for="tabPending" aria-controls="panelPending">Pending</label>
 
-                            <div class="line__actions">
-                                <button type="submit"
-                                        name="op"
-                                        value="removeRow:0"
-                                        class="btn btn--secondary btn--icon"
-                                        title="Remove row 1">
-                                    &times;<span class="visually-hidden">Remove row 1</span>
-                                </button>
-                            </div>
-                        </div>
+            <input type="radio" name="ajeTab" id="tabApproved" />
+            <label role="tab" for="tabApproved" aria-controls="panelApproved">Approved</label>
 
-                        <!-- totals row -->
-                        <div class="totals">
-                            <div class="totals__row">
-                                <span>Totals</span>
-                                <output id="totalDebit" name="totalDebit" class="num">0.00</output>
-                                <output id="totalCredit" name="totalCredit" class="num">0.00</output>
-                                <span></span>
-                            </div>
-                            <p class="muted small">
-                                Each adjusting entry must include at least one debit and one credit. Total debits must equal total credits.
-                            </p>
-                        </div>
+            <input type="radio" name="ajeTab" id="tabRejected" />
+            <label role="tab" for="tabRejected" aria-controls="panelRejected">Rejected</label>
+
+            <!-- Filters -->
+            <form class="filters" method="get" data-action="filter-aj-entries">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="fromDate">From</label>
+                        <input type="date" id="fromDate" name="from" />
                     </div>
-
-                    <!-- line controls -->
-                    <div class="line-actions">
-                        <button type="submit" class="btn btn--secondary" name="op" value="addRow">+ Add Row</button>
+                    <div class="filter-group">
+                        <label for="toDate">To</label>
+                        <input type="date" id="toDate" name="to" />
                     </div>
-                </fieldset>
-
-                <!-- Attachments -->
-                <fieldset class="attachments">
-                    <legend class="legend">Attachments</legend>
-                    <div class="attachments-inner">
-                        <p class="muted small">Accepted: PDF, Word, Excel, CSV, JPG, PNG</p>
-                        <input type="file"
-                               id="attachments"
-                               name="attachments"
-                               multiple
-                               accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png" />
+                    <div class="filter-group">
+                        <label for="search">Search</label>
+                        <input type="search" id="search" name="q" placeholder="Account, amount, or date" />
                     </div>
-                </fieldset>
-
-                <!-- Hidden -->
-                <input type="hidden" name="jeType" value="adjusting" />
-                <input type="hidden" name="origin" value="adjusting-journal" />
-
-                <!-- form buttons -->
-                <div class="form-actions">
-                    <button type="reset" class="btn btn--secondary">Reset</button>
-                    <button type="submit" class="btn btn--primary" name="op" value="submitForApproval">
-                        Submit for Approval
-                    </button>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn--secondary btn--sm">Apply</button>
+                        <a @onclick="() => Nav.AdjustJournal(Username)" href="#" class="btn btn--ghost btn--sm">Clear</a>
+                    </div>
                 </div>
             </form>
-        </article>
-    </section>
 
-    <!-- ADJUSTING ENTRIES LIST PANEL -->
-    <section class="cards">
-        <article id="aje-status-card" class="card card--page">
-            <header class="page-head page-head--inline">
-                <h2 class="h2">Adjusting Entries</h2>
-            </header>
+            <!-- Pending -->
+            <section id="panelPending" class="tab-panel" role="tabpanel" aria-labelledby="tabPending">
+                <div class="table-wrap">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>PR</th>
+                            <th>JE #</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th class="right">Total Dr</th>
+                            <th class="right">Total Cr</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
 
-            <div class="tabs tabs-compact" role="tablist" aria-label="Adjusting entry status">
-                <input type="radio" name="ajeTab" id="tabPending" checked />
-                <label role="tab" for="tabPending" aria-controls="panelPending">Pending</label>
+            <!-- Approved -->
+            <section id="panelApproved" class="tab-panel" role="tabpanel" aria-labelledby="tabApproved">
+                <div class="table-wrap">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>PR</th>
+                            <th>JE #</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th class="right">Total Dr</th>
+                            <th class="right">Total Cr</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
 
-                <input type="radio" name="ajeTab" id="tabApproved" />
-                <label role="tab" for="tabApproved" aria-controls="panelApproved">Approved</label>
-
-                <input type="radio" name="ajeTab" id="tabRejected" />
-                <label role="tab" for="tabRejected" aria-controls="panelRejected">Rejected</label>
-
-                <!-- Filters -->
-                <form class="filters" method="get" data-action="filter-aj-entries">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label for="fromDate">From</label>
-                            <input type="date" id="fromDate" name="from" />
-                        </div>
-                        <div class="filter-group">
-                            <label for="toDate">To</label>
-                            <input type="date" id="toDate" name="to" />
-                        </div>
-                        <div class="filter-group">
-                            <label for="search">Search</label>
-                            <input type="search" id="search" name="q" placeholder="Account, amount, or date" />
-                        </div>
-                        <div class="filter-actions">
-                            <button type="submit" class="btn btn--secondary btn--sm">Apply</button>
-                            <a href="adjusting-journal.html" class="btn btn--ghost btn--sm">Clear</a>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Pending -->
-                <section id="panelPending" class="tab-panel" role="tabpanel" aria-labelledby="tabPending">
-                    <div class="table-wrap">
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th>PR</th>
-                                <th>JE #</th>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th class="right">Total Dr</th>
-                                <th class="right">Total Cr</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <!-- Approved -->
-                <section id="panelApproved" class="tab-panel" role="tabpanel" aria-labelledby="tabApproved">
-                    <div class="table-wrap">
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th>PR</th>
-                                <th>JE #</th>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th class="right">Total Dr</th>
-                                <th class="right">Total Cr</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <!-- Rejected -->
-                <section id="panelRejected" class="tab-panel" role="tabpanel" aria-labelledby="tabRejected">
-                    <div class="table-wrap">
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th>PR</th>
-                                <th>JE #</th>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th class="right">Total Dr</th>
-                                <th class="right">Total Cr</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-        </article>
-    </section>
+            <!-- Rejected -->
+            <section id="panelRejected" class="tab-panel" role="tabpanel" aria-labelledby="tabRejected">
+                <div class="table-wrap">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>PR</th>
+                            <th>JE #</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th class="right">Total Dr</th>
+                            <th class="right">Total Cr</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </article>
+</section>
 </main>
 
 <!-- Footer -->
@@ -338,6 +353,19 @@
         <small class="muted">© 2025 LEDGR · Build v0.1</small>
     </div>
 </footer>
-<script src="assets/js/dashboard.js"></script>
+<script src="dashboardN.js"></script>
 </body>
 </html>
+
+@code {
+
+    [Parameter] public string Username { get; set; }
+    public string Role { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Role = User.GetUserFromUserName(Username).Result.GetRole();
+        StateHasChanged();
+    }
+
+}

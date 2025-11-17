@@ -18,7 +18,7 @@ public class Manager : User
         int journalEntryID = -1;
         try
         {
-            var insertSql = "INSERT INTO JournalEntry VALUES(null, @DATE, @STATUS, @COMMENT, @REFERENCE, @USERID, 'R')";
+            var insertSql = "INSERT INTO JournalEntry VALUES(null, @DATE, @STATUS, @COMMENT, @REFERENCE, @USERID, 'N')";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -37,10 +37,6 @@ public class Manager : User
             var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             
             var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
 
             using var reader = selectCommand.ExecuteReader();
             if (reader.HasRows)
@@ -67,7 +63,7 @@ public class Manager : User
         int journalEntryID = -1;
         try
         {
-            var insertSql = "INSERT INTO JournalEntry(ID, Date, Status, Comment, UserID, Type) VALUES(null, @DATE, @STATUS, @COMMENT, @USERID, 'R')";
+            var insertSql = "INSERT INTO JournalEntry(ID, Date, Status, Comment, UserID, Type) VALUES(null, @DATE, @STATUS, @COMMENT, @USERID, 'N')";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -85,10 +81,6 @@ public class Manager : User
             var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             
             var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
 
             using var reader = selectCommand.ExecuteReader();
             if (reader.HasRows)
@@ -115,7 +107,7 @@ public class Manager : User
         int journalEntryID = -1;
         try
         {
-            var insertSql = "INSERT INTO JournalEntry(ID, Date, Status, Reference, UserID, Type) VALUES(null, @DATE, @STATUS, @REFERENCE, @USERID, 'R')";
+            var insertSql = "INSERT INTO JournalEntry(ID, Date, Status, Reference, UserID, Type) VALUES(null, @DATE, @STATUS, @REFERENCE, @USERID, 'N')";
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
             connection.Open();
             
@@ -133,10 +125,6 @@ public class Manager : User
             var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             
             var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
 
             using var reader = selectCommand.ExecuteReader();
             if (reader.HasRows)
@@ -163,7 +151,7 @@ public class Manager : User
             int journalEntryID = -1;
             try
             {
-                var insertSql = "INSERT INTO JournalEntry(ID, Date, Status, UserID, Type) VALUES(null, @DATE, @STATUS, @USERID,'R')";
+                var insertSql = "INSERT INTO JournalEntry(ID, Date, Status, UserID, Type) VALUES(null, @DATE, @STATUS, @USERID,'N')";
                 using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
                 connection.Open();
             
@@ -174,16 +162,9 @@ public class Manager : User
 
                 insertCommand.ExecuteNonQuery();
 
-                /*var selectSql =
-                    "SELECT ID FROM JOURNALENTRY WHERE Date = @DATE AND Status = @STATUS AND Comment = @COMMENT AND Reference = @Reference";*/
-
                 var selectSql = "SELECT ID FROM JournalEntry ORDER BY DESC LIMIT 1";
 
                 var selectCommand = new SqliteCommand(selectSql, connection);
-                /*insertCommand.Parameters.AddWithValue("@DATE", date);
-                insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-                insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-                insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
 
                 using var reader = selectCommand.ExecuteReader();
                 if (reader.HasRows)
@@ -204,31 +185,6 @@ public class Manager : User
             return journalEntryID;
     }
     
-    /*public static bool CreateJournalEntryDebit(int accountNum, double amount, int journalEntryID)
-    {
-        try
-        {
-            using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
-            var sql = "INSERT INTO JournalEntryDebit VALUES(NULL, @ACCOUNTNUM, @AMOUNT, @JE)";
-            connection.Open();
-            
-            var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@ACCOUNTNUM", accountNum);
-            command.Parameters.AddWithValue("@AMOUNT", amount);
-            command.Parameters.AddWithValue("@JE", journalEntryID);
-
-            command.ExecuteNonQuery();
-            
-            connection.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            //throw some error here
-        }
-
-        return true;
-    }*/
     public static bool CreateJournalEntryDetails(int accountNum, double amount, string debitCredit, int journalEntryID, string username)
     {
         int userID = GetUserFromUserName(username).Result.GetUserID();
@@ -352,19 +308,16 @@ public class Manager : User
         switch (status)
         {
             case ('P'):
-                //sql = "SELECT t1.ID, t1.Date, Debit.AccountNumber, Debit.Amount, Credit.AccountNumber, Credit.Amount, t1.Status, t1.Comment, t1.Reference, User.Username, Account.Name FROM JournalEntry as t1 INNER JOIN JournalEntryDebit as Debit on t1.ID = Debit.JournalEntryID INNER JOIN JournalEntryCredit as Credit ON Debit.JournalEntryID = Credit.JournalEntryID INNER JOIN User ON t1.UserID = User.ID INNER JOIN Account ON Debit.AccountNumber = Account.Number INNER JOIN Account ON Credit.AccountNumber WHERE t1.Status = 'P'";
                 sql =
-                    "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'P' AND t1.Type = 'R'";
+                    "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'P' AND t1.Type = 'N'";
                 break;
             case('A'):
-                //sql = "SELECT t1.ID, t1.Date, Debit.AccountNumber, Debit.Amount, Credit.AccountNumber, Credit.Amount, t1.Status, t1.Comment, t1.Reference, User.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDebit as Debit on t1.ID = Debit.JournalEntryID INNER JOIN JournalEntryCredit as Credit ON Debit.JournalEntryID = Credit.JournalEntryID INNER JOIN User ON t1.UserID = User.ID WHERE t1.Status = 'A'";
                 sql =
-                    "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'A' AND t1.Type = 'R'";
+                    "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'A' AND t1.Type = 'N'";
                 break;
             case('R'):
-                //sql = "SELECT t1.ID, t1.Date, Debit.AccountNumber, Debit.Amount, Credit.AccountNumber, Credit.Amount, t1.Status, t1.Comment, t1.Reference, User.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDebit as Debit on t1.ID = Debit.JournalEntryID INNER JOIN JournalEntryCredit as Credit ON Debit.JournalEntryID = Credit.JournalEntryID INNER JOIN User ON t1.UserID = User.ID WHERE t1.Status = 'R'";
                 sql =
-                    "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'R' AND t1.Type = 'R'";
+                    "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'R' AND t1.Type = 'N'";
                 break;
         }
         try
@@ -673,10 +626,6 @@ public class Manager : User
 
             var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
 
             using var reader = selectCommand.ExecuteReader();
             if (reader.HasRows)
@@ -719,10 +668,6 @@ public class Manager : User
 
             var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
 
             using var reader = selectCommand.ExecuteReader();
             if (reader.HasRows)
@@ -766,10 +711,7 @@ public class Manager : User
 
             var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
             var selectCommand = new SqliteCommand(selectSql, connection);
-            /*insertCommand.Parameters.AddWithValue("@DATE", date);
-            insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-            insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-            insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
+            
 
             using var reader = selectCommand.ExecuteReader();
             if (reader.HasRows)
@@ -812,10 +754,7 @@ public class Manager : User
 
                 var selectSql = "SELECT ID FROM JournalEntry ORDER BY ID DESC LIMIT 1";
                 var selectCommand = new SqliteCommand(selectSql, connection);
-                /*insertCommand.Parameters.AddWithValue("@DATE", date);
-                insertCommand.Parameters.AddWithValue("@STATUS", 'P');
-                insertCommand.Parameters.AddWithValue("@COMMENT", comment);
-                insertCommand.Parameters.AddWithValue("@REFERENCE", reference);*/
+                
 
                 using var reader = selectCommand.ExecuteReader();
                 if (reader.HasRows)
@@ -846,17 +785,14 @@ public class Manager : User
         switch (status)
         {
             case ('P'):
-                //sql = "SELECT t1.ID, t1.Date, Debit.AccountNumber, Debit.Amount, Credit.AccountNumber, Credit.Amount, t1.Status, t1.Comment, t1.Reference, User.Username, Account.Name FROM JournalEntry as t1 INNER JOIN JournalEntryDebit as Debit on t1.ID = Debit.JournalEntryID INNER JOIN JournalEntryCredit as Credit ON Debit.JournalEntryID = Credit.JournalEntryID INNER JOIN User ON t1.UserID = User.ID INNER JOIN Account ON Debit.AccountNumber = Account.Number INNER JOIN Account ON Credit.AccountNumber WHERE t1.Status = 'P'";
                 sql =
                     "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'P' AND t1.Type = 'A'";
                 break;
             case('A'):
-                //sql = "SELECT t1.ID, t1.Date, Debit.AccountNumber, Debit.Amount, Credit.AccountNumber, Credit.Amount, t1.Status, t1.Comment, t1.Reference, User.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDebit as Debit on t1.ID = Debit.JournalEntryID INNER JOIN JournalEntryCredit as Credit ON Debit.JournalEntryID = Credit.JournalEntryID INNER JOIN User ON t1.UserID = User.ID WHERE t1.Status = 'A'";
                 sql =
                     "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM AdjustingJournalEntry as t1 INNER JOIN AdjustingJournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'A' AND t1.Type = 'A'";
                 break;
             case('R'):
-                //sql = "SELECT t1.ID, t1.Date, Debit.AccountNumber, Debit.Amount, Credit.AccountNumber, Credit.Amount, t1.Status, t1.Comment, t1.Reference, User.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDebit as Debit on t1.ID = Debit.JournalEntryID INNER JOIN JournalEntryCredit as Credit ON Debit.JournalEntryID = Credit.JournalEntryID INNER JOIN User ON t1.UserID = User.ID WHERE t1.Status = 'R'";
                 sql =
                     "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM AdjustingJournalEntry as t1 INNER JOIN AdjustingJournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID WHERE t1.status = 'R' AND t1.Type = 'A'";
                 break;

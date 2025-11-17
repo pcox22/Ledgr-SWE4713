@@ -1,4 +1,4 @@
-@page "/incomeStatement/{Username}/{dataID}"
+@page "/incomeStatement/{Username}"
 @using LedgrLogic
 @inject Navigation Nav
 
@@ -56,8 +56,8 @@
         <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
         <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
-        <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
-        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#l">Reports</a></li>
+        <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#">Reports</a></li>
       </ul>
     </div>
   </nav>

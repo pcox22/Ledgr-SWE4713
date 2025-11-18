@@ -82,7 +82,7 @@
         <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
         </svg>
-        <span id="dateText">October 23rd, 2025</span>
+        <span id="dateText">@CalendarDate</span>
     </button>
     <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -272,8 +272,9 @@
 
     [Parameter] public string Username { get; set; }
     [Parameter] public string AccountNum { get; set; }
-    
     public string Role { get; set; } = string.Empty;
+    public string CalendarDate = DateTime.Today.ToString("M");
+
     public List<string> LedgerList { get; set; }
     public List<string> RunningBalance { get; set; } = new List<string>();
     public List<string> AccountDetails;
@@ -283,8 +284,6 @@
 
     public string FormattedDebits => TotalDebits.Sum().ToString("F2");
     public string FormattedCredits => TotalCredits.Sum().ToString("F2");
-    
-    
 
     
     // Get the permissions of the User and Initialize data for page

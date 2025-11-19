@@ -8,7 +8,7 @@
 <PageTitle>Home</PageTitle>
 
 <link rel="stylesheet" href="home.css" />
-<link rel="stylesheet" href="/dashboard.css">
+<link rel="stylesheet" href="dashboard.css"/>
 
 
 <!-- HEADER -->
@@ -178,7 +178,17 @@
     <script src="/dashboard.js"></script>
 </div>
 
-
+<!-- FOOTER -->
+<footer class="app-footer">
+    <div class="app-footer__inner">
+        <nav class="footer-nav">
+            <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
+            <a href="privacy.html" class="link">Privacy</a>
+            <a href="terms.html" class="link">Terms</a>
+        </nav>
+        <small class="muted">© 2025 LEDGR · Build v0.1</small>
+    </div>
+</footer>
 
 @code {
     [Parameter] public string? Username { get; set; } = string.Empty;

@@ -90,6 +90,11 @@ public class Navigation
     {
         _nav.NavigateTo($"/journalEntry/{Username}");
     }
+
+    public void HelpPage(string Username)
+    {
+        _nav.NavigateTo($"/help/{Username}");
+    }
     public void LogOut(string Username)
     {
         _nav.NavigateTo("/");

@@ -1,5 +1,6 @@
 @page "/journalEntry/{Username}/"
 @using System.Collections
+@using System.Reflection.Metadata
 @using LedgrLogic
 @using Org.BouncyCastle.Tls
 @inject NavigationManager NavigationManager
@@ -276,7 +277,7 @@
     
     public string Role { get; set; } = string.Empty;
     public string CalendarDate = DateTime.Today.ToString("M");
-
+    
     public int EntryLines { get; set; } = 0;
     public List<string> EntryBalances { get; set; } = new List<string>();
     public List<string> AccountNumbers { get; set; } = new List<string>();

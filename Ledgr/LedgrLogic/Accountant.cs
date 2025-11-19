@@ -232,11 +232,54 @@ public class Accountant : User
     //view entries created by the manager or other accountants
     
     //view status of all journal entries by status (pending, approved, or rejected)
+    public static async Task<List<string>> ViewEntries()
+    {
+        List<string> entries = new List<string>();
+        using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+
+        var sql =
+            "SELECT t1.ID, t1.Date, t3.Name, t2.DebitCredit, t2. Amount, t1.Status, t1.Comment, t1.Reference, t4.Username FROM JournalEntry as t1 INNER JOIN JournalEntryDetails as t2 on t1.ID = t2.JournalEntryID INNER JOIN Account AS t3 ON t2.AccountNumber = t3.Number INNER JOIN User AS t4 ON t1.UserID = t4.ID";
+        
+        try
+        {
+            var command = new SqliteCommand(sql, connection);
+            connection.Open();
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < 9; i++)
+                    {
+                        if (!reader.IsDBNull(i))
+                        {
+                            entries.Add(reader.GetString(i));
+                        }
+                        else
+                        {
+                            entries.Add("");
+                        }
+                    }
+                }
+            }
+            await connection.CloseAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        return entries;
+    }
+    
     public static async Task<List<string>> ViewEntriesByStatus(char status)
     {
         List<string> entries = new List<string>();
         using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
         var sql = "";
+        
+        
 
         switch (status)
         {

@@ -152,9 +152,9 @@
                     <tr>
                         <th>Journal ID</th>
                         <th>Date</th>
-                        <th>Total Debit</th>
-                        <th>Total Credit</th>
-                        <th>Status</th>
+                        <th style="text-align: center">Debit</th>
+                        <th style="text-align: center">Credit</th>
+                        <th style="text-align: center">Status</th>
                         <th>Actions</th>
                     </tr>
                     @for (int i = 0; i < JournalEntries.Count; i += 9)
@@ -165,16 +165,16 @@
                             <td>@JournalEntries[index + 1]</td>
                             @if (JournalEntries[index + 3] == "Debit")
                             {
-                                <td>@JournalEntries[index + 4]</td>
-                                <td>---</td>
+                                <td style="text-align: right">@JournalEntries[index + 4]</td>
+                                <td></td>
                             }
                             @if (JournalEntries[index + 3] == "Credit")
                             {
-                                <td>---</td>
-                                <td>@JournalEntries[index + 4]</td>
+                                <td></td>
+                                <td style="text-align: right">@JournalEntries[index + 4]</td>
                             }
 
-                            <td>@JournalEntries[index + 5]</td>
+                            <td style="text-align: center">@JournalEntries[index + 5]</td>
                             <td>
                                 <button class="btn btn--secondary">View</button>
                             </td>
@@ -216,11 +216,18 @@
 
     List<string> JournalEntries { get; set; }
     
+    
     // Get the permissions of the User
     protected override async Task OnParametersSetAsync()
     {
         Role = (await Admin.GetUserFromUserName(Username)).GetRole();
-        JournalEntries = await Accountant.ViewEntriesByStatus('P');
+        JournalEntries = await Accountant.ViewEntries();
+
+        for (int i = 0; i < JournalEntries.Count; i+= 9)
+        {
+            JournalEntries[i + 4] = Convert.ToDouble(JournalEntries[i + 4]).ToString("N2");
+        }
+        
         StateHasChanged();
     }
 

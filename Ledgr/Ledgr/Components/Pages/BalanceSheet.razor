@@ -57,8 +57,8 @@
         <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
         <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
-        <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
-        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#l">Reports</a></li>
+        <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#">Reports</a></li>
       </ul>
     </div>
   </nav>
@@ -70,7 +70,7 @@
     <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
     </svg>
-    <span id="dateText">October 16th, 2025</span>
+    <span id="dateText">@CalendarDate</span>
   </button>
   <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -227,7 +227,7 @@
 <footer class="app-footer">
   <div class="app-footer__inner">
     <nav class="footer-nav">
-      <a href="help.html" class="link">Help</a>
+      <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
       <a href="privacy.html" class="link">Privacy</a>
       <a href="terms.html" class="link">Terms</a>
     </nav>
@@ -242,5 +242,7 @@
 @code {
 
   [Parameter] public string Username { get; set; }
+  public string CalendarDate = DateTime.Today.ToString("M");
+
 
 }

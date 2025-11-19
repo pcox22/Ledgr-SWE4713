@@ -57,7 +57,7 @@
                 <li><a @onclick="() => Nav.CoAListCall(Username)" class="app-nav__link" href="#">Chart of Accounts</a></li>
                 <li><a @onclick="() => Nav.CoAEventLog(Username)" class="app-nav__link" href="#">Event Log</a></li>
                 <li><a @onclick="() => Nav.JournalCall(Username)" class="app-nav__link" href="#">Journal</a></li>
-                <li><a @onclick="() => Nav.JournalEntryAdjustManager(Username)" class="app-nav__link" href="#">Adjusting Entries</a></li>
+                <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
                 <li><a @onclick="() => Nav.Reports(Username)" class="app-nav__link" href="#">Reports</a></li>
             </ul>
         </div>
@@ -82,7 +82,7 @@
         <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
         </svg>
-        <span id="dateText">October 23rd, 2025</span>
+        <span id="dateText">@CalendarDate</span>
     </button>
     <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -161,51 +161,77 @@
                     <th scope="col">Date</th>
                     <th scope="col">Description</th>
                     <th scope="col">PR</th>
-                    <th scope="col" >Debit</th>
-                    <th scope="col" >Credit</th>
-                    <th scope="col" >Running Balance</th>
+                    <th scope="col" style="text-align: right">Debit</th>
+                    <th scope="col" style="text-align: right">Credit</th>
+                    <th scope="col" style="text-align: right">Balance</th>
                 </tr>
                 </thead>
                 <tbody id="ledgerTbody">
-                @for (int i = 0; i < LedgerList.Count; i += 7)
+                @for (int i = 0; i < LedgerListDebits.Count; i += 7)
                 {
                     int index = i;
                     <tr>
-                        <td>@LedgerList[index + 2]</td>
-                        @if (LedgerList[index + 3] == string.Empty)
+                        <td>@LedgerListDebits[index + 2]</td>
+                        @if (LedgerListDebits[index + 3] == string.Empty)
                         {
                             <td>-- --</td>
                         }
-                        @if (LedgerList[index + 3] != string.Empty)
+                        @if (LedgerListDebits[index + 3] != string.Empty)
                         {
-                            <td>@LedgerList[index + 3]</td>
+                            <td>@LedgerListDebits[index + 3]</td>
                         }
-                        <td>JE-@LedgerList[index + 6]</td>
-                        @if (LedgerList[index + 4] == "Debit")
+                        <td>JE-@LedgerListDebits[index + 6]</td>
+                        @if (LedgerListDebits[index + 4] == "Debit")
                         {
-                            <td>@LedgerList[index + 5]</td>
+                            <td style="text-align: right">@LedgerListDebits[index + 5]</td>
                             <td></td>
 
                         }
-                        @if (LedgerList[index + 4] == "Credit")
+                        @if (LedgerListDebits[index + 4] == "Credit")
                         {
                             <td></td>
-                            <td>@LedgerList[index + 5]</td>
+                            <td style="text-align: right">@LedgerListDebits[index + 5]</td>
                         }
-                        <td>@RunningBalance[index / 7]</td>
+                        <td style="text-align: right">@RunningBalance[index / 7]</td>
                     </tr>
                 }
-                </tbody>
-                <tfoot>
+                @for (int i = 0; i < LedgerListCredits.Count; i += 7)
+                {
+                    int index = i;
+                    <tr>
+                        <td>@LedgerListCredits[index + 2]</td>
+                        @if (LedgerListCredits[index + 3] == string.Empty)
+                        {
+                            <td>-- --</td>
+                        }
+                        @if (LedgerListCredits[index + 3] != string.Empty)
+                        {
+                            <td>@LedgerListCredits[index + 3]</td>
+                        }
+                        <td>JE-@LedgerListCredits[index + 6]</td>
+                        @if (LedgerListCredits[index + 4] == "Debit")
+                        {
+                            <td style="text-align: right">@LedgerListCredits[index + 5]</td>
+                            <td></td>
+
+                        }
+                        @if (LedgerListCredits[index + 4] == "Credit")
+                        {
+                            <td></td>
+                            <td style="text-align: right">@LedgerListCredits[index + 5]</td>
+                        }
+                        <td style="text-align: right">@RunningBalance[index / 7]</td>
+                    </tr>
+                }
                 <tr>
-                    <td class="" scope="col">Totals</td>
+                    <td class="" scope="col"><strong>Totals</strong></td>
                     <td scope="col"></td>
                     <td class="num" scope="col" id="endingBalance"></td>
-                    <td class="num" scope="col" id="totalDebit">$@FormattedDebits</td>
-                    <td class="num" scope="col" id="totalCredit">$@FormattedCredits</td>
-                    <td scope="col">$@RunningBalance[RunningBalance.Count - 1]</td>
+                    <td class="num" scope="col" id="totalDebit"><strong>$@FormattedTotalDebits</strong></td>
+                    <td class="num" scope="col" id="totalCredit"><strong>$@FormattedTotalCredits</strong></td>
+                    <td scope="col" style="text-align: right"><strong>$@RunningBalance[RunningBalance.Count - 1]</strong></td>
                 </tr>
-                </tfoot>
+                </tbody>
             </table>
         </div>
 
@@ -272,17 +298,24 @@
 
     [Parameter] public string Username { get; set; }
     [Parameter] public string AccountNum { get; set; }
-    
     public string Role { get; set; } = string.Empty;
+    public string CalendarDate = DateTime.Today.ToString("M");
+
     public List<string> LedgerList { get; set; }
+    public List<string> LedgerListDebits { get; set; } = new List<string>();
+    public List<string> LedgerListCredits { get; set; } = new List<string>();
+    
     public List<string> RunningBalance { get; set; } = new List<string>();
     public List<string> AccountDetails;
 
     public List<double> TotalDebits { get; set; } = new List<double>();
     public List<double> TotalCredits { get; set; } = new List<double>();
 
-    public string FormattedDebits => TotalDebits.Sum().ToString("F2");
-    public string FormattedCredits => TotalCredits.Sum().ToString("F2");
+    public List<string> FormattedDebits { get; set; } = new List<string>();
+    public List<string> FormattedCredits { get; set; } = new List<string>();
+
+    public string FormattedTotalDebits => TotalDebits.Sum().ToString("F2");
+    public string FormattedTotalCredits => TotalCredits.Sum().ToString("F2");
     
     
 
@@ -299,22 +332,43 @@
             // Separate Section for Balance Handling
             if (LedgerList[i + 4] == "Debit")
             {
-                TotalDebits.Add(Convert.ToDouble(LedgerList[i+5]));
+                TotalDebits.Add(Convert.ToDouble(LedgerList[i + 5]));
+                
+                // If the data is for a debit, add all data into the debits list
+                for (int j = i; j < i + 7; j++)
+                {
+                    if (j == i + 5)
+                    {
+                        LedgerListDebits.Add(Convert.ToDouble(LedgerList[i + 5]).ToString("N2"));
+                        continue;
+                    }
+                    LedgerListDebits.Add(LedgerList[j]);
+                }
             }
             else
             {
                 TotalCredits.Add(Convert.ToDouble(LedgerList[i+5]));
+                // If the data is for a credit, add all data into the credits list
+                for (int j = i; j < i + 7; j++)
+                {
+                    if (j == i + 5)
+                    {
+                        LedgerListCredits.Add(Convert.ToDouble(LedgerList[i + 5]).ToString("N2"));
+                        continue;
+                    }
+                    LedgerListCredits.Add(LedgerList[j]);
+                }
             }
             
             if (RunningBalance.Count == 0)
             {
                 if (LedgerList[i + 4] == "Credit")
                 {
-                    string formattedBalanceNeg = (Convert.ToDouble(LedgerList[i + 5]) * -1).ToString("F2");
+                    string formattedBalanceNeg = (Convert.ToDouble(LedgerList[i + 5]) * -1).ToString("N2");
                     RunningBalance.Add(formattedBalanceNeg);
                     continue;
                 }
-                string formattedBalance = (Convert.ToDouble(LedgerList[i + 5])).ToString("F2");
+                string formattedBalance = (Convert.ToDouble(LedgerList[i + 5])).ToString("N2");
                 RunningBalance.Add(formattedBalance);
                 continue;
             }
@@ -331,6 +385,16 @@
             double sum = Convert.ToDouble(RunningBalance[(i/7) - 1]) + add;
             string formSum = sum.ToString("F2");
             RunningBalance.Add(formSum);
+        }
+
+        foreach (double dr in TotalDebits)
+        {
+            FormattedDebits.Add(dr.ToString("F2"));
+        }
+
+        foreach (double cr in TotalCredits)
+        {
+            FormattedCredits.Add(cr.ToString("F2"));
         }
     }
     

@@ -1,0 +1,232 @@
+@page "/help/{Username}"
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEDGR Help Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="help.css">
+</head>
+<body>
+<!-- HEADER -->
+<header class="main-header">
+  <div class="header-left">
+    <img src="logo-slogan.png" alt="LEDGR Logo" class="logo">
+  </div>
+  <div class="header-right">
+    <div class="admin-container">
+      <img src="admin-icon.png" alt="Admin Icon" class="admin-icon">
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="help-hero">
+  <h1>LEDGR Help Center</h1>
+  <p>Find answers, guides, and support for all your questions</p>
+  
+<!-- Search Bar
+  <div class="search-container">
+    <input type="text" placeholder="Search by keyword or ask a question">
+  </div>
+  -->
+</section> 
+
+<!-- BREADCRUMB IMPLEMENTATION
+<nav class="back-link">
+  <a href="(Link to previous page needs to go here)">← Return to...</a>  Add link to previous page here, also put the page its going back to. 
+</nav> -->
+
+<!-- MAIN CONTENT -->
+<main class="help-main">
+  <section class="topics">
+    <h2>Main Topics</h2>
+    <p>Browse by category to find the help you need</p>
+
+    <div class="topic-grid">
+      <div class="topic-card" data-modal="gettingStartedModal">
+        <div class="icon-box"></div>
+        <img src="rocketIcon.svg" alt="Getting Started Icon" class="topic-icon">
+        <h3>Getting Started</h3>
+        <p>Everything you need to set up your LEDGR account.</p>
+      </div>
+
+      <div class="topic-card" data-modal="usingLedgrModal">
+        <div class="icon-box"></div>
+        <img src="laptopIcon.svg" alt="Using LEDGR Icon" class="topic-icon">
+        <h3>Using LEDGR</h3>
+        <p>Learn how to navigate and use the system efficiently.</p>
+      </div>
+
+      <div class="topic-card" data-modal="reportsModal">
+        <div class="icon-box"></div>
+        <img src="docmentIcon.svg" alt="Reports Icon" class="topic-icon">
+        <h3>Reports</h3>
+        <p>Generate and view key business reports and statements.</p>
+      </div>
+
+      <div class="topic-card" data-modal="journalModal">
+        <div class="icon-box"></div>
+        <img src="journalIcon.svg" alt="Journal Icon" class="topic-icon">
+        <h3>Journal</h3>
+        <p>Record and track all financial transactions.</p>
+      </div>
+
+      <div class="topic-card" data-modal="ledgerModal">
+        <div class="icon-box"></div>
+        <img src="ledgrIcon.svg" alt="Ledger Icon" class="topic-icon">
+        <h3>Ledger</h3>
+        <p>Monitor account balances and maintain financial accuracy.</p>
+      </div>
+
+      <div class="topic-card" data-modal="accountsModal">
+        <div class="icon-box"></div>
+        <img src="coaIcon.svg" alt="Chart of Accounts Icon" class="topic-icon">
+        <h3>Chart of Accounts</h3>
+        <p>Add, edit, or deactivate accounts in your organization.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="faq">
+    <h2>Frequently Asked Questions</h2>
+    <details>
+      <summary>How do I create a new user account?</summary>
+      <p>To create a new LEDGR account, go to the Login Page and click Create Account. Fill in your full name, email address, and a secure password. After submitting your information, check your email for a verification link. Once verified, you’ll be able to log in and start using LEDGR.</p>
+    </details>
+    <details>
+      <summary>Where can I view account balances?</summary>
+      <p>You can view balances in both the Chart of Accounts and Ledger modules. The Chart of Accounts displays each account’s current balance, while the Ledger shows detailed debit and credit transactions used to calculate those balances.</p>
+    </details>
+    <details>
+      <summary>Troubleshooting login issues</summary>
+      <p>If you’re unable to log in, first verify that you’re entering the correct username and password. If your account is locked, contact an Administrator to reset your access. For forgotten passwords, click Forgot Password on the login screen to receive a reset link via email.</p>
+    </details>
+  </section>
+
+  <!-- Modal for Getting Started -->
+  <div id="gettingStartedModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Getting Started</h2>
+      <p>Welcome to LEDGR — your smart way to balance business finances. Follow these detailed steps to create your account, verify your credentials, and log in securely for the first time:</p>
+      <ol>
+        <li><strong>Access the Login Page:</strong> Go to the LEDGR login screen. If you’re a new user, click on Create Account</li>
+        <li><strong>Fill Out Registration Details:</strong> Enter your full name, valid email address and create a secure password following the password policy (minimum 8 characters, including one uppercase letter, one number, and one special character).</li>
+        <li><strong>Email Verification:</strong> After submitting your information, you’ll receive a verification email. Click the link inside to activate your LEDGR account.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Modal for Using LEDGR -->
+  <div id="usingLedgrModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Using LEDGR</h2>
+      <p>Once your account is created, LEDGR makes it simple to navigate and manage your financial data. Here’s a quick overview:</p>
+      <ol>
+        <li><strong>Explore the Dashboard:</strong> The main dashboard gives you access to your Chart of Accounts, Journal, Ledger, and Reports modules.</li>
+        <li><strong>Use the Navigation Menu:</strong> Each module is clearly labeled, allowing you to move between features such as creating entries or viewing balances.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Modal for Reports -->
+  <div id="reportsModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Reports</h2>
+      <p>Reports allow you to view and export key financial information for your business. Follow these steps:</p>
+      <ol>
+        <li><strong>Access Reports:</strong> From the main dashboard, select the Reports module.</li>
+        <li><strong>Choose a Report Type:</strong> Select from options like Trial Balance, Income Statement, or Balance Sheet.</li>
+        <li><strong>Generate & Export:</strong> Apply filters such as date or account, then click Generate. You can export the results as a PDF or CSV file.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Modal for Journal -->
+  <div id="journalModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Journal</h2>
+      <p>The Journal module is where you record every financial transaction. Here’s how it works:</p>
+      <ol>
+        <li><strong>Create an Entry:</strong> Select New Journal Entry and enter the debit and credit details for the transaction.</li>
+        <li><strong>Attach Documents:</strong> Upload receipts, invoices, or any proof related to the transaction.</li>
+        <li><strong>Submit for Approval:</strong> Once reviewed, send the journal entry to your manager for approval.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Modal for Ledger -->
+  <div id="ledgerModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Ledger</h2>
+      <p>The Ledger module tracks all approved transactions and keeps running balances for each account:</p>
+      <ol>
+        <li><strong>View an Account:</strong> Click on any account name in the Chart of Accounts to open its ledger.</li>
+        <li><strong>Review Entries:</strong> Each entry lists the date, debit, credit, and balance for every transaction.</li>
+        <li><strong>Check Accuracy:</strong> Ensure all transactions match the approved journal entries for accurate reporting.</li>
+      </ol>
+    </div>
+  </div>
+
+
+  <!-- Modal for Chart of Accounts -->
+  <div id="accountsModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Chart of Accounts</h2>
+      <p>The Chart of Accounts organizes all financial accounts used in LEDGR. Use it to manage your organization’s account structure:</p>
+      <ol>
+        <li><strong>Add or Edit Accounts:</strong> Create new accounts or modify existing ones using the Add Account button.</li>
+        <li><strong>Deactivate Accounts:</strong> Mark inactive accounts instead of deleting them to preserve history.</li>
+        <li><strong>View Logs:</strong> Each account includes an event log showing who made changes and when.</li>
+      </ol>
+    </div>
+  </div>
+
+
+  <section class="support">
+    <p>Still Need Help?<br>Can't find what you're looking for? Contact our support team.</p>
+    <button class="support-btn">Contact Support</button>
+  </section>
+</main>
+
+<script>
+  // Open modal
+  document.querySelectorAll(".topic-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const modalId = card.getAttribute("data-modal");
+      document.getElementById(modalId).style.display = "block";
+    });
+  });
+
+  // Close modal
+  document.querySelectorAll(".close").forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.closest(".modal").style.display = "none";
+    });
+  });
+
+  // Click outside modal to close
+  window.addEventListener("click", event => {
+    if (event.target.classList.contains("modal")) {
+      event.target.style.display = "none";
+    }
+  });
+</script>
+
+</body>
+</html>
+
+@code {
+
+  [Parameter] public string Username { get; set; }
+
+}

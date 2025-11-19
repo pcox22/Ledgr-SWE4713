@@ -1,5 +1,6 @@
 @page "/journalEntry/{Username}/"
 @using System.Collections
+@using System.Reflection.Metadata
 @using LedgrLogic
 @using Org.BouncyCastle.Tls
 @inject NavigationManager NavigationManager
@@ -44,7 +45,7 @@
                 <li><a @onclick="() => Nav.CoAListCall(Username)" class="app-nav__link" href="#">Chart of Accounts</a></li>
                 <li><a @onclick="() => Nav.CoAEventLog(Username)" class="app-nav__link" href="#">Event Log</a></li>
                 <li><a @onclick="() => Nav.JournalCall(Username)" class="app-nav__link is-active" href="#">Journal</a></li>
-                <li><a @onclick="() => Nav.JournalEntryAdjustManager(Username)" class="app-nav__link" href="#">Adjusting Entries</a></li>
+                <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
                 <li><a @onclick="() => Nav.Reports(Username)" class="app-nav__link" href="#">Reports</a></li>
             </ul>
         </div>
@@ -81,7 +82,7 @@
         <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
         </svg>
-        <span id="dateText">November 6th, 2025</span>
+        <span id="dateText">@CalendarDate</span>
     </button>
     <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -275,6 +276,8 @@
     [Parameter] public string Username { get; set; }
     
     public string Role { get; set; } = string.Empty;
+    public string CalendarDate = DateTime.Today.ToString("M");
+    
     public int EntryLines { get; set; } = 0;
     public List<string> EntryBalances { get; set; } = new List<string>();
     public List<string> AccountNumbers { get; set; } = new List<string>();

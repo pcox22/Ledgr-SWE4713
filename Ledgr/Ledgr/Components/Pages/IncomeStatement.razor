@@ -144,9 +144,10 @@
       <!-- Report body -->
       <section class="report-body">
         <header class="report-header">
-          <h2 class="report-title">Income Statement</h2>
-          <p class="muted small" id="isPeriodLabel">
-            For the Month Ended October 31, 2025
+          <h2 class="report-title" style="text-align: center">Addams & Family Inc.</h2>
+          <h2 class="report-title" style="text-align: center">Income Statement</h2>
+          <p class="muted small" id="isPeriodLabel" style="text-align: center">
+            For the Month Ended @ReportDate
           </p>
         </header>
 
@@ -239,6 +240,8 @@
   [Parameter] public string Username { get; set; }
   public string Role { get; set; }
   public string CalendarDate = DateTime.Today.ToString("M");
+  public string ReportDate = DateTime.Today.ToString("d");
+
 
 
   protected override async Task OnParametersSetAsync()

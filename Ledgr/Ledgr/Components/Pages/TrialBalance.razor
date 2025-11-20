@@ -99,7 +99,7 @@
           </p>
         </div>
         <div class="page-head__actions">
-          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
+          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--secondary btn--sm">Back to Reports</a>
         </div>
       </header>
 
@@ -139,9 +139,10 @@
       <!-- Report body -->
       <section class="report-body">
         <header class="report-header">
-          <h2 class="report-title">Trial Balance</h2>
-          <p class="muted small" id="tbPeriodLabel">
-            As of October 31, 2025
+          <h2 class="report-title" style="text-align: center"><strong>Addams & Family Inc.</strong></h2>
+          <h2 class="report-title" style="text-align: center">Trial Balance</h2>
+          <p style="text-align: center" class="muted small" id="tbPeriodLabel">
+            As of @ReportDate
           </p>
         </header>
 
@@ -221,6 +222,7 @@
   [Parameter] public string Username { get; set; }
   public string Role { get; set; }
   public string CalendarDate = DateTime.Today.ToString("M");
+  public string ReportDate = DateTime.Today.ToString("d");
 
 
   protected override async Task OnParametersSetAsync()

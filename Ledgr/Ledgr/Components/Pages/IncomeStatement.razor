@@ -91,16 +91,14 @@
   <section class="cards">
     <article class="card card--page report-card report-card--income">
       <!-- Header -->
-      <header class="page-head page-head--stack">
-        <div>
-          <h1 class="h2">Income Statement</h1>
-          <p class="muted">
-            Summarize revenues and expenses over a period to determine net income or net loss.
+      <header class="page-head page-head--stack" style="justify-content: center">
+        <header class="report-header">
+          <h2 class="report-title" style="text-align: center; font-size: 35px;">Addams & Family Inc.</h2>
+          <h2 class="report-title" style="text-align: center; font-size: 35px">Income Statement</h2>
+          <p class="muted small" id="isPeriodLabel" style="text-align: center">
+            For the Month Ended @ReportDate
           </p>
-        </div>
-        <div class="page-head__actions">
-          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
-        </div>
+        </header>
       </header>
 
       <!-- Filters / Controls -->
@@ -143,14 +141,6 @@
 
       <!-- Report body -->
       <section class="report-body">
-        <header class="report-header">
-          <h2 class="report-title" style="text-align: center">Addams & Family Inc.</h2>
-          <h2 class="report-title" style="text-align: center">Income Statement</h2>
-          <p class="muted small" id="isPeriodLabel" style="text-align: center">
-            For the Month Ended @ReportDate
-          </p>
-        </header>
-
         <div class="table-wrap">
           <table class="table report-table">
             <thead>
@@ -215,6 +205,9 @@
           Net income (or net loss) is calculated as total revenues minus total expenses for the selected period.
         </p>
       </section>
+      <div class="page-head__actions">
+        <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--secondary btn--sm">Back to Reports</a>
+      </div>
     </article>
   </section>
 </main>

@@ -91,16 +91,14 @@
   <section class="cards">
     <article class="card card--page report-card report-card--retained-earnings">
       <!-- Header -->
-      <header class="page-head page-head--stack">
-        <div>
-          <h1 class="h2">Statement of Retained Earnings</h1>
-          <p class="muted">
-            Track changes in retained earnings from the beginning to the end of a period.
-          </p>
-        </div>
-        <div class="page-head__actions">
-          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
-        </div>
+      <header class="page-head page-head--stack" style="justify-content: center">
+          <header class="report-header">
+            <h2 class="report-title" style="text-align: center; font-size: 35px">Addams & Family Inc.</h2>
+            <h2 class="report-title" style="text-align: center; font-size: 25px">Statement of Retained Earnings</h2>
+            <p class="muted small" id="rePeriodLabel" style="text-align: center">
+              For the Month Ended @ReportDate
+            </p>
+          </header>
       </header>
 
       <!-- Filters / Controls -->
@@ -143,14 +141,6 @@
 
       <!-- Report body -->
       <section class="report-body">
-        <header class="report-header">
-          <h2 class="report-title" style="text-align: center">Addams & Family Inc.</h2>
-          <h2 class="report-title" style="text-align: center">Statement of Retained Earnings</h2>
-          <p class="muted small" id="rePeriodLabel" style="text-align: center">
-            For the Month Ended @ReportDate
-          </p>
-        </header>
-
         <div class="table-wrap">
           <table class="table report-table">
             <thead>
@@ -189,6 +179,9 @@
         <p class="muted small">
           Ending retained earnings equals beginning retained earnings plus net income (or minus net loss), minus dividends for the period.
         </p>
+        <div class="page-head__actions">
+          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--secondary btn--sm">Back to Reports</a>
+        </div>
       </section>
     </article>
   </section>

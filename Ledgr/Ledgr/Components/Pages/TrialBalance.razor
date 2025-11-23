@@ -91,16 +91,14 @@
   <section class="cards">
     <article class="card card--page report-card report-card--trial-balance">
       <!-- Header -->
-      <header class="page-head page-head--stack">
-        <div>
-          <h1 class="h2">Trial Balance</h1>
-          <p class="muted">
-            View all account balances and confirm that total debits equal total credits for a selected date or period.
-          </p>
-        </div>
-        <div class="page-head__actions">
-          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
-        </div>
+      <header class="page-head page-head--stack" style="justify-content: center">
+          <header class="report-header" style="">
+            <h1 class="report-title" style="text-align: center; font-size: 35px"><strong>Addams & Family Inc.</strong></h1>
+            <h2 class="report-title" style="text-align: center; font-size: 25px">Trial Balance</h2>
+            <p style="text-align: center" class="muted small" id="tbPeriodLabel">
+              As of @ReportDate
+            </p>
+          </header>
       </header>
 
       <!-- Filters / Controls -->
@@ -138,13 +136,7 @@
 
       <!-- Report body -->
       <section class="report-body">
-        <header class="report-header">
-          <h2 class="report-title">Trial Balance</h2>
-          <p class="muted small" id="tbPeriodLabel">
-            As of October 31, 2025
-          </p>
-        </header>
-
+        <!-- Moved Header to top; replaced original -->
         <div class="table-wrap">
           <table class="table table-hover report-table">
             <thead>
@@ -195,6 +187,9 @@
         <p class="muted small">
           The trial balance is used to verify that total debits equal total credits before preparing financial statements.
         </p>
+        <div class="page-head__actions">
+          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--secondary btn--sm">Back to Reports</a>
+        </div>
       </section>
     </article>
   </section>
@@ -204,7 +199,7 @@
 <footer class="app-footer">
   <div class="app-footer__inner">
     <nav class="footer-nav">
-      <a href="help.html" class="link">Help</a>
+      <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
       <a href="privacy.html" class="link">Privacy</a>
       <a href="terms.html" class="link">Terms</a>
     </nav>
@@ -221,6 +216,7 @@
   [Parameter] public string Username { get; set; }
   public string Role { get; set; }
   public string CalendarDate = DateTime.Today.ToString("M");
+  public string ReportDate = DateTime.Today.ToString("d");
 
 
   protected override async Task OnParametersSetAsync()

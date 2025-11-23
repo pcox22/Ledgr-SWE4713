@@ -279,7 +279,7 @@
 <footer class="app-footer">
     <div class="app-footer__inner">
         <nav class="footer-nav">
-            <a href="/help.html" class="link">Help</a>
+            <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
             <a href="/privacy.html" class="link">Privacy</a>
             <a href="/terms.html" class="link">Terms</a>
         </nav>
@@ -314,8 +314,8 @@
     public List<string> FormattedDebits { get; set; } = new List<string>();
     public List<string> FormattedCredits { get; set; } = new List<string>();
 
-    public string FormattedTotalDebits => TotalDebits.Sum().ToString("F2");
-    public string FormattedTotalCredits => TotalCredits.Sum().ToString("F2");
+    public string FormattedTotalDebits => TotalDebits.Sum().ToString("N2");
+    public string FormattedTotalCredits => TotalCredits.Sum().ToString("N2");
     
     
 

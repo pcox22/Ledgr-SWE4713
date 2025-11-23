@@ -883,5 +883,164 @@ public class User
 
          return path;
      }
+
+     public double GetCurrentRatio()
+     {
+         try
+         {
+             var assetsSql = "SELECT SUM(Balance) FROM Account WHERE Account.SubCategory = 'Current Asset'";
+             var liabilitiesSql = "SELECT SUM(Balance) FROM Account WHERE Account.SubCategory = 'Current Liability'";
+             
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             double assets = 0;
+
+             using var assetsCommand = new SqliteCommand(assetsSql, connection);
+             using var assetsReader = assetsCommand.ExecuteReader();
+             if (assetsReader.HasRows)
+             {
+                 assets = assetsReader.GetDouble(0);
+             }
+
+             double liabilities = 0;
+
+             using var liaCommand = new SqliteCommand(liabilitiesSql, connection);
+             using var liaReader = liaCommand.ExecuteReader();
+             if (liaReader.HasRows)
+             {
+                 liabilities = liaReader.GetDouble(0);
+             }
+             
+             connection.Close();
+             
+             //ratios should be percentages
+             return (assets / liabilities) * 100;
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             throw;
+         }
+     }
+     
+     public double GetWorkingCapital()
+     {
+         try
+         {
+             var assetsSql = "SELECT SUM(Balance) FROM Account WHERE Account.SubCategory = 'Current Asset'";
+             var liabilitiesSql = "SELECT SUM(Balance) FROM Account WHERE Account.SubCategory = 'Current Liability'";
+             
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             double assets = 0;
+
+             using var assetsCommand = new SqliteCommand(assetsSql, connection);
+             using var assetsReader = assetsCommand.ExecuteReader();
+             if (assetsReader.HasRows)
+             {
+                 assets = assetsReader.GetDouble(0);
+             }
+
+             double liabilities = 0;
+
+             using var liaCommand = new SqliteCommand(liabilitiesSql, connection);
+             using var liaReader = liaCommand.ExecuteReader();
+             if (liaReader.HasRows)
+             {
+                 liabilities = liaReader.GetDouble(0);
+             }
+             
+             connection.Close();
+
+             return (assets - liabilities);
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             throw;
+         }
+     }
+     
+     public double GetDebtRatio()
+     {
+         try
+         {
+             var assetsSql = "SELECT SUM(Balance) FROM Account WHERE Account.Category = 'Asset'";
+             var liabilitiesSql = "SELECT SUM(Balance) FROM Account WHERE Account.Category = 'Liability'";
+             
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             double assets = 0;
+
+             using var assetsCommand = new SqliteCommand(assetsSql, connection);
+             using var assetsReader = assetsCommand.ExecuteReader();
+             if (assetsReader.HasRows)
+             {
+                 assets = assetsReader.GetDouble(0);
+             }
+
+             double liabilities = 0;
+
+             using var liaCommand = new SqliteCommand(liabilitiesSql, connection);
+             using var liaReader = liaCommand.ExecuteReader();
+             if (liaReader.HasRows)
+             {
+                 liabilities = liaReader.GetDouble(0);
+             }
+             
+             connection.Close();
+
+             //ratios should be percentages
+             return (liabilities/assets) * 100;
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             throw;
+         }
+     }
+     
+     public double GetDtE()
+     {
+         try
+         {
+             var equitySql = "SELECT SUM(Balance) FROM Account WHERE Account.Category = 'Equity'";
+             var liabilitiesSql = "SELECT SUM(Balance) FROM Account WHERE Account.Category = 'Liability'";
+             
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             double equity = 0;
+
+             using var equityCommand = new SqliteCommand(equitySql, connection);
+             using var equityReader = equityCommand.ExecuteReader();
+             if (equityReader.HasRows)
+             {
+                 equity = equityReader.GetDouble(0);
+             }
+
+             double liabilities = 0;
+
+             using var liaCommand = new SqliteCommand(liabilitiesSql, connection);
+             using var liaReader = liaCommand.ExecuteReader();
+             if (liaReader.HasRows)
+             {
+                 liabilities = liaReader.GetDouble(0);
+             }
+             
+             connection.Close();
+
+             //ratios should be percentages
+             return (liabilities/equity) * 100;
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             throw;
+         }
+     }
      
 }

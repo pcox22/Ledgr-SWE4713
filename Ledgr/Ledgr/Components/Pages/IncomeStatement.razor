@@ -1,4 +1,4 @@
-@page "/incomeStatement/{Username}/{dataID}"
+@page "/incomeStatement/{Username}"
 @using LedgrLogic
 @inject Navigation Nav
 
@@ -56,8 +56,8 @@
         <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
         <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
-        <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
-        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#l">Reports</a></li>
+        <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link is-active" href="#">Reports</a></li>
       </ul>
     </div>
   </nav>
@@ -81,7 +81,7 @@
     <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
     </svg>
-    <span id="dateText">October 16th, 2025</span>
+    <span id="dateText">@CalendarDate</span>
   </button>
   <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -91,16 +91,14 @@
   <section class="cards">
     <article class="card card--page report-card report-card--income">
       <!-- Header -->
-      <header class="page-head page-head--stack">
-        <div>
-          <h1 class="h2">Income Statement</h1>
-          <p class="muted">
-            Summarize revenues and expenses over a period to determine net income or net loss.
+      <header class="page-head page-head--stack" style="justify-content: center">
+        <header class="report-header">
+          <h2 class="report-title" style="text-align: center; font-size: 35px;">Addams & Family Inc.</h2>
+          <h2 class="report-title" style="text-align: center; font-size: 35px">Income Statement</h2>
+          <p class="muted small" id="isPeriodLabel" style="text-align: center">
+            For the Month Ended @ReportDate
           </p>
-        </div>
-        <div class="page-head__actions">
-          <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--ghost btn--sm">Back to Reports</a>
-        </div>
+        </header>
       </header>
 
       <!-- Filters / Controls -->
@@ -143,13 +141,6 @@
 
       <!-- Report body -->
       <section class="report-body">
-        <header class="report-header">
-          <h2 class="report-title">Income Statement</h2>
-          <p class="muted small" id="isPeriodLabel">
-            For the Month Ended October 31, 2025
-          </p>
-        </header>
-
         <div class="table-wrap">
           <table class="table report-table">
             <thead>
@@ -214,6 +205,9 @@
           Net income (or net loss) is calculated as total revenues minus total expenses for the selected period.
         </p>
       </section>
+      <div class="page-head__actions">
+        <a @onclick="() => Nav.Reports(Username)" href="#" class="btn btn--secondary btn--sm">Back to Reports</a>
+      </div>
     </article>
   </section>
 </main>
@@ -222,7 +216,7 @@
 <footer class="app-footer">
   <div class="app-footer__inner">
     <nav class="footer-nav">
-      <a href="help.html" class="link">Help</a>
+      <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
       <a href="privacy.html" class="link">Privacy</a>
       <a href="terms.html" class="link">Terms</a>
     </nav>
@@ -238,6 +232,10 @@
 
   [Parameter] public string Username { get; set; }
   public string Role { get; set; }
+  public string CalendarDate = DateTime.Today.ToString("M");
+  public string ReportDate = DateTime.Today.ToString("d");
+
+
 
   protected override async Task OnParametersSetAsync()
   {

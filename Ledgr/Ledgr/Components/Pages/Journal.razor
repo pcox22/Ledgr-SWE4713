@@ -52,8 +52,8 @@
                 <li><a @onclick="(() => Nav.Home(Username))" class="app-nav__link" href="#">Dashboard</a></li>
                 <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
                 <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
-                <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
-                <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link is-active" href="#">Adjusting Entries</a></li>
+                <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link is-active" href="#">Journal</a></li>
+                <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
                 <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link" href="#l">Reports</a></li>
             </ul>
         </div>
@@ -78,7 +78,7 @@
         <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
         </svg>
-        <span id="dateText">October 23rd, 2025</span>
+        <span id="dateText">@CalendarDate</span>
     </button>
     <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -152,9 +152,9 @@
                     <tr>
                         <th>Journal ID</th>
                         <th>Date</th>
-                        <th>Total Debit</th>
-                        <th>Total Credit</th>
-                        <th>Status</th>
+                        <th style="text-align: center">Debit</th>
+                        <th style="text-align: center">Credit</th>
+                        <th style="text-align: center">Status</th>
                         <th>Actions</th>
                     </tr>
                     @for (int i = 0; i < JournalEntries.Count; i += 9)
@@ -165,16 +165,16 @@
                             <td>@JournalEntries[index + 1]</td>
                             @if (JournalEntries[index + 3] == "Debit")
                             {
-                                <td>@JournalEntries[index + 4]</td>
-                                <td>---</td>
+                                <td style="text-align: right">@JournalEntries[index + 4]</td>
+                                <td></td>
                             }
                             @if (JournalEntries[index + 3] == "Credit")
                             {
-                                <td>---</td>
-                                <td>@JournalEntries[index + 4]</td>
+                                <td></td>
+                                <td style="text-align: right">@JournalEntries[index + 4]</td>
                             }
 
-                            <td>@JournalEntries[index + 5]</td>
+                            <td style="text-align: center">@JournalEntries[index + 5]</td>
                             <td>
                                 <button class="btn btn--secondary">View</button>
                             </td>
@@ -194,7 +194,7 @@
 <footer class="app-footer">
     <div class="app-footer__inner">
         <nav class="footer-nav">
-            <a href="../help.html" class="link">Help</a>
+            <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
             <a href="../privacy.html" class="link">Privacy</a>
             <a href="../terms.html" class="link">Terms</a>
         </nav>
@@ -212,13 +212,22 @@
 
     [Parameter] public string Username { get; set; }
     public string Role { get; set; } = string.Empty;
+    public string CalendarDate = DateTime.Today.ToString("M");
+
     List<string> JournalEntries { get; set; }
+    
     
     // Get the permissions of the User
     protected override async Task OnParametersSetAsync()
     {
         Role = (await Admin.GetUserFromUserName(Username)).GetRole();
-        JournalEntries = await Accountant.ViewEntriesByStatus('P');
+        JournalEntries = await Accountant.ViewEntries();
+
+        for (int i = 0; i < JournalEntries.Count; i+= 9)
+        {
+            JournalEntries[i + 4] = Convert.ToDouble(JournalEntries[i + 4]).ToString("N2");
+        }
+        
         StateHasChanged();
     }
 

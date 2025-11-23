@@ -56,8 +56,8 @@
         <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link is-active" href="#">Chart of Accounts</a></li>
         <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
         <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
-        <li><a @onclick="(() => Nav.JournalEntryAdjustManager(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
-        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link" href="#l">Reports</a></li>
+        <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link" href="#">Reports</a></li>
       </ul>
     </div>
   </nav>
@@ -81,7 +81,7 @@
     <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
     </svg>
-    <span id="dateText">October 23rd, 2025</span>
+    <span id="dateText">@CalendarDate</span>
   </button>
   <input id="dateInput" type="date" class="visually-hidden">
 </div>
@@ -238,10 +238,13 @@
                 <!-- <td>@Accounts[index + 3]</td> -->
                 <td>@Accounts[index + 4]</td>
                 <td>@Accounts[index + 5]</td>
-                <td>@Accounts[index + 6]</td>
-                <td>@Accounts[index + 7]</td>
-                <td>@Accounts[index + 8]</td>
-                <td>@Accounts[index + 9]</td>
+                
+                <!-- Initial, Debits, Credits, Balance -->
+                <td style="text-align: right">@Accounts[index + 6]</td>
+                <td style="text-align: right">@Accounts[index + 7]</td>
+                <td style="text-align: right">@Accounts[index + 8]</td>
+                <td style="text-align: right">@Accounts[index + 9]</td>
+                
                 <td>@Accounts[index + 10]</td>
                 <td>@Accounts[index + 11]</td>
                 <td>@Accounts[index + 12]</td>
@@ -290,7 +293,7 @@
 <footer class="app-footer">
   <div class="app-footer__inner">
     <nav class="footer-nav">
-      <a href="/help.html" class="link">Help</a>
+      <a @onclick="() => Nav.HelpPage(Username)" href="#" class="link">Help</a>
       <a href="/privacy.html" class="link">Privacy</a>
       <a href="/terms.html" class="link">Terms</a>
     </nav>
@@ -326,8 +329,10 @@
 
   [Parameter] public string? Username { get; set; }
   public string Role { get; set; } = string.Empty;
+  public string CalendarDate = DateTime.Today.ToString("M");
 
-  private List<string> Accounts = Account.GetAccounts("").Result;
+
+  private List<string> Accounts = new List<string>();
   private bool showActions { get; set; } = false;
   private string AcctNum { get; set; } = "-1";
 
@@ -344,6 +349,16 @@
   protected override async Task OnParametersSetAsync()
   {
     Role = (await Admin.GetUserFromUserName(Username)).GetRole();
+    Accounts = Account.GetAccounts("").Result;
+
+    for (int i = 0; i < Accounts.Count; i += 15)
+    {
+      Accounts[i + 6] = Convert.ToDouble(Accounts[i + 6]).ToString("N2");
+      Accounts[i + 7] = Convert.ToDouble(Accounts[i + 7]).ToString("N2");
+      Accounts[i + 8] = Convert.ToDouble(Accounts[i + 8]).ToString("N2");
+      Accounts[i + 9] = Convert.ToDouble(Accounts[i + 9]).ToString("N2");
+
+    }
   }
   
   public void showActionsDialog(int index)

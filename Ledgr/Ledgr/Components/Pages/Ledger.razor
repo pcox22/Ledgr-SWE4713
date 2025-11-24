@@ -397,46 +397,4 @@
             FormattedCredits.Add(cr.ToString("F2"));
         }
     }
-    
-    public void Home()
-    {
-        NavigationManager.NavigateTo($"/dashboard/{Username}");
-    }
-
-    public void CoAList()
-    {
-        NavigationManager.NavigateTo($"/CoAList/{Username}");
-    }
-    
-    public void CoAForm()
-    {
-        NavigationManager.NavigateTo($"/CoAForm/{Username}");
-    }
-    public void CoAEventLog()
-    {
-        NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
-    }
-    public void Journal()
-    {
-        NavigationManager.NavigateTo($"/journal/{Username}");
-    }
-
-    public void LedgerCall()
-    {
-        NavigationManager.NavigateTo($"/ledger/{Username}");
-    }
-    public void ManageUser()
-    {
-        NavigationManager.NavigateTo($"/manageUsers/{Username}");
-    }
-    public void PasswordReport()
-    {
-        NavigationManager.NavigateTo($"/pwReport/{Username}");
-    }
-
-    public void LogOut()
-    {
-        NavigationManager.NavigateTo("/");
-    }
-
 }

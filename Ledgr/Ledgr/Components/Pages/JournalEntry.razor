@@ -192,7 +192,8 @@
                         </div>
 
                         <div class="line-actions">
-                            <button @onclick="AddLine" type="button" id="addLine" class="btn btn--secondary">+ Add Entry Line</button>
+                            <button @onclick="AddDebit" type="button" id="addLine" class="btn btn--secondary">+ Add Debit</button>
+                            <button @onclick="AddCredit" type="button" id="addLine" class="btn btn--secondary">+ Add Credit</button>
                         </div>
 
                         <div id="balanceState" class="balance balance--notok" aria-live="polite">
@@ -277,8 +278,10 @@
     
     public string Role { get; set; } = string.Empty;
     public string CalendarDate = DateTime.Today.ToString("M");
-    
-    public int EntryLines { get; set; } = 0;
+
+    public int EntryLines => DebitAmount + CreditAmount;
+    public int DebitAmount { get; set; } = 0;
+    public int CreditAmount { get; set; } = 0;
     public List<string> EntryBalances { get; set; } = new List<string>();
     public List<string> AccountNumbers { get; set; } = new List<string>();
     public List<string> AccountNames { get; set; } = new List<string>();
@@ -308,25 +311,26 @@
     public string Alert { get; set; } = string.Empty;
     
 
-    public void AddLine()
+    public void AddDebit()
     {
         try
         {
-            if (EntryLines == AccountNames.Count)
-            {
-                throw new InsufficientAccountNamesException("Cannot have more journal entries than valid accounts");
-            }
-            EntryLines++;
+            if (EntryLines == AccountNames.Count) { throw new InsufficientAccountNamesException("Cannot have more journal entries than valid accounts"); }
+            DebitAmount++;
         }
-        catch (InsufficientAccountNamesException e)
-        {
-            Alert = e.Message;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+        catch (InsufficientAccountNamesException e) { Alert = e.Message; }
+        catch (Exception e) { Console.WriteLine(e.Message); }
+    }
 
+    public void AddCredit()
+    {
+        try
+        {
+            if (EntryLines == AccountNames.Count) { throw new InsufficientAccountNamesException("Cannot have more journal entries than valid accounts"); }
+            CreditAmount++;
+        }
+        catch (InsufficientAccountNamesException e) { Alert = e.Message; }
+        catch (Exception e) { Console.WriteLine(e.Message); }
     }
 
     public async Task HandleFile(InputFileChangeEventArgs e)
@@ -450,47 +454,6 @@
         {
             return false;
         }
-    }
-    
-    // Nav Buttons - Linked to side bar
-    public void Home()
-    {
-        NavigationManager.NavigateTo($"/dashboard/{Username}");
-    }
-    public void CoAList()
-    {
-        NavigationManager.NavigateTo($"/CoAList/{Username}");
-    }
-    
-    public void CoAForm()
-    {
-        NavigationManager.NavigateTo($"/CoAForm/{Username}");
-    }
-    public void CoAEventLog()
-    {
-        NavigationManager.NavigateTo($"/CoAEventLog/{Username}");
-    }
-
-    public void ManageUser()
-    {
-        NavigationManager.NavigateTo($"/manageUsers/{Username}");
-    }
-    public void PasswordReport()
-    {
-        NavigationManager.NavigateTo($"/pwReport/{Username}");
-    }
-
-    public void JournalCall()
-    {
-        NavigationManager.NavigateTo($"/journal/{Username}");
-    }
-    public void LedgerCall()
-    {
-        NavigationManager.NavigateTo($"/ledger/{Username}");
-    }
-    public void LogOut()
-    {
-        NavigationManager.NavigateTo("/");
     }
 }
 

@@ -1154,4 +1154,62 @@ public class User
              throw;
          }
      }
+
+     public static double GetRoA()
+     {
+         try
+         {
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             var assetSql = "SELECT SUM(Balance) FROM Account WHERE Category = 'Asset'";
+
+             double avgAsset = 0;
+
+             using var assetCommand = new SqliteCommand(assetSql, connection);
+             using var assetReader = assetCommand.ExecuteReader();
+             if (assetReader.HasRows)
+             {
+                 avgAsset = assetReader.GetDouble(0);
+             }
+
+             double netIncome = GetNetIncome();
+
+             return netIncome/avgAsset;
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             throw;
+         }
+     }
+
+     public static double GetRoE()
+     {
+         try
+         {
+             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
+             connection.Open();
+
+             var equitySql = "SELECT SUM(Balance) FROM Account WHERE Category = 'Equity'";
+
+             double avgEquity = 0;
+
+             using var equityCommand = new SqliteCommand(equitySql, connection);
+             using var assetReader = equityCommand.ExecuteReader();
+             if (assetReader.HasRows)
+             {
+                 avgEquity = assetReader.GetDouble(0);
+             }
+
+             double netIncome = GetNetIncome();
+
+             return netIncome/avgEquity;
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine(e);
+             throw;
+         }
+     }
 }

@@ -1706,4 +1706,5 @@ public class Manager : User
 
         return entries;
     }
+     
 }

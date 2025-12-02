@@ -52,6 +52,20 @@
     width: auto;
     filter: none;
 }
+.email__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  margin-right: 0.25rem;
+}
+.icon--email {
+  width: 32px;
+  height: 32px;
+  fill: #E7EEF8;
+}
 .container{
     max-width: 1440px;
     margin: 0 auto;

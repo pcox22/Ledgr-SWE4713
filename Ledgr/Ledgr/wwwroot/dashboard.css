@@ -20,6 +20,22 @@
 .brand__logo{ height:56px; width:auto; display:block; object-fit: contain; }
 .brand__name{ color:#E7EEF8; font-weight:600; letter-spacing:.3px; white-space:nowrap; }
 
+.email__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  margin-right: 0.25rem;
+}
+
+.icon--email {
+  width: 32px;
+  height: 32px;
+  fill: #E7EEF8;
+}
+
 /* ---------- User control ---------- */
 .user{ position:relative; }
 .user__btn{

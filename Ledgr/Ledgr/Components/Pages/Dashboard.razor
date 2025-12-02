@@ -26,13 +26,22 @@
       <img src="/logo-slogan.png" alt="LEDGR Logo" class="brand__logo" />
     </div>
 
+    <!-- EMAIL BUTTON -->
+    <button id="emailBtn" class="email__btn" aria-label="Email">
+      <svg class="icon icon--email" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/>
+      </svg>
+    </button>
+
     <div class="user">
       <button id="userMenuBtn" class="user__btn" aria-haspopup="menu" aria-expanded="false">
         <svg class="icon icon--user" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/>
         </svg>
         <span class="user__name">@Username</span>
-        <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5H7z"/></svg>
+        <svg class="icon icon--caret" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 10l5 5 5-5H7z"/>
+        </svg>
       </button>
 
       <div id="userMenu" class="menu" role="menu" aria-labelledby="userMenuBtn">
@@ -43,21 +52,19 @@
           Log out
         </button>
       </div>
-        <button class="btn btn--secondary" style="padding-top: 10px">
-          <span>Compose</span>
-          <img src="emailSymbol.png" style="height:50px; width:50px;" alt="Email"/>
-        </button>
-      </div>
+    </div>
   </div>
 
+  <!-- PAGE NAVIGATION -->
   <nav class="app-nav" aria-label="Primary">
     <div class="app-nav__inner">
       <ul class="app-nav__list">
-        <li><a @onclick="Home" class="app-nav__link is-active" href="#">Dashboard</a></li>
-        <li><a @onclick="CoAList" class="app-nav__link" href="#">Chart of Accounts</a></li>
-        <li><a @onclick="LedgerCall" class="app-nav__link" href="#">Ledger</a></li>
-        <li><a @onclick="CoAEventLog" class="app-nav__link" href="#">Event Log</a></li>
-        <li><a @onclick="Journal" class="app-nav__link" href="#">Journal</a></li>
+        <li><a @onclick="(() => Nav.Home(Username))" class="app-nav__link is-active" href="#">Dashboard</a></li>
+        <li><a @onclick="(() => Nav.CoAListCall(Username))" class="app-nav__link" href="#">Chart of Accounts</a></li>
+        <li><a @onclick="(() => Nav.CoAEventLog(Username))" class="app-nav__link" href="#">Event Log</a></li>
+        <li><a @onclick="(() => Nav.JournalCall(Username))" class="app-nav__link" href="#">Journal</a></li>
+        <li><a @onclick="(() => Nav.AdjustJournal(Username))" class="app-nav__link" href="#">Adjusting Entries</a></li>
+        <li><a @onclick="(() => Nav.Reports(Username))" class="app-nav__link" href="#">Reports</a></li>
       </ul>
     </div>
   </nav>
@@ -77,28 +84,28 @@
 
 <!-- DATE DROPDOWN BOX -->
 <div class="toolbar">
-  <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
-    <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
-    </svg>
-    <span id="dateText">October 23rd, 2025</span>
-  </button>
-  <input id="dateInput" type="date" class="visually-hidden">
+    <button id="dateBtn" class="date-btn" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="icon icon--calendar" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2v2H5a2 2 0 0 0-2 2v2h18V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7Zm14 8H3v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V10Zm-14 4h6v4H7v-4Z"/>
+        </svg>
+        <span id="dateText">@CalendarDate</span>
+    </button>
+    <input id="dateInput" type="date" class="visually-hidden">
 </div>
 
 <!-- CALENDAR -->
 <div id="calendarPopover" class="cal" role="dialog" aria-modal="true" aria-labelledby="calLabel" hidden>
-  <div class="cal__inner">
-    <div class="cal__header">
-      <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
-      <div id="calLabel" class="cal__label">October 2025</div>
-      <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+    <div class="cal__inner">
+        <div class="cal__header">
+            <button class="cal__nav" data-dir="-1" aria-label="Previous month">‹</button>
+            <div id="calLabel" class="cal__label">October 2025</div>
+            <button class="cal__nav" data-dir="1" aria-label="Next month">›</button>
+        </div>
+        <div class="cal__grid cal__dow">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+        </div>
+        <div id="calGrid" class="cal__grid"></div>
     </div>
-    <div class="cal__grid cal__dow">
-      <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-    </div>
-    <div id="calGrid" class="cal__grid"></div>
-  </div>
 </div>
 
 <!-- MAIN -->

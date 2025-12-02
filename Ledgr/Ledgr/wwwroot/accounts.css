@@ -274,6 +274,22 @@ body.page {
 }
 .app-header--band .icon-btn:hover { background: rgba(255,255,255,.10); }
 
+.email__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  margin-right: 0.25rem;
+}
+
+.icon--email {
+  width: 32px;
+  height: 32px;
+  fill: #E7EEF8;
+}
+
 /* ==============================
    BACK LINK STYLING
    ============================== */

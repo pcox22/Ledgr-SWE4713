@@ -6,19 +6,6 @@
     padding-bottom: 24px;
 }
 
-/* Breadcrumb */
-.breadcrumb {
-    margin-bottom: 8px;
-}
-.breadcrumb__back {
-    font-size: 0.85rem;
-    color: #64748b;
-    text-decoration: none;
-}
-.breadcrumb__back:hover {
-    text-decoration: underline;
-}
-
 /* Status pill */
 .pill {
     display: inline-flex;

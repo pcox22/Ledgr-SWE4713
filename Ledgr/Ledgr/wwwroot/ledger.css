@@ -11,6 +11,22 @@
 .brand{ display:flex; align-items:center; gap:12px; }
 .brand__logo{ height:56px; width:auto; display:block; object-fit:contain; }
 
+.email__btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  margin-right: 0.25rem;
+}
+
+.icon--email {
+  width: 32px;
+  height: 32px;
+  fill: #E7EEF8;
+}
+
 .user{ position:relative; }
 .user__btn{
     display:flex; align-items:center; gap:12px;

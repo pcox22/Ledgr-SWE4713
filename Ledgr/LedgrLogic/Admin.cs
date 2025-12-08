@@ -448,7 +448,7 @@ public class Admin : User
 
         return Successful;
     }
-    public ArrayList UserReport()
+    public static ArrayList UserReport()
     {
         ArrayList UserReport = new ArrayList();
         try
@@ -474,7 +474,8 @@ public class Admin : User
         }
         catch (Exception e)
         {
-            return null;
+            Console.WriteLine(e);
+            throw;
         }
         return UserReport;
     }
@@ -709,7 +710,7 @@ public class Admin : User
     //Because Normal Side has to be either left or right (L or R in the database) ensure the char given is L or R
     public bool EditAccountNormalSIde(int tempAccountNumber, char tempNormalSide)
     {
-        if (tempNormalSide != 'L' || tempNormalSide != 'R')
+        if (tempNormalSide != 'L' && tempNormalSide != 'R')
         {
             return false;
         }
@@ -765,7 +766,7 @@ public class Admin : User
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
             var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@CATEGORY", tempAccountSubCategory);
+            command.Parameters.AddWithValue("@SUBCATEGORY", tempAccountSubCategory);
             command.Parameters.AddWithValue("@ID", tempAccountNumber);
             
             connection.Open();
@@ -875,7 +876,7 @@ public class Admin : User
     {
         try
         {
-            var sql = "UPDATE Account SET Order = @ORDER WHERE Number = @ID"; 
+            var sql = "UPDATE Account SET \"Order\" = @ORDER WHERE Number = @ID"; 
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
             var command = new SqliteCommand(sql, connection);
@@ -885,13 +886,15 @@ public class Admin : User
             connection.Open();
 
             command.ExecuteNonQuery();
+            connection.Close();
+            
+            return true;
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             return false;
         }
-        return true;
     }
     
     public bool EditAccountStatement(int tempAccountNumber, string tempStatement)
@@ -906,19 +909,21 @@ public class Admin : User
             using var connection = new SqliteConnection($"Data Source=" + Database.GetDatabasePath());
 
             var command = new SqliteCommand(sql, connection);
-            command.Parameters.AddWithValue("@Statement", tempStatement);
+            command.Parameters.AddWithValue("@STATEMENT", tempStatement);
             command.Parameters.AddWithValue("@ID", tempAccountNumber);
             
             connection.Open();
 
             command.ExecuteNonQuery();
+            
+            connection.Close();
+            return true;
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             return false;
         }
-        return true;
     }
     
     //Deactivate an account
@@ -1012,9 +1017,9 @@ public class Admin : User
             var command = new SqliteCommand(sql, connection);
             connection.Open();
             using var reader = command.ExecuteReader();
-            if (reader.HasRows)
+            while (reader.Read())
             {
-                while (reader.Read())
+                if (reader.HasRows)
                 {
                     for (int i = 0; i < columns; i++)
                     {

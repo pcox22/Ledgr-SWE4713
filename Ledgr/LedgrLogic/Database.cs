@@ -21,7 +21,7 @@ public static class Database
         //Console.WriteLine(Environment.CurrentDirectory);
         //Console.WriteLine("P Root: " + ProjectRoot);
 
-        return "sqlitecloud://cer0sf3wdk.g5.sqlite.cloud:8860/auth.sqlitecloud?apikey=KPUoMQP5qQf5b9XHEmOV4N1HXxZYbC9V6p0HhCS4JZA";
+        return DBPath;
     }
     
     

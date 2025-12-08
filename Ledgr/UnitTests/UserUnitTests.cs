@@ -11,14 +11,15 @@ public class UserUnitTests
     public void Setup()
     {
     }
-
+    
+    //User-SRS-REQ-002
     [Test]
     public void VerifyLogin_ValidInput_ReturnsCorrectUsername()
     {
         //arrange
-        string tempUsername = "TTest1003";
-        string tempPassword = "PassW0rd...";
-        string Expected = "TTest1003";
+        string tempUsername = "pcox0930";
+        string tempPassword = "AppD0m4!N";
+        string Expected = "pcox0930";
         
         //act
         User returnedUser = User.VerifyLoginB(tempUsername, tempPassword);
@@ -28,11 +29,12 @@ public class UserUnitTests
         Assert.That(Actual, Is.EqualTo(Expected));
     }
     
+    //User-SRS-REQ-001
     [Test]
     public void GenerateUsername_ValidUsername_ReturnsTrue()
     {
         //arrange
-        string Expected = "RStraiton1002";
+        string Expected = "RStraiton1207";
         
         //act
         string Actual = User.GenerateUsername("RJ", "Straiton");
@@ -41,6 +43,7 @@ public class UserUnitTests
         Assert.That(Actual, Is.EqualTo(Expected));
     }
 
+    //User-SRS-REQ-009
     [Test]
     public void CreatePotentialUser_ValidInputs_ReturnsTrue()
     {
@@ -71,7 +74,8 @@ public class UserUnitTests
         //assert
         Assert.That(Actual, Is.EqualTo(Expected));
     }
-
+    
+    
     [Test]
     public void GetUserID_ValidInput_ReturnsCorrectID()
     {
@@ -85,7 +89,8 @@ public class UserUnitTests
         //assert
         Assert.That(actual, Is.EqualTo(expected));
     }
-
+    
+    //User-SRS-REQ-010
     [Test]
     public void GetSecurityQuestions_ValidInput_ReturnsCorrectQuestion()
     {
@@ -99,7 +104,9 @@ public class UserUnitTests
         //assert
         Assert.That(actual, Is.EqualTo(expected));
     }
-
+    
+    
+    //User-SRS-REQ-006
     [Test]
     public void ChangePassword_ValidInput_ReturnsTrue()
     {
@@ -112,6 +119,126 @@ public class UserUnitTests
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
+    }
+    
+    //User-SRS-REQ-011
+    [Test]
+    public void GetCurrentRatio_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 17.64;
+        
+        //act
+        double actual = User.GetCurrentRatio();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-012
+    [Test]
+    public void GetQuickRatio_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 17.64;
+        
+        //act
+        double actual = User.GetQuickRatio();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-013
+    [Test]
+    public void GetWorkingCapital_ReturnsCorrectAmount()
+    {
+        //expected
+        double expected = 16975;
+        
+        //act
+        double actual = User.GetWorkingCapital();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-014
+    [Test]
+    public void GetNetProfitMargin_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 0.34;
+        
+        //act
+        double actual = User.GetNetProfitMargin();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-015
+    [Test]
+    public void GetRoA_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 0.16;
+        
+        //act
+        double actual = User.GetRoA();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-016
+    [Test]
+    public void GetRoE_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 0.22;
+        
+        //act
+        double actual = User.GetRoE();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-017
+    [Test]
+    public void GetDebtRatio_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 0.07;
+        
+        //act
+        double actual = User.GetDebtRatio();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
+    }
+    
+    //User-SRS-REQ-018
+    [Test]
+    public void GetDtE_ReturnsCorrectRatio()
+    {
+        //expected
+        double expected = 0.10;
+        
+        //act
+        double actual = User.GetDtE();
+        actual = Math.Round(actual, 2);
+        
+        //assert
+        Assert.That(actual.Equals(expected));
     }
     
 }

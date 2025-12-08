@@ -12,7 +12,7 @@ public class AdminUnitTests
     {
     }
 
-    /*[Test]
+    [Test]
     //TEST ID: Admin-SRS-REQ-001
     public void ExpiredPasswordReport_ReturnsValidList()
     {
@@ -36,11 +36,10 @@ public class AdminUnitTests
     public void UserReport_ReturnsValidList()
     {
         //arrange
-        string knownUsername = "pcox0930";
-        List<string> storedUsers;
+        string knownUsername = "ecox1008";
         
         //act
-        storedUsers = Admin.UserReport();
+        ArrayList storedUsers = Admin.UserReport();
         
         //assert
         if (storedUsers.Contains(knownUsername))
@@ -61,7 +60,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.UpdateUsername(4, newUsername, "pcox0930");
+        actual = temp.UpdateUsername(4, newUsername);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -78,7 +77,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.UpdateEmail(4, newEmail, "pcox0930");
+        actual = temp.UpdateEmail(4, newEmail);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -95,7 +94,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.UpdateFirstName(1005, newFirstName, "pcox0930");
+        actual = temp.UpdateFirstName(1005, newFirstName);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -112,7 +111,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.UpdateLastName(1005, newLastName, "pcox0930");
+        actual = temp.UpdateLastName(1005, newLastName);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -129,7 +128,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.UpdateDoB(1005, newDoB, "pcox0930");
+        actual = temp.UpdateDoB(1005, newDoB);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -146,7 +145,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.UpdateAddress(1005, newAddress, "pcox0930");
+        actual = temp.UpdateAddress(1005, newAddress);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -162,7 +161,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = Admin.ApproveUser(tempID, "pcox0930").Result;
+        actual = Admin.ApproveUser(tempID).Result;
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -170,14 +169,13 @@ public class AdminUnitTests
     
     [Test]
     //TEST ID: Admin-SRS-REQ-010
-    public void DeactivateUser_ValidInput_ReturnsTrue()
+    public  void DeactivateUser_ValidInput_ReturnsTrue()
     {
         //arrange
         bool expected = true;
-        bool actual;
         
         //act
-        actual = Admin.DeactivateUser("ecox1008", "2025-10-13", "2025-10-15","pcox0930");
+        bool actual = Admin.DeactivateUser("ecox1008", "2025-12-07", "2025-12-15").IsCompletedSuccessfully;
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -192,7 +190,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = Admin.ActivateUser(13, "pcox0930");
+        actual = Admin.ActivateUser(15).IsCompletedSuccessfully;
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -208,7 +206,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.PromoteToManager(1003, "pcox0930");
+        actual = temp.PromoteToManager(1003);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -224,7 +222,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.PromoteToAdmin(1003, "pcox0930");
+        actual = temp.PromoteToAdmin(1003);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -240,7 +238,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.DemoteFromManager(1003, "pcox0930");
+        actual = temp.DemoteFromManager(1003);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -256,7 +254,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.DemoteFromAdmin(1003, "pcox0930");
+        actual = temp.DemoteFromAdmin(1003);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -273,7 +271,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountName(12345, newAccountName, "pcox0930");
+        actual = temp.EditAccountName(12345, newAccountName);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -290,7 +288,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountDescription(4001, newAccountDesc, "pcox0930");
+        actual = temp.EditAccountDescription(4001, newAccountDesc);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -302,12 +300,12 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
-        char newNormalSide = 'R';
+        char newNormalSide = 'L';
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.EditAccountNormalSIde(12345, newNormalSide, "pcox0930");
+        actual = temp.EditAccountNormalSIde(1001, newNormalSide);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -324,7 +322,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountCategory(2001, newCategory, "pcox0930");
+        actual = temp.EditAccountCategory(2001, newCategory);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -341,7 +339,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountSubCategory(12345, newSubCategory, "pcox0930");
+        actual = temp.EditAccountSubCategory(1001, newSubCategory);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -358,7 +356,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountInitialBalance(12345, newInitBalance, "pcox0930");
+        actual = temp.EditAccountInitialBalance(12345, newInitBalance);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -375,7 +373,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountDebit(12345, newDebit, "pcox0930");
+        actual = temp.EditAccountDebit(12345, newDebit);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -392,7 +390,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountCredit(12345, newCredit, "pcox0930");
+        actual = temp.EditAccountCredit(12345, newCredit);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -409,7 +407,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountBalance(12345, newBalance, "pcox0930");
+        actual = temp.EditAccountBalance(12345, newBalance);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -421,12 +419,12 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
-        int newOrder = 8;
+        int newOrder = 1;
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.EditAccountOrder(5001, newOrder, "pcox0930");
+        actual = temp.EditAccountOrder(5001, newOrder);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -443,7 +441,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.EditAccountStatement(12345, newStatement, "pcox0930");
+        actual = temp.EditAccountStatement(1001, newStatement);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -453,11 +451,9 @@ public class AdminUnitTests
     //TEST ID: Admin-SRS-REQ-027
     public void DeactivateAccount_AccountBalanceGreaterThanZero_ThrowsInvalidChangeException()
     {
-        //arrange
-        Admin temp = new Admin();
         
         //assert
-        Assert.Throws<InvalidChangeException>(() => temp.DeactivateAccount(12345, "pcox0930"));
+        Assert.Throws<InvalidChangeException>(() => Admin.DeactivateAccount(1001));
     }
     
     [Test]
@@ -466,12 +462,12 @@ public class AdminUnitTests
     {
         //arrange
         Admin temp = new Admin();
-        temp.EditAccountBalance(12345, 0, "pcox0930");
+        temp.EditAccountBalance(1001, 0);
         bool expected = true;
         bool actual;
         
         //act
-        actual = temp.DeactivateAccount(12345, "pcox0930");
+       actual = Admin.DeactivateAccount(12345).Equals(true);
             
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -487,7 +483,7 @@ public class AdminUnitTests
         bool actual;
         
         //act
-        actual = temp.ActivateAccount(12345, "pcox0930");
+        actual = temp.ActivateAccount(1001);
         
         //assert
         Assert.That(actual, Is.EqualTo(expected));
@@ -498,12 +494,11 @@ public class AdminUnitTests
     public void GetEventLog_Account_ReturnsTrue()
     {
         //arrange
-        Admin temp = new Admin();
         List<string> accountEventLog;
-        string knownAccountName = "Inventory Merchandising";
+        string knownAccountName = "Cash";
         
         //act
-        accountEventLog = temp.GetEventLog("Account");
+        accountEventLog = Admin.GetEventLog("Account").Result;
         
         //assert
         if (accountEventLog.Contains(knownAccountName))
@@ -521,12 +516,11 @@ public class AdminUnitTests
     public void GetEventLog_User_ReturnsTrue()
     {
         //arrange
-        Admin temp = new Admin();
         List<string> userEventLog;
         string knownUsername = "MLiu1001";
         
         //act
-        userEventLog = temp.GetEventLog("User");
+        userEventLog = Admin.GetEventLog("User").Result;
         
         //assert
         if (userEventLog.Contains(knownUsername))
@@ -544,12 +538,11 @@ public class AdminUnitTests
     public void GetEventLog_Employee_ReturnsTrue()
     {
         //arrange
-        Admin temp = new Admin();
         List<string> employeeEventLog;
         string knownAddress = "1100 South Marietta Parkway";
         
         //act
-        employeeEventLog = temp.GetEventLog("Employee");
+        employeeEventLog = Admin.GetEventLog("Employee").Result;
         
         //assert
         if (employeeEventLog.Contains(knownAddress))
@@ -576,5 +569,5 @@ public class AdminUnitTests
         
         //assert
        Assert.That(actual, Is.EqualTo(expected));
-    }*/
+    }
 }

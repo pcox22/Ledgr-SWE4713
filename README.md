@@ -23,3 +23,10 @@ Ledgr is a web based Accounting application that will allow users to track and s
 - Creating an income statement, a balance sheet, and cash flow statement for the selected accounting year
 
 ## Documentation
+
+### Figma Design & Prototyping
+
+As part of the design process, interactive mockups and user interface designs were created in Figma to establish the application's layout, workflow, and user experience before development began.
+
+**View the Figma Project:**  
+(https://www.figma.com/design/7dLOuSmWUQqkQpLZrlOdMu/Ledgr-Accounting-Software-Prototype?node-id=1-2&t=aJxY2h1tKjotXqeX-1)
